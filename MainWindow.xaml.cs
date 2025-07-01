@@ -159,7 +159,7 @@ namespace ManutMap
 
             foreach (var item in result)
             {
-                var tipo = item["TIPODESIGFI"]?.ToString().Trim().ToLowerInvariant();
+                var tipo = item["TIPO"]?.ToString().Trim().ToLowerInvariant();
                 var dtRec = item["DTAHORARECLAMACAO"]?.ToString();
                 var dtCon = item["DTCONCLUSAO"]?.ToString();
                 bool isOpen = !string.IsNullOrWhiteSpace(dtRec) && string.IsNullOrWhiteSpace(dtCon);
