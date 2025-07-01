@@ -58,6 +58,14 @@
                         <TextBlock Text="Tipo SIGFI:" FontWeight="SemiBold"/>
                         <ComboBox x:Name="SigfiFilterCombo" SelectionChanged="FiltersChanged" Margin="0 0 0 15"/>
 
+                        <!-- Tipo Serviço -->
+                        <DockPanel>
+                            <TextBlock Text="Tipo Serviço:" Style="{StaticResource LabelText}"/>
+                            <ComboBox x:Name="TipoFilterCombo"
+                        Style="{StaticResource InputControl}"
+                        SelectionChanged="FiltersChanged"/>
+                        </DockPanel>
+
                         <!-- NumOS -->
                         <TextBlock Text="NumOS:" FontWeight="SemiBold"/>
                         <TextBox x:Name="NumOsFilterBox" TextChanged="FiltersChanged" Margin="0 0 0 15"/>

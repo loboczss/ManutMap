@@ -30,6 +30,7 @@ namespace ManutMap
 
             // associa eventos de filtro
             SigfiFilterCombo.SelectionChanged += FiltersChanged;
+            TipoFilterCombo.SelectionChanged += FiltersChanged;
             NumOsFilterBox.TextChanged += FiltersChanged;
             IdSigfiFilterBox.TextChanged += FiltersChanged;
             RotaFilterBox.TextChanged += FiltersChanged;
@@ -50,6 +51,7 @@ namespace ManutMap
             _manutList = _fileService.LoadLocalJson(path) ?? new JArray();
 
             PopulateSigfiCombo();
+            PopulateTipoCombo();
             ApplyFilters();
         }
 
@@ -69,11 +71,28 @@ namespace ManutMap
             SigfiFilterCombo.SelectedIndex = 0;
         }
 
+        private void PopulateTipoCombo()
+        {
+            var tipos = _manutList
+                .OfType<JObject>()
+                .Select(o => o["TIPO"]?.ToString().Trim())
+                .Where(s => !string.IsNullOrEmpty(s))
+                .Distinct()
+                .OrderBy(s => s);
+
+            TipoFilterCombo.Items.Clear();
+            TipoFilterCombo.Items.Add(new ComboBoxItem { Content = "Todos" });
+            foreach (var t in tipos)
+                TipoFilterCombo.Items.Add(new ComboBoxItem { Content = t });
+            TipoFilterCombo.SelectedIndex = 0;
+        }
+
         private async void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
             DownloadButton.IsEnabled = false;
             _manutList = await _spService.DownloadLatestJsonAsync();
             PopulateSigfiCombo();
+            PopulateTipoCombo();
             ApplyFilters();
             DownloadButton.IsEnabled = true;
         }
@@ -90,6 +109,7 @@ namespace ManutMap
             var criteria = new FilterCriteria
             {
                 Sigfi = (SigfiFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
+                TipoServico = (TipoFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
                 NumOs = NumOsFilterBox.Text.Trim(),
                 IdSigfi = IdSigfiFilterBox.Text.Trim(),
                 Rota = RotaFilterBox.Text.Trim(),
