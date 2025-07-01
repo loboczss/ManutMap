@@ -49,5 +49,23 @@ namespace ManutMap.Services
             else
                 _view.ExecuteScriptAsync(script);
         }
+
+        public void AddMarkersByTipoSigfi(IEnumerable<JObject> data,
+                                           bool showOpen,
+                                           bool showClosed,
+                                           string colorPrev,
+                                           string colorCorr,
+                                           string latLonField = "LATLON")
+        {
+            var json = JsonConvert.SerializeObject(data);
+            var script =
+                $"addMarkersByTipoSigfi({json},{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()}," +
+                $"'{colorPrev}','{colorCorr}','{latLonField}');";
+
+            if (!_ready)
+                _pendingScripts.Add(script);
+            else
+                _view.ExecuteScriptAsync(script);
+        }
     }
 }
