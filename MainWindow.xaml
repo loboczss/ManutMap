@@ -23,7 +23,12 @@
         <Style x:Key="SectionTitle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="0 10 0 4"/>
+            <Setter Property="Margin" Value="0 16 0 8"/>
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0 4 0 0"/>
         </Style>
     </Window.Resources>
 
@@ -39,50 +44,50 @@
                 <StackPanel Margin="20">
                     <TextBlock Text="Filtros Avançados" FontSize="18" FontWeight="Bold" Margin="0 0 0 20"/>
 
-                    <!-- 🔍 BUSCA -->
-                    <TextBlock Text="🔍 Busca" Style="{StaticResource SectionTitle}"/>
+                    <!-- Seção de Busca -->
+                    <TextBlock Text="Busca" Style="{StaticResource SectionTitle}"/>
                     <TextBlock Text="Tipo SIGFI:"/>
-                    <ComboBox x:Name="SigfiFilterCombo" Width="120" Margin="0 0 0 10" SelectionChanged="FiltersChanged"/>
-                    <TextBlock Text="Tipo Serviço:"/>
-                    <ComboBox x:Name="TipoFilterCombo" Width="120" Margin="0 0 0 10" SelectionChanged="FiltersChanged"/>
-                    <TextBlock Text="NumOS:"/>
-                    <TextBox x:Name="NumOsFilterBox" Width="120" Margin="0 0 0 10" TextChanged="FiltersChanged"/>
-                    <TextBlock Text="IDSIGFI:"/>
-                    <TextBox x:Name="IdSigfiFilterBox" Width="120" Margin="0 0 0 10" TextChanged="FiltersChanged"/>
-                    <TextBlock Text="Rota:"/>
-                    <ComboBox x:Name="RotaFilterCombo" Width="120" Margin="0 0 0 10" SelectionChanged="FiltersChanged"/>
+                    <ComboBox x:Name="SigfiFilterCombo" Width="240" SelectionChanged="FiltersChanged"/>
 
-                    <!-- 🗓️ PERÍODO -->
-                    <TextBlock Text="🗓️ Período" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Text="Tipo Serviço:"/>
+                    <ComboBox x:Name="TipoFilterCombo" Width="240" SelectionChanged="FiltersChanged"/>
+
+                    <TextBlock Text="NumOS:"/>
+                    <TextBox x:Name="NumOsFilterBox" Width="240" TextChanged="FiltersChanged"/>
+
+                    <TextBlock Text="IDSIGFI:"/>
+                    <TextBox x:Name="IdSigfiFilterBox" Width="240" TextChanged="FiltersChanged"/>
+
+                    <TextBlock Text="Rota:"/>
+                    <ComboBox x:Name="RotaFilterCombo" Width="240" SelectionChanged="FiltersChanged"/>
+
+                    <!-- Seção de Período -->
+                    <TextBlock Text="Período" Style="{StaticResource SectionTitle}"/>
                     <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
-                        <DatePicker x:Name="StartDatePicker" Width="120" SelectedDateChanged="FiltersChanged"/>
-                        <TextBlock Text=" até " Margin="5 0"/>
-                        <DatePicker x:Name="EndDatePicker" Width="120" SelectedDateChanged="FiltersChanged"/>
+                        <DatePicker x:Name="StartDatePicker" Width="110" SelectedDateChanged="FiltersChanged"/>
+                        <TextBlock Text=" a " Margin="5 0"/>
+                        <DatePicker x:Name="EndDatePicker" Width="110" SelectedDateChanged="FiltersChanged"/>
                     </StackPanel>
 
-                    <!-- ✅ STATUS -->
-                    <TextBlock Text="✅ Camadas" Style="{StaticResource SectionTitle}"/>
-                    <CheckBox x:Name="ChbOpen" Content="Aberto" IsChecked="True"
-                              Margin="0 0 0 4"
-                              Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                    <TextBox x:Name="TxtColorOpen" Width="100" Margin="0 0 0 10" Text="#FF0000"/>
+                    <!-- Seção de Camadas -->
+                    <TextBlock Text="Camadas" Style="{StaticResource SectionTitle}"/>
+                    <CheckBox x:Name="ChbOpen" Content="Aberto" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                    <TextBox x:Name="TxtColorOpen" Width="100" Margin="0 0 0 8" Text="#FF0000"/>
 
-                    <CheckBox x:Name="ChbClosed" Content="Concluído" IsChecked="True"
-                              Margin="0 0 0 4"
-                              Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                    <TextBox x:Name="TxtColorClosed" Width="100" Margin="0 0 0 10" Text="#008000"/>
+                    <CheckBox x:Name="ChbClosed" Content="Concluído" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                    <TextBox x:Name="TxtColorClosed" Width="100" Margin="0 0 0 8" Text="#008000"/>
 
-                    <!-- ⚙️ CONFIG -->
-                    <TextBlock Text="⚙️ Configurações" Style="{StaticResource SectionTitle}"/>
+                    <!-- Seção de Configurações -->
+                    <TextBlock Text="Configurações" Style="{StaticResource SectionTitle}"/>
                     <TextBlock Text="Campo Coordenada:"/>
-                    <ComboBox x:Name="LatLonFieldCombo" Width="120" SelectionChanged="FiltersChanged">
+                    <ComboBox x:Name="LatLonFieldCombo" Width="240" SelectionChanged="FiltersChanged">
                         <ComboBoxItem Content="LATLON"/>
                         <ComboBoxItem Content="LATLONCON"/>
                     </ComboBox>
 
-                    <!-- 🔽 Ação -->
+                    <!-- Botão de Ação -->
                     <Button x:Name="DownloadButton"
-                            Content="🔽 Baixar JSON"
+                            Content="Baixar JSON"
                             Click="DownloadButton_Click"
                             Style="{StaticResource PrimaryButton}"
                             Margin="0 20 0 0"/>
