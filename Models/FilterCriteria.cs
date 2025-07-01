@@ -17,5 +17,10 @@ namespace ManutMap.Models
 
         public string ColorOpen { get; set; } = "#FF0000";
         public string ColorClosed { get; set; } = "#008000";
+
+        // NOVO: qual campo de coordenada usar
+        // "LATLON" ou "LATLONCON"
+        public string LatLonField { get; set; } = "LATLON";
     }
 }
+

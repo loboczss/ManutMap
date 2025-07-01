@@ -98,7 +98,10 @@ namespace ManutMap
                 ShowOpen = ChbOpen.IsChecked == true,
                 ShowClosed = ChbClosed.IsChecked == true,
                 ColorOpen = TxtColorOpen.Text.Trim(),
-                ColorClosed = TxtColorClosed.Text.Trim()
+                ColorClosed = TxtColorClosed.Text.Trim(),
+
+                        LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString()
+                        ?? "LATLON"
             };
 
             var result = _filterSvc.Apply(_manutList, criteria);
