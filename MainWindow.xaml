@@ -4,127 +4,95 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="ManutMap – Mapa de Manutenções"
         Height="720" Width="1280"
-        Background="#F9FAFB"
+        Background="White"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Style x:Key="PrimaryButton" TargetType="Button">
             <Setter Property="Background" Value="#2563EB"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="0 10 0 0"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-        </Style>
-        <!-- Style for labels inside filter panels -->
-        <Style x:Key="LabelText" TargetType="TextBlock">
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Margin" Value="0 0 5 0"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
         </Style>
 
-        <!-- Style applied to input controls like ComboBox -->
-        <Style x:Key="InputControl" TargetType="ComboBox">
-            <Setter Property="Margin" Value="0 0 0 15"/>
-            <Setter Property="MinWidth" Value="150"/>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0 10 0 4"/>
         </Style>
     </Window.Resources>
 
-    <DockPanel>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <!-- Top Toolbar -->
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="#1F2937" Margin="0,0,0,2">
-            <Button x:Name="DownloadButton"
-                    Content="Baixar JSON"
-                    Style="{StaticResource PrimaryButton}"
-                    Click="DownloadButton_Click"/>
-            <TextBlock Text="Procura por 'Manutencao_AC2025'"
-                       VerticalAlignment="Center"
-                       Foreground="White"
-                       FontSize="14"
-                       Margin="10,0,0,0"/>
-        </StackPanel>
+        <!-- PAINEL LATERAL DE FILTROS -->
+        <Border Grid.Column="0" Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="0 0 1 0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="20">
+                    <TextBlock Text="Filtros Avançados" FontSize="18" FontWeight="Bold" Margin="0 0 0 20"/>
 
-        <!-- Main Content -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
+                    <!-- 🔍 BUSCA -->
+                    <TextBlock Text="🔍 Busca" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Text="Tipo SIGFI:"/>
+                    <ComboBox x:Name="SigfiFilterCombo" Width="120" Margin="0 0 0 10" SelectionChanged="FiltersChanged"/>
+                    <TextBlock Text="Tipo Serviço:"/>
+                    <ComboBox x:Name="TipoFilterCombo" Width="120" Margin="0 0 0 10" SelectionChanged="FiltersChanged"/>
+                    <TextBlock Text="NumOS:"/>
+                    <TextBox x:Name="NumOsFilterBox" Width="120" Margin="0 0 0 10" TextChanged="FiltersChanged"/>
+                    <TextBlock Text="IDSIGFI:"/>
+                    <TextBox x:Name="IdSigfiFilterBox" Width="120" Margin="0 0 0 10" TextChanged="FiltersChanged"/>
+                    <TextBlock Text="Rota:"/>
+                    <ComboBox x:Name="RotaFilterCombo" Width="120" Margin="0 0 0 10" SelectionChanged="FiltersChanged"/>
 
-            <!-- Mapa -->
-            <Border Grid.Column="0" Margin="10">
-                <wv2:WebView2 x:Name="MapView" Margin="0,0,-98,0"/>
-            </Border>
-
-            <!-- Filtros -->
-            <Border Grid.Column="1" Background="White" Margin="122,10,10,10" BorderBrush="#E5E7EB" BorderThickness="1">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="9,0,0,0">
-                    <StackPanel Margin="20">
-
-                        <TextBlock Text="Filtros" FontSize="20" FontWeight="Bold" Foreground="#111827" Margin="0 0 0 20"/>
-
-                        <!-- Tipo SIGFI -->
-                        <TextBlock Text="Tipo SIGFI:" FontWeight="SemiBold"/>
-                        <ComboBox x:Name="SigfiFilterCombo" SelectionChanged="FiltersChanged" Margin="0 0 0 15"/>
-
-                        <!-- Tipo Serviço -->
-                        <DockPanel>
-                            <TextBlock Text="Tipo Serviço:" Style="{StaticResource LabelText}"/>
-                            <ComboBox x:Name="TipoFilterCombo"
-                        Style="{StaticResource InputControl}"
-                        SelectionChanged="FiltersChanged"/>
-                        </DockPanel>
-
-                        <!-- NumOS -->
-                        <TextBlock Text="NumOS:" FontWeight="SemiBold"/>
-                        <TextBox x:Name="NumOsFilterBox" TextChanged="FiltersChanged" Margin="0 0 0 15"/>
-
-                        <!-- IDSIGFI -->
-                        <TextBlock Text="IDSIGFI:" FontWeight="SemiBold"/>
-                        <TextBox x:Name="IdSigfiFilterBox" TextChanged="FiltersChanged" Margin="0 0 0 15"/>
-
-                        <!-- Rota -->
-                        <TextBlock Text="Rota:" FontWeight="SemiBold"/>
-                        <ComboBox x:Name="RotaFilterCombo" SelectionChanged="FiltersChanged" Margin="0 0 0 15"/>
-
-                        <!-- Período -->
-                        <TextBlock Text="Período:" FontWeight="SemiBold"/>
-                        <StackPanel Orientation="Horizontal" Margin="0 0 0 15">
-                            <DatePicker x:Name="StartDatePicker" Width="156" SelectedDateChanged="FiltersChanged" Margin="0 0 10 0"/>
-                            <TextBlock Text="a" VerticalAlignment="Center" Margin="0 5 0 0"/>
-                            <DatePicker x:Name="EndDatePicker" Width="148" SelectedDateChanged="FiltersChanged" Margin="10 0 0 0"/>
-                        </StackPanel>
-
-                        <!-- Camadas -->
-                        <TextBlock Text="Camadas:" FontWeight="SemiBold" Margin="0 0 0 5"/>
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
-                                <CheckBox x:Name="ChbOpen" Content="Aberto" IsChecked="True"
-                                          Checked="FiltersChanged" Unchecked="FiltersChanged" Margin="0 0 10 0"/>
-                                <TextBox x:Name="TxtColorOpen" Width="100" Text="#FF0000" ToolTip="Cor dos abertos" TextChanged="FiltersChanged"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
-                                <CheckBox x:Name="ChbClosed" Content="Concluído" IsChecked="True"
-                                          Checked="FiltersChanged" Unchecked="FiltersChanged" Margin="0 0 10 0"/>
-                                <TextBox x:Name="TxtColorClosed" Width="100" Text="#008000" ToolTip="Cor dos concluídos" TextChanged="FiltersChanged"/>
-                            </StackPanel>
-                        </StackPanel>
-
-                        <!-- Novo: Campo de coordenada -->
-                        <TextBlock Text="Coordenadha:" FontWeight="SemiBold" Margin="0 0 0 5"/>
-                        <ComboBox x:Name="LatLonFieldCombo"
-                                  SelectionChanged="FiltersChanged"
-                                  Margin="0 0 0 15">
-                            <ComboBoxItem Content="LATLON"/>
-                            <ComboBoxItem Content="LATLONCON"/>
-                        </ComboBox>
-
+                    <!-- 🗓️ PERÍODO -->
+                    <TextBlock Text="🗓️ Período" Style="{StaticResource SectionTitle}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
+                        <DatePicker x:Name="StartDatePicker" Width="120" SelectedDateChanged="FiltersChanged"/>
+                        <TextBlock Text=" até " Margin="5 0"/>
+                        <DatePicker x:Name="EndDatePicker" Width="120" SelectedDateChanged="FiltersChanged"/>
                     </StackPanel>
-                </ScrollViewer>
-            </Border>
+
+                    <!-- ✅ STATUS -->
+                    <TextBlock Text="✅ Camadas" Style="{StaticResource SectionTitle}"/>
+                    <CheckBox x:Name="ChbOpen" Content="Aberto" IsChecked="True"
+                              Margin="0 0 0 4"
+                              Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                    <TextBox x:Name="TxtColorOpen" Width="100" Margin="0 0 0 10" Text="#FF0000"/>
+
+                    <CheckBox x:Name="ChbClosed" Content="Concluído" IsChecked="True"
+                              Margin="0 0 0 4"
+                              Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                    <TextBox x:Name="TxtColorClosed" Width="100" Margin="0 0 0 10" Text="#008000"/>
+
+                    <!-- ⚙️ CONFIG -->
+                    <TextBlock Text="⚙️ Configurações" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Text="Campo Coordenada:"/>
+                    <ComboBox x:Name="LatLonFieldCombo" Width="120" SelectionChanged="FiltersChanged">
+                        <ComboBoxItem Content="LATLON"/>
+                        <ComboBoxItem Content="LATLONCON"/>
+                    </ComboBox>
+
+                    <!-- 🔽 Ação -->
+                    <Button x:Name="DownloadButton"
+                            Content="🔽 Baixar JSON"
+                            Click="DownloadButton_Click"
+                            Style="{StaticResource PrimaryButton}"
+                            Margin="0 20 0 0"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- MAPA -->
+        <Grid Grid.Column="1">
+            <wv2:WebView2 x:Name="MapView" />
         </Grid>
-    </DockPanel>
+    </Grid>
 </Window>
