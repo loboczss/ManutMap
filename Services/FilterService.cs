@@ -31,10 +31,10 @@ namespace ManutMap.Services
                         if (idSigfi.IndexOf(c.IdSigfi, StringComparison.OrdinalIgnoreCase) < 0)
                             return false;
                     }
-                    if (!string.IsNullOrEmpty(c.Rota))
+                    if (c.Rota != "Todos")
                     {
-                        var rota = item["ROTA"]?.ToString() ?? string.Empty;
-                        if (rota.IndexOf(c.Rota, StringComparison.OrdinalIgnoreCase) < 0)
+                        var rota = (item["ROTA"]?.ToString() ?? string.Empty).Trim();
+                        if (!rota.Equals(c.Rota, StringComparison.OrdinalIgnoreCase))
                             return false;
                     }
                     if (c.TipoServico != "Todos")
