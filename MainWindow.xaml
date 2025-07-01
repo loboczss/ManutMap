@@ -120,9 +120,9 @@
                         <!-- Rota -->
                         <DockPanel>
                             <TextBlock Text="Rota:" Style="{StaticResource LabelText}"/>
-                            <TextBox x:Name="RotaFilterBox"
+                            <ComboBox x:Name="RotaFilterCombo"
                        Style="{StaticResource InputControl}"
-                       TextChanged="FiltersChanged"/>
+                       SelectionChanged="FiltersChanged"/>
                         </DockPanel>
 
                         <!-- Período -->
