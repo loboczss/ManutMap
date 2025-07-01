@@ -92,7 +92,14 @@
 
         <!-- MAPA -->
         <Grid Grid.Column="1">
-            <wv2:WebView2 x:Name="MapView" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock x:Name="StatsTextBlock"
+                       Margin="10"
+                       FontWeight="Bold"/>
+            <wv2:WebView2 x:Name="MapView" Grid.Row="1" />
         </Grid>
     </Grid>
 </Window>
