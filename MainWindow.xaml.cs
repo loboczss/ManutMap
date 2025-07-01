@@ -42,6 +42,10 @@ namespace ManutMap
             ChbClosed.Unchecked += FiltersChanged;
             TxtColorOpen.TextChanged += FiltersChanged;
             TxtColorClosed.TextChanged += FiltersChanged;
+            ChbColorBySigfi.Checked += FiltersChanged;
+            ChbColorBySigfi.Unchecked += FiltersChanged;
+            TxtColorPrev.TextChanged += FiltersChanged;
+            TxtColorCorr.TextChanged += FiltersChanged;
         }
 
         private void LoadLocalAndPopulate()
@@ -137,20 +141,37 @@ namespace ManutMap
                 ShowClosed = ChbClosed.IsChecked == true,
                 ColorOpen = TxtColorOpen.Text.Trim(),
                 ColorClosed = TxtColorClosed.Text.Trim(),
+                ColorByTipoSigfi = ChbColorBySigfi.IsChecked == true,
+                ColorPreventiva = TxtColorPrev.Text.Trim(),
+                ColorCorretiva = TxtColorCorr.Text.Trim(),
 
                         LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString()
                         ?? "LATLON"
             };
 
             var result = _filterSvc.Apply(_manutList, criteria);
-            _mapService.AddMarkers(
-                result,
-                criteria.ShowOpen,
-                criteria.ShowClosed,
-                criteria.ColorOpen,
-                criteria.ColorClosed,
-                criteria.LatLonField
-            );
+            if (criteria.ColorByTipoSigfi)
+            {
+                _mapService.AddMarkersByTipoSigfi(
+                    result,
+                    criteria.ShowOpen,
+                    criteria.ShowClosed,
+                    criteria.ColorPreventiva,
+                    criteria.ColorCorretiva,
+                    criteria.LatLonField
+                );
+            }
+            else
+            {
+                _mapService.AddMarkers(
+                    result,
+                    criteria.ShowOpen,
+                    criteria.ShowClosed,
+                    criteria.ColorOpen,
+                    criteria.ColorClosed,
+                    criteria.LatLonField
+                );
+            }
 
             // calcula estatísticas básicas para exibir no painel
             int prevAbertas = 0,

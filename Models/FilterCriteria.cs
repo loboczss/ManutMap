@@ -19,6 +19,11 @@ namespace ManutMap.Models
         public string ColorOpen { get; set; } = "#FF0000";
         public string ColorClosed { get; set; } = "#008000";
 
+        // Se true, usa cores baseadas no Tipo SIGFI
+        public bool ColorByTipoSigfi { get; set; }
+        public string ColorPreventiva { get; set; } = "#0000FF";
+        public string ColorCorretiva { get; set; } = "#FFA500";
+
         // NOVO: qual campo de coordenada usar
         // "LATLON" ou "LATLONCON"
         public string LatLonField { get; set; } = "LATLON";

@@ -77,6 +77,12 @@
                     <CheckBox x:Name="ChbClosed" Content="Concluído" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                     <TextBox x:Name="TxtColorClosed" Width="100" Margin="0 0 0 8" Text="#008000"/>
 
+                    <CheckBox x:Name="ChbColorBySigfi" Content="Colorir por Tipo SIGFI" Margin="0 8 0 0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                    <TextBlock Text="Cor Preventiva:"/>
+                    <TextBox x:Name="TxtColorPrev" Width="100" Margin="0 0 0 8" Text="#0000FF"/>
+                    <TextBlock Text="Cor Corretiva:"/>
+                    <TextBox x:Name="TxtColorCorr" Width="100" Margin="0 0 0 8" Text="#FFA500"/>
+
                     <!-- Seção de Configurações -->
                     <TextBlock Text="Configurações" Style="{StaticResource SectionTitle}"/>
                     <TextBlock Text="Campo Coordenada:"/>
