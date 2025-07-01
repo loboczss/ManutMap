@@ -42,9 +42,12 @@
         if (!coord || coord.trim() === '') return;
 
         var coordStr = coord.trim();
-        var parts = coordStr.split(',');
-        var lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
-        if(isNaN(lat)||isNaN(lng))return;
+        // tenta extrair dois numeros, tolerando diferentes formatos
+        var nums = coordStr.match(/-?\d+(?:[.,]\d+)?/g);
+        if(!nums || nums.length < 2) return;
+        var lat = parseFloat(nums[0].replace(',', '.')),
+            lng = parseFloat(nums[1].replace(',', '.'));
+        if(isNaN(lat) || isNaN(lng)) return;
         var color = isOpen?colorOpen:colorClosed;
 
         var m = L.circleMarker([lat,lng],{
