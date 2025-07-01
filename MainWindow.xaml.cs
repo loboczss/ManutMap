@@ -130,7 +130,8 @@ namespace ManutMap
                 criteria.ShowOpen,
                 criteria.ShowClosed,
                 criteria.ColorOpen,
-                criteria.ColorClosed
+                criteria.ColorClosed,
+                criteria.LatLonField
             );
         }
     }

@@ -13,26 +13,36 @@ namespace ManutMap.Services
             return source.OfType<JObject>()
                 .Where(item =>
                 {
-                    if (c.Sigfi != "Todos" &&
-                        !item["TIPODESIGFI"]?.ToString().Trim()
-                             .Equals(c.Sigfi, StringComparison.OrdinalIgnoreCase) == true)
-                        return false;
-                    if (!string.IsNullOrEmpty(c.NumOs) &&
-                        item["NUMOS"]?.ToString()
-                             .IndexOf(c.NumOs, StringComparison.OrdinalIgnoreCase) < 0)
-                        return false;
-                    if (!string.IsNullOrEmpty(c.IdSigfi) &&
-                        item["IDSIGFI"]?.ToString()
-                             .IndexOf(c.IdSigfi, StringComparison.OrdinalIgnoreCase) < 0)
-                        return false;
-                    if (!string.IsNullOrEmpty(c.Rota) &&
-                        item["ROTA"]?.ToString()
-                             .IndexOf(c.Rota, StringComparison.OrdinalIgnoreCase) < 0)
-                        return false;
-                    if (c.TipoServico != "Todos" &&
-                        !item["TIPO"]?.ToString().Trim()
-                             .Equals(c.TipoServico, StringComparison.OrdinalIgnoreCase) == true)
-                        return false;
+                    if (c.Sigfi != "Todos")
+                    {
+                        var tipoSigfi = (item["TIPODESIGFI"]?.ToString() ?? "").Trim();
+                        if (!tipoSigfi.Equals(c.Sigfi, StringComparison.OrdinalIgnoreCase))
+                            return false;
+                    }
+                    if (!string.IsNullOrEmpty(c.NumOs))
+                    {
+                        var numOs = item["NUMOS"]?.ToString() ?? string.Empty;
+                        if (numOs.IndexOf(c.NumOs, StringComparison.OrdinalIgnoreCase) < 0)
+                            return false;
+                    }
+                    if (!string.IsNullOrEmpty(c.IdSigfi))
+                    {
+                        var idSigfi = item["IDSIGFI"]?.ToString() ?? string.Empty;
+                        if (idSigfi.IndexOf(c.IdSigfi, StringComparison.OrdinalIgnoreCase) < 0)
+                            return false;
+                    }
+                    if (!string.IsNullOrEmpty(c.Rota))
+                    {
+                        var rota = item["ROTA"]?.ToString() ?? string.Empty;
+                        if (rota.IndexOf(c.Rota, StringComparison.OrdinalIgnoreCase) < 0)
+                            return false;
+                    }
+                    if (c.TipoServico != "Todos")
+                    {
+                        var tipo = (item["TIPO"]?.ToString() ?? "").Trim();
+                        if (!tipo.Equals(c.TipoServico, StringComparison.OrdinalIgnoreCase))
+                            return false;
+                    }
 
                     var dtRec = item["DTAHORARECLAMACAO"]?.ToString();
                     var dtCon = item["DTCONCLUSAO"]?.ToString();
@@ -48,7 +58,8 @@ namespace ManutMap.Services
                         if ((isOpen && DateTime.TryParse(dtRec, out dt)) ||
                             (isClosed && DateTime.TryParse(dtCon, out dt)))
                         {
-                            if (dt < c.StartDate || dt > c.EndDate) return false;
+                            if (c.StartDate.HasValue && dt < c.StartDate.Value) return false;
+                            if (c.EndDate.HasValue && dt > c.EndDate.Value) return false;
                         }
                         else return false;
                     }
