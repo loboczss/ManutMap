@@ -26,16 +26,17 @@
     // Agora recebe um argumento a mais: latLonField
     function addMarkers(data, showOpen, showClosed, colorOpen, colorClosed, latLonField){
       clearMarkers();
-      data.forEach(function(item){
-        var dtRec = item.DTAHORARECLAMACAO?item.DTAHORARECLAMACAO.trim():''; 
-        var dtCon = item.DTCONCLUSAO?item.DTCONCLUSAO.trim():''; 
-        var isOpen   = dtRec!==''&&dtCon===''; 
-        var isClosed = dtCon!=='';
-        if((isOpen&&!showOpen)||(isClosed&&!showClosed))return;
 
-        // usa o campo escolhido: LATLON ou LATLONCON
-        var coordStr = item[latLonField];
-        var parts = coordStr.split(',');
+      data.forEach(function(item) {
+        var dtRec = item.DTAHORARECLAMACAO ? item.DTAHORARECLAMACAO.trim() : '';
+        var dtCon = item.DTCONCLUSAO     ? item.DTCONCLUSAO.trim()     : '';
+        var isOpen   = dtRec !== '' && dtCon === '';
+        var isClosed = dtCon !== '';
+        if ((isOpen && !showOpen) || (isClosed && !showClosed)) return;
+        var coord = item.LATLON;
+        if (!coord || coord.trim() === '') coord = item.LATLONCON;
+        if (!coord || coord.trim() === '') return;
+        var parts = coord.split(',');
         var lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
         if(isNaN(lat)||isNaN(lng))return;
         var color = isOpen?colorOpen:colorClosed;
