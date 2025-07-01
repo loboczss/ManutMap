@@ -101,6 +101,14 @@
                         SelectionChanged="FiltersChanged"/>
                         </DockPanel>
 
+                        <!-- Tipo Serviço -->
+                        <DockPanel>
+                            <TextBlock Text="Tipo Serviço:" Style="{StaticResource LabelText}"/>
+                            <ComboBox x:Name="TipoFilterCombo"
+                        Style="{StaticResource InputControl}"
+                        SelectionChanged="FiltersChanged"/>
+                        </DockPanel>
+
                         <!-- NumOS -->
                         <DockPanel>
                             <TextBlock Text="NumOS:" Style="{StaticResource LabelText}"/>

@@ -29,6 +29,10 @@ namespace ManutMap.Services
                         item["ROTA"]?.ToString()
                              .IndexOf(c.Rota, StringComparison.OrdinalIgnoreCase) < 0)
                         return false;
+                    if (c.TipoServico != "Todos" &&
+                        !item["TIPO"]?.ToString().Trim()
+                             .Equals(c.TipoServico, StringComparison.OrdinalIgnoreCase) == true)
+                        return false;
 
                     var dtRec = item["DTAHORARECLAMACAO"]?.ToString();
                     var dtCon = item["DTCONCLUSAO"]?.ToString();
