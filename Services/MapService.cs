@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Web.WebView2.Wpf;
-using Microsoft.Web.WebView2.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ManutMap.Helpers;
@@ -13,26 +12,24 @@ namespace ManutMap.Services
     {
         private readonly WebView2 _view;
         private readonly List<string> _pendingScripts = new();
+        private bool _ready = false;
 
         public MapService(WebView2 view)
         {
             _view = view;
-            // Assina o evento CORRETO
-            _view.CoreWebView2InitializationCompleted += OnWebView2Initialized;
         }
 
         public async Task InitializeAsync()
         {
-            // Garante inicialização do WebView2
             await _view.EnsureCoreWebView2Async();
+            _view.NavigationCompleted += (s, e) =>
+            {
+                _ready = true;
+                foreach (var script in _pendingScripts)
+                    _view.ExecuteScriptAsync(script);
+                _pendingScripts.Clear();
+            };
             _view.NavigateToString(MapHtmlHelper.GetHtml());
-        }
-
-        private void OnWebView2Initialized(object sender, CoreWebView2InitializationCompletedEventArgs e)
-        {
-            foreach (var script in _pendingScripts)
-                _view.CoreWebView2.ExecuteScriptAsync(script);
-            _pendingScripts.Clear();
         }
 
         public void AddMarkers(IEnumerable<JObject> data,
@@ -46,10 +43,10 @@ namespace ManutMap.Services
                 $"addMarkers({json},{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()}," +
                 $"'{colorOpen}','{colorClosed}');";
 
-            if (_view.CoreWebView2 == null)
+            if (!_ready)
                 _pendingScripts.Add(script);
             else
-                _view.CoreWebView2.ExecuteScriptAsync(script);
+                _view.ExecuteScriptAsync(script);
         }
     }
 }
