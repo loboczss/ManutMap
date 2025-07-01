@@ -37,7 +37,7 @@ namespace ManutMap.Services
                                bool showClosed,
                                string colorOpen,
                                string colorClosed,
-                               string latLonField)
+                               string latLonField = "LATLON")
         {
             var json = JsonConvert.SerializeObject(data);
             var script =
