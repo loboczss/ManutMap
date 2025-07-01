@@ -29,7 +29,7 @@
       markers.forEach(m=>map.removeLayer(m));
       markers = [];
     }
-    // Permite especificar qual campo de coordenada utilizar
+
     function addMarkers(data, showOpen, showClosed, colorOpen, colorClosed, latLonField){
       clearMarkers();
 
@@ -48,13 +48,12 @@
         if (!coord || coord.trim() === '') return;
 
         var coordStr = coord.trim();
-        // tenta extrair dois numeros, tolerando diferentes formatos
         var nums = coordStr.match(/-?\d+(?:[.,]\d+)?/g);
         if(!nums || nums.length < 2) return;
         var lat = parseFloat(nums[0].replace(',', '.')),
             lng = parseFloat(nums[1].replace(',', '.'));
         if(isNaN(lat) || isNaN(lng)) return;
-        var color = isOpen?colorOpen:colorClosed;
+        var color = isOpen ? colorOpen : colorClosed;
 
         var m = L.circleMarker([lat,lng],{
           radius:6, fillColor:color, color:'#fff', weight:1.2, fillOpacity:0.9
@@ -75,6 +74,7 @@
         m.bindPopup(popup);
         markers.push(m);
       });
+
       if(markers.length>0){
         var grp = L.featureGroup(markers);
         map.fitBounds(grp.getBounds().pad(0.2));
@@ -115,8 +115,8 @@
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
-                    (isOpen?'<b>Status:</b> <span style="'+'color:'+color+'"'+'>Aberto</span><br>'
-                           :'<b>Status:</b> <span style="'+'color:'+color+'"'+'>Concluído</span><br>')+
+                    (isOpen?'<b>Status:</b> <span style=""color:'+color+'"">Aberto</span><br>'
+                           :'<b>Status:</b> <span style=""color:'+color+'"">Concluído</span><br>')+
                     (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
                     (dtCon?'<b>Conclusão:</b> '+dtCon+'<br>':'')+
                     '<b>Rota:</b> '+item.ROTA+'<br>'+
@@ -128,6 +128,7 @@
         m.bindPopup(popup);
         markers.push(m);
       });
+
       if(markers.length>0){
         var grp = L.featureGroup(markers);
         map.fitBounds(grp.getBounds().pad(0.2));
