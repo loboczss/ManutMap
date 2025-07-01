@@ -155,6 +155,7 @@ namespace ManutMap
             // calcula estatísticas básicas para exibir no painel
             int prevAbertas = 0,
                 prevConcluidas = 0,
+                corrAbertas = 0,
                 corrConcluidas = 0,
                 servConcluidos = 0;
 
@@ -176,6 +177,7 @@ namespace ManutMap
                 }
                 else if (tipo == "corretiva")
                 {
+                    if (isOpen) corrAbertas++;
                     if (isClosed) corrConcluidas++;
                 }
             }
@@ -183,11 +185,12 @@ namespace ManutMap
             int totalServicos = result.Count;
 
             StatsTextBlock.Text =
-                $"Preventivas abertas: {prevAbertas} / " +
-                $"Preventivas concluídas: {prevConcluidas} / " +
-                $"Corretivas concluídas: {corrConcluidas} / " +
-                $"Serviços concluídos: {servConcluidos} / " +
-                $"Serviços: {totalServicos}";
+                $"Preventivas abertas: {prevAbertas}\n" +
+                $"Corretivas abertas: {corrAbertas}\n" +
+                $"Preventivas concluídas: {prevConcluidas}\n" +
+                $"Corretivas concluídas: {corrConcluidas}\n" +
+                $"Serviços concluídos: {servConcluidos}\n" +
+                $"Total de serviços: {totalServicos}";
         }
     }
 }
