@@ -23,7 +23,7 @@
       markers.forEach(m=>map.removeLayer(m));
       markers = [];
     }
-    // Agora recebe um argumento a mais: latLonField
+    // Permite especificar qual campo de coordenada utilizar
     function addMarkers(data, showOpen, showClosed, colorOpen, colorClosed, latLonField){
       clearMarkers();
 
@@ -33,10 +33,16 @@
         var isOpen   = dtRec !== '' && dtCon === '';
         var isClosed = dtCon !== '';
         if ((isOpen && !showOpen) || (isClosed && !showClosed)) return;
-        var coord = item.LATLON;
-        if (!coord || coord.trim() === '') coord = item.LATLONCON;
+        var coord = null;
+        if(latLonField === 'LATLON')
+          coord = item.LATLON;
+        else if(latLonField === 'LATLONCON')
+          coord = item.LATLONCON;
+
         if (!coord || coord.trim() === '') return;
-        var parts = coord.split(',');
+
+        var coordStr = coord.trim();
+        var parts = coordStr.split(',');
         var lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
         if(isNaN(lat)||isNaN(lng))return;
         var color = isOpen?colorOpen:colorClosed;

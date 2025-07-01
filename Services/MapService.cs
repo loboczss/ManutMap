@@ -36,12 +36,13 @@ namespace ManutMap.Services
                                bool showOpen,
                                bool showClosed,
                                string colorOpen,
-                               string colorClosed)
+                               string colorClosed,
+                               string latLonField)
         {
             var json = JsonConvert.SerializeObject(data);
             var script =
                 $"addMarkers({json},{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()}," +
-                $"'{colorOpen}','{colorClosed}');";
+                $"'{colorOpen}','{colorClosed}','{latLonField}');";
 
             if (!_ready)
                 _pendingScripts.Add(script);
