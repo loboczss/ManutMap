@@ -155,7 +155,8 @@ namespace ManutMap
             // calcula estatísticas básicas para exibir no painel
             int prevAbertas = 0,
                 prevConcluidas = 0,
-                corrConcluidas = 0;
+                corrConcluidas = 0,
+                servConcluidos = 0;
 
             foreach (var item in result)
             {
@@ -164,6 +165,9 @@ namespace ManutMap
                 var dtCon = item["DTCONCLUSAO"]?.ToString();
                 bool isOpen = !string.IsNullOrWhiteSpace(dtRec) && string.IsNullOrWhiteSpace(dtCon);
                 bool isClosed = !string.IsNullOrWhiteSpace(dtCon);
+
+                if (isClosed)
+                    servConcluidos++;
 
                 if (tipo == "preventiva")
                 {
@@ -182,6 +186,7 @@ namespace ManutMap
                 $"Preventivas abertas: {prevAbertas} / " +
                 $"Preventivas concluídas: {prevConcluidas} / " +
                 $"Corretivas concluídas: {corrConcluidas} / " +
+                $"Serviços concluídos: {servConcluidos} / " +
                 $"Serviços: {totalServicos}";
         }
     }
