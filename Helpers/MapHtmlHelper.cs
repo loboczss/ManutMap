@@ -14,9 +14,15 @@
   <div id='map'></div>
   <script>
     var map = L.map('map').setView([-8.0, -70.0], 5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
       attribution:'&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    });
+    var sat = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { attribution:'Tiles &copy; Esri' }
+    );
+    osm.addTo(map);
+    L.control.layers({'Mapa': osm, 'Satélite': sat}).addTo(map);
 
     var markers = [];
     function clearMarkers(){
