@@ -109,7 +109,8 @@
             </Grid.RowDefinitions>
             <TextBlock x:Name="StatsTextBlock"
                        Margin="10"
-                       FontWeight="Bold"/>
+                       FontWeight="Bold"
+                       TextWrapping="Wrap"/>
             <wv2:WebView2 x:Name="MapView" Grid.Row="1" />
         </Grid>
     </Grid>
