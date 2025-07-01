@@ -18,6 +18,18 @@
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
+        <!-- Style for labels inside filter panels -->
+        <Style x:Key="LabelText" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0 0 5 0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Style applied to input controls like ComboBox -->
+        <Style x:Key="InputControl" TargetType="ComboBox">
+            <Setter Property="Margin" Value="0 0 0 15"/>
+            <Setter Property="MinWidth" Value="150"/>
+        </Style>
     </Window.Resources>
 
     <DockPanel>
