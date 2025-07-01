@@ -25,9 +25,8 @@ namespace ManutMap.Services
                         item["IDSIGFI"]?.ToString()
                              .IndexOf(c.IdSigfi, StringComparison.OrdinalIgnoreCase) < 0)
                         return false;
-                    if (!string.IsNullOrEmpty(c.Rota) &&
-                        item["ROTA"]?.ToString()
-                             .IndexOf(c.Rota, StringComparison.OrdinalIgnoreCase) < 0)
+                    if (c.Rota != "Todas" &&
+                        !string.Equals(item["ROTA"]?.ToString().Trim(), c.Rota, StringComparison.OrdinalIgnoreCase))
                         return false;
 
                     var dtRec = item["DTAHORARECLAMACAO"]?.ToString();
