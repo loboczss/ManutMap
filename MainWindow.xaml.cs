@@ -151,6 +151,38 @@ namespace ManutMap
                 criteria.ColorClosed,
                 criteria.LatLonField
             );
+
+            // calcula estatísticas básicas para exibir no painel
+            int prevAbertas = 0,
+                prevConcluidas = 0,
+                corrConcluidas = 0;
+
+            foreach (var item in result)
+            {
+                var tipo = item["TIPODESIGFI"]?.ToString().Trim().ToLowerInvariant();
+                var dtRec = item["DTAHORARECLAMACAO"]?.ToString();
+                var dtCon = item["DTCONCLUSAO"]?.ToString();
+                bool isOpen = !string.IsNullOrWhiteSpace(dtRec) && string.IsNullOrWhiteSpace(dtCon);
+                bool isClosed = !string.IsNullOrWhiteSpace(dtCon);
+
+                if (tipo == "preventiva")
+                {
+                    if (isOpen) prevAbertas++;
+                    if (isClosed) prevConcluidas++;
+                }
+                else if (tipo == "corretiva")
+                {
+                    if (isClosed) corrConcluidas++;
+                }
+            }
+
+            int totalServicos = result.Count;
+
+            StatsTextBlock.Text =
+                $"Preventivas abertas: {prevAbertas} / " +
+                $"Preventivas concluídas: {prevConcluidas} / " +
+                $"Corretivas concluídas: {corrConcluidas} / " +
+                $"Serviços: {totalServicos}";
         }
     }
 }
