@@ -33,7 +33,7 @@ namespace ManutMap
             TipoFilterCombo.SelectionChanged += FiltersChanged;
             NumOsFilterBox.TextChanged += FiltersChanged;
             IdSigfiFilterBox.TextChanged += FiltersChanged;
-            RotaFilterBox.TextChanged += FiltersChanged;
+            RotaFilterCombo.SelectionChanged += FiltersChanged;
             StartDatePicker.SelectedDateChanged += FiltersChanged;
             EndDatePicker.SelectedDateChanged += FiltersChanged;
             ChbOpen.Checked += FiltersChanged;
@@ -52,6 +52,7 @@ namespace ManutMap
 
             PopulateSigfiCombo();
             PopulateTipoCombo();
+            PopulateRotaCombo();
             ApplyFilters();
         }
 
@@ -87,12 +88,29 @@ namespace ManutMap
             TipoFilterCombo.SelectedIndex = 0;
         }
 
+        private void PopulateRotaCombo()
+        {
+            var rotas = _manutList
+                .OfType<JObject>()
+                .Select(o => o["ROTA"]?.ToString().Trim())
+                .Where(s => !string.IsNullOrEmpty(s))
+                .Distinct()
+                .OrderBy(s => s);
+
+            RotaFilterCombo.Items.Clear();
+            RotaFilterCombo.Items.Add(new ComboBoxItem { Content = "Todos" });
+            foreach (var r in rotas)
+                RotaFilterCombo.Items.Add(new ComboBoxItem { Content = r });
+            RotaFilterCombo.SelectedIndex = 0;
+        }
+
         private async void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
             DownloadButton.IsEnabled = false;
             _manutList = await _spService.DownloadLatestJsonAsync();
             PopulateSigfiCombo();
             PopulateTipoCombo();
+            PopulateRotaCombo();
             ApplyFilters();
             DownloadButton.IsEnabled = true;
         }
@@ -112,7 +130,7 @@ namespace ManutMap
                 TipoServico = (TipoFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
                 NumOs = NumOsFilterBox.Text.Trim(),
                 IdSigfi = IdSigfiFilterBox.Text.Trim(),
-                Rota = RotaFilterBox.Text.Trim(),
+                Rota = (RotaFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
                 StartDate = StartDatePicker.SelectedDate,
                 EndDate = EndDatePicker.SelectedDate,
                 ShowOpen = ChbOpen.IsChecked == true,

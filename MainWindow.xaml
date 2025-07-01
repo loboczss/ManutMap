@@ -88,7 +88,7 @@
 
                         <!-- Rota -->
                         <TextBlock Text="Rota:" FontWeight="SemiBold"/>
-                        <TextBox x:Name="RotaFilterBox" TextChanged="FiltersChanged" Margin="0 0 0 15"/>
+                        <ComboBox x:Name="RotaFilterCombo" SelectionChanged="FiltersChanged" Margin="0 0 0 15"/>
 
                         <!-- Período -->
                         <TextBlock Text="Período:" FontWeight="SemiBold"/>

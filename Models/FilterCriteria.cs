@@ -7,7 +7,7 @@ namespace ManutMap.Models
         public string Sigfi { get; set; } = "Todos";
         public string NumOs { get; set; }
         public string IdSigfi { get; set; }
-        public string Rota { get; set; }
+        public string Rota { get; set; } = "Todos";
         public string TipoServico { get; set; } = "Todos";
 
         public DateTime? StartDate { get; set; }
