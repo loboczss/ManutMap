@@ -205,13 +205,27 @@ namespace ManutMap
 
             int totalServicos = result.Count;
 
-            StatsTextBlock.Text =
-                $"Preventivas abertas: {prevAbertas}\n" +
-                $"Corretivas abertas: {corrAbertas}\n" +
-                $"Preventivas concluídas: {prevConcluidas}\n" +
-                $"Corretivas concluídas: {corrConcluidas}\n" +
-                $"Serviços concluídos: {servConcluidos}\n" +
-                $"Total de serviços: {totalServicos}";
+            var sb = new System.Text.StringBuilder();
+            if (criteria.TipoServico == "Todos" ||
+                criteria.TipoServico.Equals("preventiva",
+                    System.StringComparison.OrdinalIgnoreCase))
+            {
+                sb.AppendLine($"Preventivas abertas: {prevAbertas}");
+                sb.AppendLine($"Preventivas concluídas: {prevConcluidas}");
+            }
+
+            if (criteria.TipoServico == "Todos" ||
+                criteria.TipoServico.Equals("corretiva",
+                    System.StringComparison.OrdinalIgnoreCase))
+            {
+                sb.AppendLine($"Corretivas abertas: {corrAbertas}");
+                sb.AppendLine($"Corretivas concluídas: {corrConcluidas}");
+            }
+
+            sb.AppendLine($"Serviços concluídos: {servConcluidos}");
+            sb.Append($"Total de serviços: {totalServicos}");
+
+            StatsTextBlock.Text = sb.ToString();
         }
     }
 }
