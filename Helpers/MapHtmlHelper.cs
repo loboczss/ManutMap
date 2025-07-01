@@ -32,7 +32,10 @@
         var isOpen   = dtRec !== '' && dtCon === '';
         var isClosed = dtCon !== '';
         if ((isOpen && !showOpen) || (isClosed && !showClosed)) return;
-        var parts = item.LATLON.split(',');
+        var coord = item.LATLON;
+        if (!coord || coord.trim() === '') coord = item.LATLONCON;
+        if (!coord || coord.trim() === '') return;
+        var parts = coord.split(',');
         var lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
         if (isNaN(lat) || isNaN(lng)) return;
         var color = isOpen ? colorOpen : colorClosed;
