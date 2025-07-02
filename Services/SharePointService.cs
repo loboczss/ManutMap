@@ -41,8 +41,11 @@ namespace ManutMap.Services
 
             using var stream = await _client.Drives[drive.Id].Items[target.Id].Content.GetAsync();
             var local = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manutencoes_latest.json");
-            using var fs = new FileStream(local, FileMode.Create, FileAccess.Write);
-            await stream.CopyToAsync(fs);
+            // Use a scoped FileStream so it's closed before reading the file
+            using (var fs = new FileStream(local, FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                await stream.CopyToAsync(fs);
+            }
 
             var json = File.ReadAllText(local);
             var root = JObject.Parse(json);
