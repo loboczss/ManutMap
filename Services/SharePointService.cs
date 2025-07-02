@@ -94,8 +94,8 @@ namespace ManutMap.Services
                 Type = "view",
                 Scope = "anonymous"
             };
-            var link = await _client.Drives[drive.Id].Items[uploaded.Id].CreateLink.PostAsync(body);
-            return link?.Link?.WebUrl;
+            var item = await _client.Drives[drive.Id].Items[uploaded.Id].GetAsync();
+            return item?.WebUrl;
         }
     }
 }
