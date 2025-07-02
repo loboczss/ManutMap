@@ -98,7 +98,7 @@
                 <TextBlock DockPanel.Dock="Top" Text="Filtros e Visualização" FontSize="14" Foreground="{StaticResource SecondaryTextBrush}" Margin="20,0,20,20"/>
 
                 <Grid DockPanel.Dock="Bottom" Margin="20">
-                    <Button x:Name="DownloadButton" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click"/>
+                    <Button x:Name="DownloadButton" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click" Margin="0,0,0,-6"/>
                 </Grid>
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20,0">
@@ -145,26 +145,41 @@
                         </Expander>
 
                         <Expander Header="Visualização e Camadas" IsExpanded="True">
-                            <StackPanel Margin="5,10,5,0">
-                                <CheckBox x:Name="ChbOpen" Content="Aberto" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                <TextBox x:Name="TxtColorOpen" Width="100" Margin="20,5,0,10" Text="#FF0000"/>
+                            <StackPanel Margin="5,10,5,0" Orientation="Vertical">
 
-                                <CheckBox x:Name="ChbClosed" Content="Concluído" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                <TextBox x:Name="TxtColorClosed" Width="100" Margin="20,5,0,10" Text="#008000"/>
+                                <GroupBox Header="Status das OS">
+                                    <StackPanel Margin="10,5,0,0">
+                                        <CheckBox x:Name="ChbOpen" Content="Exibir OS Abertas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                        <TextBlock Text="Cor (Aberto):" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
+                                        <TextBox x:Name="TxtColorOpen" Width="100" Margin="10,0,0,10" Text="#FF0000"/>
 
-                                <CheckBox x:Name="ChbColorBySigfi" Content="Colorir por Tipo SIGFI" Margin="0,8,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                <StackPanel Margin="20,5,0,0">
-                                    <TextBlock Text="Cor Preventiva:" Style="{StaticResource LabelTextBlock}"/>
-                                    <TextBox x:Name="TxtColorPrev" Width="100" Margin="0,0,0,8" Text="#0000FF"/>
-                                    <TextBlock Text="Cor Corretiva:" Style="{StaticResource LabelTextBlock}"/>
-                                    <TextBox x:Name="TxtColorCorr" Width="100" Margin="0,0,0,8" Text="#FFA500"/>
-                                </StackPanel>
+                                        <CheckBox x:Name="ChbClosed" Content="Exibir OS Concluídas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                        <TextBlock Text="Cor (Concluído):" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
+                                        <TextBox x:Name="TxtColorClosed" Width="100" Margin="10,0,0,0" Text="#008000"/>
+                                    </StackPanel>
+                                </GroupBox>
 
-                                <TextBlock Text="Campo Coordenada:" Style="{StaticResource LabelTextBlock}" Margin="0,15,0,5"/>
-                                <ComboBox x:Name="LatLonFieldCombo" SelectionChanged="FiltersChanged">
-                                    <ComboBoxItem Content="LATLON"/>
-                                    <ComboBoxItem Content="LATLONCON"/>
-                                </ComboBox>
+                                <GroupBox Header="Colorir por Tipo SIGFI">
+                                    <StackPanel Margin="10,5,0,0">
+                                        <CheckBox x:Name="ChbColorBySigfi" Content="Ativar Coloração por Tipo SIGFI" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                        <TextBlock Text="Cor Preventiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
+                                        <TextBox x:Name="TxtColorPrev" Width="100" Margin="10,0,0,5" Text="#0000FF"/>
+
+                                        <TextBlock Text="Cor Corretiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
+                                        <TextBox x:Name="TxtColorCorr" Width="100" Margin="10,0,0,0" Text="#FFA500"/>
+                                    </StackPanel>
+                                </GroupBox>
+
+                                <GroupBox Header="Campo de Coordenadas">
+                                    <StackPanel Margin="10,5,0,0">
+                                        <TextBlock Text="Selecione o campo com coordenadas:" Style="{StaticResource LabelTextBlock}"/>
+                                        <ComboBox x:Name="LatLonFieldCombo" SelectionChanged="FiltersChanged" Width="150" Margin="0,5,0,0">
+                                            <ComboBoxItem Content="LATLON"/>
+                                            <ComboBoxItem Content="LATLONCON"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </GroupBox>
+
                             </StackPanel>
                         </Expander>
                     </StackPanel>
