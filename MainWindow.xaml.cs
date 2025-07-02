@@ -30,6 +30,7 @@ namespace ManutMap
 
         private readonly DispatcherTimer _debounceTimer;
         private readonly DispatcherTimer _updateTimer;
+        private bool _sidebarVisible = true;
 
         public MainWindow()
         {
@@ -271,6 +272,24 @@ namespace ManutMap
                 MessageBox.Show("Link copiado para a área de transferência:\n" + link,
                                 "Link Compartilhado", MessageBoxButton.OK, MessageBoxImage.Information);
             }
+        }
+
+        private void ToggleSidebarButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_sidebarVisible)
+            {
+                SidebarColumn.Width = new GridLength(0);
+                SidebarBorder.Visibility = Visibility.Collapsed;
+                ToggleSidebarButton.Content = "►";
+            }
+            else
+            {
+                SidebarColumn.Width = new GridLength(340);
+                SidebarBorder.Visibility = Visibility.Visible;
+                ToggleSidebarButton.Content = "◄";
+            }
+
+            _sidebarVisible = !_sidebarVisible;
         }
     }
 }
