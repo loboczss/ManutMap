@@ -1,4 +1,7 @@
-﻿namespace ManutMap.Helpers
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+namespace ManutMap.Helpers
 {
     public static class MapHtmlHelper
     {
@@ -136,5 +139,24 @@
     }
   </script>
 </body></html>";
+
+        public static string GetHtmlWithData(IEnumerable<Newtonsoft.Json.Linq.JObject> data,
+                                             bool colorBySigfi,
+                                             bool showOpen,
+                                             bool showClosed,
+                                             string colorOpen,
+                                             string colorClosed,
+                                             string colorPrev,
+                                             string colorCorr,
+                                             string latLonField)
+        {
+            var baseHtml = GetHtml();
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+            var call = colorBySigfi
+                ? $"addMarkersByTipoSigfi(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorPrev}','{colorCorr}','{latLonField}');"
+                : $"addMarkers(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorOpen}','{colorClosed}','{latLonField}');";
+            var script = $"<script>var data = {json};window.onload=function(){{{call}}}</script>";
+            return baseHtml.Replace("</body></html>", script + "</body></html>");
+        }
     }
 }

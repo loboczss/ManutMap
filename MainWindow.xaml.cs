@@ -156,25 +156,9 @@ namespace ManutMap
             ApplyFilters();
         }
 
-        private void RegionalChanged(object sender, SelectionChangedEventArgs e)
+        private FilterCriteria GetCurrentCriteria()
         {
-            var selected = (RegionalFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
-            if (selected == "Todos")
-            {
-                PopulateComboBox(RotaFilterCombo, "ROTA");
-            }
-            else if (_regionalRotas.TryGetValue(selected, out var rotas))
-            {
-                PopulateComboBox(RotaFilterCombo, rotas);
-            }
-            FiltersChanged(sender, e);
-        }
-
-        private void ApplyFilters()
-        {
-            if (_manutList == null) return;
-
-            var criteria = new FilterCriteria
+            return new FilterCriteria
             {
                 Sigfi = (SigfiFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
                 TipoServico = (TipoFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
@@ -193,6 +177,27 @@ namespace ManutMap
                 ColorCorretiva = TxtColorCorr.Text.Trim(),
                 LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON"
             };
+        }
+
+        private void RegionalChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selected = (RegionalFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
+            if (selected == "Todos")
+            {
+                PopulateComboBox(RotaFilterCombo, "ROTA");
+            }
+            else if (_regionalRotas.TryGetValue(selected, out var rotas))
+            {
+                PopulateComboBox(RotaFilterCombo, rotas);
+            }
+            FiltersChanged(sender, e);
+        }
+
+        private void ApplyFilters()
+        {
+            if (_manutList == null) return;
+
+            var criteria = GetCurrentCriteria();
 
             var filteredResult = _filterSvc.Apply(_manutList, criteria);
 
@@ -239,6 +244,32 @@ namespace ManutMap
             CorretivasStatsText.Text = $"{corrAbertas} abertas, {corrConcluidas} concluídas";
             ServicosStatsText.Text = $"{servAbertos} abertos, {servConcluidos} concluídos";
             TotalStatsText.Text = dadosFiltrados.Count().ToString();
+        }
+
+        private async void ShareButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_manutList == null) return;
+
+            var criteria = GetCurrentCriteria();
+            var filtered = _filterSvc.Apply(_manutList, criteria);
+            var html = Helpers.MapHtmlHelper.GetHtmlWithData(filtered,
+                                                            criteria.ColorByTipoSigfi,
+                                                            criteria.ShowOpen,
+                                                            criteria.ShowClosed,
+                                                            criteria.ColorOpen,
+                                                            criteria.ColorClosed,
+                                                            criteria.ColorPreventiva,
+                                                            criteria.ColorCorretiva,
+                                                            criteria.LatLonField);
+
+            var fileName = $"mapa_{DateTime.Now:yyyyMMddHHmmss}.html";
+            var link = await _spService.UploadHtmlAndShareAsync(fileName, html);
+            if (!string.IsNullOrEmpty(link))
+            {
+                Clipboard.SetText(link);
+                MessageBox.Show("Link copiado para a área de transferência:\n" + link,
+                                "Link Compartilhado", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
     }
 }

@@ -98,7 +98,12 @@
                 <TextBlock DockPanel.Dock="Top" Text="Filtros e Visualização" FontSize="14" Foreground="{StaticResource SecondaryTextBrush}" Margin="20,0,20,20"/>
 
                 <Grid DockPanel.Dock="Bottom" Margin="20">
-                    <Button x:Name="DownloadButton" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click" Margin="0,0,0,-6"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="DownloadButton" Grid.Column="0" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click" Margin="0,0,5,-6"/>
+                    <Button x:Name="ShareButton" Grid.Column="1" Content="Compartilhar" Style="{StaticResource PrimaryButton}" Click="ShareButton_Click" Margin="5,0,0,-6"/>
                 </Grid>
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20,0">

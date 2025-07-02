@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Microsoft.Graph;
@@ -75,6 +76,26 @@ namespace ManutMap.Services
             LastUpdate = DateTime.Now;
 
             return merged;
+        }
+
+        public async Task<string> UploadHtmlAndShareAsync(string fileName, string htmlContent)
+        {
+            var site = await _client.Sites[$"{SiteHostname}:{SitePath}:"].GetAsync();
+            var drives = await _client.Sites[site.Id].Drives.GetAsync();
+            var drive = drives.Value.FirstOrDefault(d =>
+                d.Name.Equals(LibraryName, StringComparison.OrdinalIgnoreCase));
+            if (drive == null) throw new InvalidOperationException($"Biblioteca '{LibraryName}' não encontrada.");
+
+            using var ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(htmlContent));
+            var uploaded = await _client.Drives[drive.Id].Root.ItemWithPath(fileName).Content.PutAsync(ms);
+
+            var body = new Microsoft.Graph.Drives.Item.Items.Item.CreateLink.CreateLinkPostRequestBody
+            {
+                Type = "view",
+                Scope = "anonymous"
+            };
+            var link = await _client.Drives[drive.Id].Items[uploaded.Id].CreateLink.PostAsync(body);
+            return link?.Link?.WebUrl;
         }
     }
 }
