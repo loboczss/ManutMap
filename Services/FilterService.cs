@@ -8,6 +8,13 @@ namespace ManutMap.Services
 {
     public class FilterService
     {
+        private readonly Dictionary<string, List<string>> _regionalRotas = new()
+        {
+            {"Cruzeiro do Sul", new List<string>{"01","02","03","04","05","14","15","16","17","30","32","34","36","39","40","42","06"}},
+            {"Tarauacá", new List<string>{"07","08","09","10","21","22","23","24","33","38","37","50","51","66","67","71"}},
+            {"Sena Madureira", new List<string>{"11","12","52","54","55","57","58","59","63","65"}}
+        };
+
         public List<JObject> Apply(JArray source, FilterCriteria c)
         {
             return source.OfType<JObject>()
@@ -31,9 +38,14 @@ namespace ManutMap.Services
                         if (idSigfi.IndexOf(c.IdSigfi, StringComparison.OrdinalIgnoreCase) < 0)
                             return false;
                     }
+                    var rota = (item["ROTA"]?.ToString() ?? string.Empty).Trim();
+                    if (c.Regional != "Todos")
+                    {
+                        if (!_regionalRotas.TryGetValue(c.Regional, out var rotas) || !rotas.Contains(rota))
+                            return false;
+                    }
                     if (c.Rota != "Todos")
                     {
-                        var rota = (item["ROTA"]?.ToString() ?? string.Empty).Trim();
                         if (!rota.Equals(c.Rota, StringComparison.OrdinalIgnoreCase))
                             return false;
                     }

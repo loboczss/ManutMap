@@ -19,6 +19,12 @@ namespace ManutMap
         private readonly FilterService _filterSvc = new FilterService();
         private MapService _mapService;
         private JArray _manutList;
+        private readonly Dictionary<string, List<string>> _regionalRotas = new()
+        {
+            {"Cruzeiro do Sul", new List<string>{"01","02","03","04","05","14","15","16","17","30","32","34","36","39","40","42","06"}},
+            {"Tarauacá", new List<string>{"07","08","09","10","21","22","23","24","33","38","37","50","51","66","67","71"}},
+            {"Sena Madureira", new List<string>{"11","12","52","54","55","57","58","59","63","65"}}
+        };
 
         private readonly DispatcherTimer _debounceTimer;
 
@@ -42,6 +48,7 @@ namespace ManutMap
             TipoFilterCombo.SelectionChanged += FiltersChanged;
             NumOsFilterBox.TextChanged += FiltersChanged;
             IdSigfiFilterBox.TextChanged += FiltersChanged;
+            RegionalFilterCombo.SelectionChanged += RegionalChanged;
             RotaFilterCombo.SelectionChanged += FiltersChanged;
             StartDatePicker.SelectedDateChanged += FiltersChanged;
             EndDatePicker.SelectedDateChanged += FiltersChanged;
@@ -65,6 +72,7 @@ namespace ManutMap
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
             PopulateComboBox(TipoFilterCombo, "TIPO");
             PopulateComboBox(RotaFilterCombo, "ROTA");
+            PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
             ApplyFilters();
         }
@@ -88,6 +96,17 @@ namespace ManutMap
             comboBox.SelectedIndex = 0;
         }
 
+        private void PopulateComboBox(ComboBox comboBox, IEnumerable<string> items)
+        {
+            comboBox.Items.Clear();
+            comboBox.Items.Add(new ComboBoxItem { Content = "Todos" });
+            foreach (var item in items.OrderBy(i => i))
+            {
+                comboBox.Items.Add(new ComboBoxItem { Content = item });
+            }
+            comboBox.SelectedIndex = 0;
+        }
+
         private async void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
             DownloadButton.IsEnabled = false;
@@ -96,6 +115,7 @@ namespace ManutMap
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
             PopulateComboBox(TipoFilterCombo, "TIPO");
             PopulateComboBox(RotaFilterCombo, "ROTA");
+            PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
             ApplyFilters();
             DownloadButton.IsEnabled = true;
@@ -114,6 +134,20 @@ namespace ManutMap
             ApplyFilters();
         }
 
+        private void RegionalChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selected = (RegionalFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
+            if (selected == "Todos")
+            {
+                PopulateComboBox(RotaFilterCombo, "ROTA");
+            }
+            else if (_regionalRotas.TryGetValue(selected, out var rotas))
+            {
+                PopulateComboBox(RotaFilterCombo, rotas);
+            }
+            FiltersChanged(sender, e);
+        }
+
         private void ApplyFilters()
         {
             if (_manutList == null) return;
@@ -124,6 +158,7 @@ namespace ManutMap
                 TipoServico = (TipoFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
                 NumOs = NumOsFilterBox.Text.Trim(),
                 IdSigfi = IdSigfiFilterBox.Text.Trim(),
+                Regional = (RegionalFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
                 Rota = (RotaFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
                 StartDate = StartDatePicker.SelectedDate,
                 EndDate = EndDatePicker.SelectedDate,

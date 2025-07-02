@@ -7,6 +7,7 @@ namespace ManutMap.Models
         public string Sigfi { get; set; } = "Todos";
         public string NumOs { get; set; }
         public string IdSigfi { get; set; }
+        public string Regional { get; set; } = "Todos";
         public string Rota { get; set; } = "Todos";
         public string TipoServico { get; set; } = "Todos";
 
