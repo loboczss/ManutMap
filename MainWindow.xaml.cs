@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using Newtonsoft.Json.Linq;
 using ManutMap.Models;
 using ManutMap.Services;
@@ -17,18 +20,27 @@ namespace ManutMap
         private MapService _mapService;
         private JArray _manutList;
 
+        private readonly DispatcherTimer _debounceTimer;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            // inicializa o mapa
+            // --- CORREÇÃO 1: INICIALIZAÇÃO DO TIMER MOVIDA PARA CIMA ---
+            // Isso garante que o timer exista antes que qualquer evento seja disparado.
+            _debounceTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(400)
+            };
+            _debounceTimer.Tick += DebouncedApplyFilters;
+
+            // O resto da inicialização continua normalmente
             _mapService = new MapService(MapView);
             _mapService.InitializeAsync();
 
-            // apenas quando a janela estiver carregada
             this.Loaded += (_, __) => LoadLocalAndPopulate();
 
-            // associa eventos de filtro
+            // Associa todos os eventos de filtro a um único handler
             SigfiFilterCombo.SelectionChanged += FiltersChanged;
             TipoFilterCombo.SelectionChanged += FiltersChanged;
             NumOsFilterBox.TextChanged += FiltersChanged;
@@ -50,77 +62,61 @@ namespace ManutMap
 
         private void LoadLocalAndPopulate()
         {
-            // carrega do disco
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manutencoes_latest.json");
             _manutList = _fileService.LoadLocalJson(path) ?? new JArray();
 
-            PopulateSigfiCombo();
-            PopulateTipoCombo();
-            PopulateRotaCombo();
+            PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
+            PopulateComboBox(TipoFilterCombo, "TIPO");
+            PopulateComboBox(RotaFilterCombo, "ROTA");
+
             ApplyFilters();
         }
 
-        private void PopulateSigfiCombo()
+        private void PopulateComboBox(ComboBox comboBox, string jsonField)
         {
-            var tipos = _manutList
+            var items = _manutList
                 .OfType<JObject>()
-                .Select(o => o["TIPODESIGFI"]?.ToString().Trim())
+                .Select(o => o[jsonField]?.ToString().Trim())
                 .Where(s => !string.IsNullOrEmpty(s))
                 .Distinct()
-                .OrderBy(s => s);
+                .OrderBy(s => s)
+                .ToList();
 
-            SigfiFilterCombo.Items.Clear();
-            SigfiFilterCombo.Items.Add(new ComboBoxItem { Content = "Todos" });
-            foreach (var t in tipos)
-                SigfiFilterCombo.Items.Add(new ComboBoxItem { Content = t });
-            SigfiFilterCombo.SelectedIndex = 0;
-        }
-
-        private void PopulateTipoCombo()
-        {
-            var tipos = _manutList
-                .OfType<JObject>()
-                .Select(o => o["TIPO"]?.ToString().Trim())
-                .Where(s => !string.IsNullOrEmpty(s))
-                .Distinct()
-                .OrderBy(s => s);
-
-            TipoFilterCombo.Items.Clear();
-            TipoFilterCombo.Items.Add(new ComboBoxItem { Content = "Todos" });
-            foreach (var t in tipos)
-                TipoFilterCombo.Items.Add(new ComboBoxItem { Content = t });
-            TipoFilterCombo.SelectedIndex = 0;
-        }
-
-        private void PopulateRotaCombo()
-        {
-            var rotas = _manutList
-                .OfType<JObject>()
-                .Select(o => o["ROTA"]?.ToString().Trim())
-                .Where(s => !string.IsNullOrEmpty(s))
-                .Distinct()
-                .OrderBy(s => s);
-
-            RotaFilterCombo.Items.Clear();
-            RotaFilterCombo.Items.Add(new ComboBoxItem { Content = "Todos" });
-            foreach (var r in rotas)
-                RotaFilterCombo.Items.Add(new ComboBoxItem { Content = r });
-            RotaFilterCombo.SelectedIndex = 0;
+            comboBox.Items.Clear();
+            comboBox.Items.Add(new ComboBoxItem { Content = "Todos" });
+            foreach (var item in items)
+            {
+                comboBox.Items.Add(new ComboBoxItem { Content = item });
+            }
+            comboBox.SelectedIndex = 0;
         }
 
         private async void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
             DownloadButton.IsEnabled = false;
             _manutList = await _spService.DownloadLatestJsonAsync();
-            PopulateSigfiCombo();
-            PopulateTipoCombo();
-            PopulateRotaCombo();
+
+            PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
+            PopulateComboBox(TipoFilterCombo, "TIPO");
+            PopulateComboBox(RotaFilterCombo, "ROTA");
+
             ApplyFilters();
             DownloadButton.IsEnabled = true;
         }
 
         private void FiltersChanged(object sender, RoutedEventArgs e)
         {
+            // --- CORREÇÃO 2: VERIFICAÇÃO DE SEGURANÇA ---
+            // Impede o erro caso o evento dispare antes da hora.
+            if (_debounceTimer == null) return;
+
+            _debounceTimer.Stop();
+            _debounceTimer.Start();
+        }
+
+        private void DebouncedApplyFilters(object sender, EventArgs e)
+        {
+            _debounceTimer.Stop();
             ApplyFilters();
         }
 
@@ -144,102 +140,55 @@ namespace ManutMap
                 ColorByTipoSigfi = ChbColorBySigfi.IsChecked == true,
                 ColorPreventiva = TxtColorPrev.Text.Trim(),
                 ColorCorretiva = TxtColorCorr.Text.Trim(),
-
-                        LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString()
-                        ?? "LATLON"
+                LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON"
             };
 
-            var result = _filterSvc.Apply(_manutList, criteria);
+            var filteredResult = _filterSvc.Apply(_manutList, criteria);
+
             if (criteria.ColorByTipoSigfi)
             {
-                _mapService.AddMarkersByTipoSigfi(
-                    result,
-                    criteria.ShowOpen,
-                    criteria.ShowClosed,
-                    criteria.ColorPreventiva,
-                    criteria.ColorCorretiva,
-                    criteria.LatLonField
-                );
+                _mapService.AddMarkersByTipoSigfi(filteredResult, criteria.ShowOpen, criteria.ShowClosed, criteria.ColorPreventiva, criteria.ColorCorretiva, criteria.LatLonField);
             }
             else
             {
-                _mapService.AddMarkers(
-                    result,
-                    criteria.ShowOpen,
-                    criteria.ShowClosed,
-                    criteria.ColorOpen,
-                    criteria.ColorClosed,
-                    criteria.LatLonField
-                );
+                _mapService.AddMarkers(filteredResult, criteria.ShowOpen, criteria.ShowClosed, criteria.ColorOpen, criteria.ColorClosed, criteria.LatLonField);
             }
 
-            // calcula estatísticas básicas para exibir no painel
-            int prevAbertas = 0,
-                prevConcluidas = 0,
-                corrAbertas = 0,
-                corrConcluidas = 0,
-                servAbertos = 0,
-                servConcluidos = 0,
-                totalConcluidos = 0;
+            StatsTextBlock.Text = GerarTextoEstatisticas(filteredResult, criteria);
+        }
 
-            foreach (var item in result)
+        private string GerarTextoEstatisticas(IEnumerable<JObject> dadosFiltrados, FilterCriteria criteria)
+        {
+            if (dadosFiltrados == null) return "Carregando dados...";
+
+            int prevAbertas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "preventiva" && string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            int prevConcluidas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "preventiva" && !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+
+            int corrAbertas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "corretiva" && string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            int corrConcluidas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "corretiva" && !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+
+            int servAbertos = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "servicos" && string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            int servConcluidos = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "servicos" && !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+
+            var sb = new StringBuilder();
+            string tipoFiltro = criteria.TipoServico.ToLowerInvariant();
+
+            if (tipoFiltro == "todos" || tipoFiltro == "preventiva")
             {
-                var tipo = item["TIPO"]?.ToString().Trim().ToLowerInvariant();
-                var dtRec = item["DTAHORARECLAMACAO"]?.ToString();
-                var dtCon = item["DTCONCLUSAO"]?.ToString();
-                bool isOpen = !string.IsNullOrWhiteSpace(dtRec) && string.IsNullOrWhiteSpace(dtCon);
-                bool isClosed = !string.IsNullOrWhiteSpace(dtCon);
-
-                if (isClosed)
-                    totalConcluidos++;
-
-                if (tipo == "preventiva")
-                {
-                    if (isOpen) prevAbertas++;
-                    if (isClosed) prevConcluidas++;
-                }
-                else if (tipo == "corretiva")
-                {
-                    if (isOpen) corrAbertas++;
-                    if (isClosed) corrConcluidas++;
-                }
-                else if (tipo == "servicos")
-                {
-                    if (isOpen) servAbertos++;
-                    if (isClosed) servConcluidos++;
-                }
+                sb.AppendLine($"Preventivas: {prevAbertas} abertas, {prevConcluidas} concluídas.");
             }
-
-            int totalServicos = result.Count;
-
-            var sb = new System.Text.StringBuilder();
-            if (criteria.TipoServico == "Todos" ||
-                criteria.TipoServico.Equals("preventiva",
-                    System.StringComparison.OrdinalIgnoreCase))
+            if (tipoFiltro == "todos" || tipoFiltro == "corretiva")
             {
-                sb.AppendLine($"Preventivas abertas: {prevAbertas}");
-                sb.AppendLine($"Preventivas concluídas: {prevConcluidas}");
+                sb.AppendLine($"Corretivas: {corrAbertas} abertas, {corrConcluidas} concluídas.");
             }
-
-            if (criteria.TipoServico == "Todos" ||
-                criteria.TipoServico.Equals("corretiva",
-                    System.StringComparison.OrdinalIgnoreCase))
+            if (tipoFiltro == "todos" || tipoFiltro == "servicos")
             {
-                sb.AppendLine($"Corretivas abertas: {corrAbertas}");
-                sb.AppendLine($"Corretivas concluídas: {corrConcluidas}");
+                sb.AppendLine($"Serviços: {servAbertos} abertos, {servConcluidos} concluídos.");
             }
 
-            if (criteria.TipoServico == "Todos" ||
-                criteria.TipoServico.Equals("servicos", System.StringComparison.OrdinalIgnoreCase))
-            {
-                sb.AppendLine($"Serviços abertos: {servAbertos}");
-                sb.AppendLine($"Serviços concluídos: {servConcluidos}");
-            }
+            sb.Append($"Total Exibido: {dadosFiltrados.Count()}");
 
-            sb.AppendLine($"Total concluídos: {totalConcluidos}");
-            sb.Append($"Total de serviços: {totalServicos}");
-
-            StatsTextBlock.Text = sb.ToString();
+            return sb.ToString();
         }
     }
 }

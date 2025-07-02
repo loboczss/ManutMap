@@ -1,117 +1,193 @@
 ﻿<Window x:Class="ManutMap.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        mc:Ignorable="d"
         Title="ManutMap – Mapa de Manutenções"
-        Height="720" Width="1280"
-        Background="White"
+        Height="768" Width="1366"
+        Background="#F0F2F5"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <Style x:Key="PrimaryButton" TargetType="Button">
-            <Setter Property="Background" Value="#2563EB"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="Margin" Value="0 10 0 0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        </Style>
-
-        <Style x:Key="SectionTitle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="0 16 0 8"/>
-        </Style>
+        <SolidColorBrush x:Key="PrimaryBlueBrush" Color="#0078D4"/>
+        <SolidColorBrush x:Key="PrimaryTextBrush" Color="#1F1F1F"/>
+        <SolidColorBrush x:Key="SecondaryTextBrush" Color="#605E5C"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#D1D1D1"/>
+        <SolidColorBrush x:Key="PanelBackgroundBrush" Color="White"/>
 
         <Style TargetType="TextBlock">
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Margin" Value="0 4 0 0"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
+
+        <Style x:Key="LabelTextBlock" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="4" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+        </Style>
+
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryBlueBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="4" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#005A9E"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Expander">
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" FontWeight="Bold" FontSize="16" Margin="0,5"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="340"/>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- PAINEL LATERAL DE FILTROS -->
-        <Border Grid.Column="0" Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="0 0 1 0">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel Margin="20">
-                    <TextBlock Text="Filtros Avançados" FontSize="18" FontWeight="Bold" Margin="0 0 0 20"/>
+        <Border Grid.Column="0" Background="{StaticResource PanelBackgroundBrush}" BorderThickness="0,0,1,0" BorderBrush="{StaticResource BorderBrush}">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="ManutMap" FontSize="24" FontWeight="Bold" Margin="20,20,20,10"/>
+                <TextBlock DockPanel.Dock="Top" Text="Filtros e Visualização" FontSize="14" Foreground="{StaticResource SecondaryTextBrush}" Margin="20,0,20,20"/>
 
-                    <!-- Seção de Busca -->
-                    <TextBlock Text="Busca" Style="{StaticResource SectionTitle}"/>
-                    <TextBlock Text="Tipo SIGFI:"/>
-                    <ComboBox x:Name="SigfiFilterCombo" Width="240" SelectionChanged="FiltersChanged"/>
+                <Grid DockPanel.Dock="Bottom" Margin="20">
+                    <Button x:Name="DownloadButton" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click"/>
+                </Grid>
 
-                    <TextBlock Text="Tipo Serviço:"/>
-                    <ComboBox x:Name="TipoFilterCombo" Width="240" SelectionChanged="FiltersChanged"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20,0">
+                    <StackPanel>
+                        <Expander Header="Busca por Atributos" IsExpanded="True">
+                            <StackPanel Margin="5,10,5,0">
+                                <TextBlock Text="Tipo SIGFI" Style="{StaticResource LabelTextBlock}"/>
+                                <ComboBox x:Name="SigfiFilterCombo" SelectionChanged="FiltersChanged"/>
 
-                    <TextBlock Text="NumOS:"/>
-                    <TextBox x:Name="NumOsFilterBox" Width="240" TextChanged="FiltersChanged"/>
+                                <TextBlock Text="Tipo Serviço" Style="{StaticResource LabelTextBlock}" Margin="0,10,0,5"/>
+                                <ComboBox x:Name="TipoFilterCombo" SelectionChanged="FiltersChanged"/>
 
-                    <TextBlock Text="IDSIGFI:"/>
-                    <TextBox x:Name="IdSigfiFilterBox" Width="240" TextChanged="FiltersChanged"/>
+                                <TextBlock Text="Número da OS" Style="{StaticResource LabelTextBlock}" Margin="0,10,0,5"/>
+                                <TextBox x:Name="NumOsFilterBox" TextChanged="FiltersChanged"/>
 
-                    <TextBlock Text="Rota:"/>
-                    <ComboBox x:Name="RotaFilterCombo" Width="240" SelectionChanged="FiltersChanged"/>
+                                <TextBlock Text="ID SIGFI" Style="{StaticResource LabelTextBlock}" Margin="0,10,0,5"/>
+                                <TextBox x:Name="IdSigfiFilterBox" TextChanged="FiltersChanged"/>
 
-                    <!-- Seção de Período -->
-                    <TextBlock Text="Período" Style="{StaticResource SectionTitle}"/>
-                    <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
-                        <DatePicker x:Name="StartDatePicker" Width="110" SelectedDateChanged="FiltersChanged"/>
-                        <TextBlock Text=" a " Margin="5 0"/>
-                        <DatePicker x:Name="EndDatePicker" Width="110" SelectedDateChanged="FiltersChanged"/>
+                                <TextBlock Text="Rota" Style="{StaticResource LabelTextBlock}" Margin="0,10,0,5"/>
+                                <ComboBox x:Name="RotaFilterCombo" SelectionChanged="FiltersChanged"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Expander Header="Período de Execução" IsExpanded="True">
+                            <Grid Margin="5,10,5,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Data Inicial" Style="{StaticResource LabelTextBlock}"/>
+                                    <DatePicker x:Name="StartDatePicker" SelectedDateChanged="FiltersChanged"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Text="a" Margin="10,0" VerticalAlignment="Bottom" Padding="0,0,0,8"/>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Data Final" Style="{StaticResource LabelTextBlock}"/>
+                                    <DatePicker x:Name="EndDatePicker" SelectedDateChanged="FiltersChanged"/>
+                                </StackPanel>
+                            </Grid>
+                        </Expander>
+
+                        <Expander Header="Visualização e Camadas" IsExpanded="True">
+                            <StackPanel Margin="5,10,5,0">
+
+                                <CheckBox x:Name="ChbOpen" Content="Aberto" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                <TextBox x:Name="TxtColorOpen" Width="100" Margin="20,5,0,10" Text="#FF0000"/>
+
+                                <CheckBox x:Name="ChbClosed" Content="Concluído" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                <TextBox x:Name="TxtColorClosed" Width="100" Margin="20,5,0,10" Text="#008000"/>
+
+                                <CheckBox x:Name="ChbColorBySigfi" Content="Colorir por Tipo SIGFI" Margin="0,8,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                <StackPanel Margin="20,5,0,0">
+                                    <TextBlock Text="Cor Preventiva:" Style="{StaticResource LabelTextBlock}"/>
+                                    <TextBox x:Name="TxtColorPrev" Width="100" Margin="0,0,0,8" Text="#0000FF"/>
+                                    <TextBlock Text="Cor Corretiva:" Style="{StaticResource LabelTextBlock}"/>
+                                    <TextBox x:Name="TxtColorCorr" Width="100" Margin="0,0,0,8" Text="#FFA500"/>
+                                </StackPanel>
+
+                                <TextBlock Text="Campo Coordenada:" Style="{StaticResource LabelTextBlock}" Margin="0,15,0,5"/>
+                                <ComboBox x:Name="LatLonFieldCombo" SelectionChanged="FiltersChanged">
+                                    <ComboBoxItem Content="LATLON"/>
+                                    <ComboBoxItem Content="LATLONCON"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </Expander>
                     </StackPanel>
-
-                    <!-- Seção de Camadas -->
-                    <TextBlock Text="Camadas" Style="{StaticResource SectionTitle}"/>
-                    <CheckBox x:Name="ChbOpen" Content="Aberto" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                    <TextBox x:Name="TxtColorOpen" Width="100" Margin="0 0 0 8" Text="#FF0000"/>
-
-                    <CheckBox x:Name="ChbClosed" Content="Concluído" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                    <TextBox x:Name="TxtColorClosed" Width="100" Margin="0 0 0 8" Text="#008000"/>
-
-                    <CheckBox x:Name="ChbColorBySigfi" Content="Colorir por Tipo SIGFI" Margin="0 8 0 0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                    <TextBlock Text="Cor Preventiva:"/>
-                    <TextBox x:Name="TxtColorPrev" Width="100" Margin="0 0 0 8" Text="#0000FF"/>
-                    <TextBlock Text="Cor Corretiva:"/>
-                    <TextBox x:Name="TxtColorCorr" Width="100" Margin="0 0 0 8" Text="#FFA500"/>
-
-                    <!-- Seção de Configurações -->
-                    <TextBlock Text="Configurações" Style="{StaticResource SectionTitle}"/>
-                    <TextBlock Text="Campo Coordenada:"/>
-                    <ComboBox x:Name="LatLonFieldCombo" Width="240" SelectionChanged="FiltersChanged">
-                        <ComboBoxItem Content="LATLON"/>
-                        <ComboBoxItem Content="LATLONCON"/>
-                    </ComboBox>
-
-                    <!-- Botão de Ação -->
-                    <Button x:Name="DownloadButton"
-                            Content="Baixar JSON"
-                            Click="DownloadButton_Click"
-                            Style="{StaticResource PrimaryButton}"
-                            Margin="0 20 0 0"/>
-                </StackPanel>
-            </ScrollViewer>
+                </ScrollViewer>
+            </DockPanel>
         </Border>
 
-        <!-- MAPA -->
         <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock x:Name="StatsTextBlock"
-                       Margin="10"
-                       FontWeight="Bold"
-                       TextWrapping="Wrap"/>
-            <wv2:WebView2 x:Name="MapView" Grid.Row="1" />
+            <wv2:WebView2 x:Name="MapView" />
+
+            <Border Background="#FFFFFFCC" CornerRadius="8" Padding="15" 
+                    HorizontalAlignment="Right" VerticalAlignment="Top" 
+                    Margin="20" MaxWidth="400">
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="1" BlurRadius="10" Color="Black" Opacity="0.1"/>
+                </Border.Effect>
+                <TextBlock x:Name="StatsTextBlock"
+                           FontWeight="SemiBold"
+                           TextWrapping="Wrap"
+                           Text="Exibindo 0 de 0 manutenções."/>
+            </Border>
         </Grid>
     </Grid>
 </Window>
