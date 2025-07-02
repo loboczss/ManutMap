@@ -158,25 +158,25 @@ namespace ManutMap
 
             // Calcula os valores (comparação sem considerar maiúsculas/minúsculas)
             int prevAbertas = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "preventiva", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(item["TIPO"]?.ToString().Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase) &&
                 string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
             int prevConcluidas = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "preventiva", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(item["TIPO"]?.ToString().Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase) &&
                 !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
             int corrAbertas = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "corretiva", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(item["TIPO"]?.ToString().Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase) &&
                 string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
             int corrConcluidas = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "corretiva", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(item["TIPO"]?.ToString().Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase) &&
                 !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
             // Cálculo para serviços
             int servAbertos = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "servicos", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(item["TIPO"]?.ToString().Trim(), "SERVICOS", StringComparison.OrdinalIgnoreCase) &&
                 string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
             int servConcluidos = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "servicos", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(item["TIPO"]?.ToString().Trim(), "SERVICOS", StringComparison.OrdinalIgnoreCase) &&
                 !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
             // Atualiza cada TextBlock individualmente
