@@ -26,15 +26,12 @@ namespace ManutMap
         {
             InitializeComponent();
 
-            // --- CORREÇÃO 1: INICIALIZAÇÃO DO TIMER MOVIDA PARA CIMA ---
-            // Isso garante que o timer exista antes que qualquer evento seja disparado.
             _debounceTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromMilliseconds(400)
             };
             _debounceTimer.Tick += DebouncedApplyFilters;
 
-            // O resto da inicialização continua normalmente
             _mapService = new MapService(MapView);
             _mapService.InitializeAsync();
 
@@ -106,10 +103,7 @@ namespace ManutMap
 
         private void FiltersChanged(object sender, RoutedEventArgs e)
         {
-            // --- CORREÇÃO 2: VERIFICAÇÃO DE SEGURANÇA ---
-            // Impede o erro caso o evento dispare antes da hora.
             if (_debounceTimer == null) return;
-
             _debounceTimer.Stop();
             _debounceTimer.Start();
         }
@@ -154,41 +148,31 @@ namespace ManutMap
                 _mapService.AddMarkers(filteredResult, criteria.ShowOpen, criteria.ShowClosed, criteria.ColorOpen, criteria.ColorClosed, criteria.LatLonField);
             }
 
-            StatsTextBlock.Text = GerarTextoEstatisticas(filteredResult, criteria);
+            AtualizarPainelEstatisticas(filteredResult);
         }
 
-        private string GerarTextoEstatisticas(IEnumerable<JObject> dadosFiltrados, FilterCriteria criteria)
+        // MÉTODO DE ESTATÍSTICAS ATUALIZADO para a nova barra
+        private void AtualizarPainelEstatisticas(IEnumerable<JObject> dadosFiltrados)
         {
-            if (dadosFiltrados == null) return "Carregando dados...";
+            if (dadosFiltrados == null) return;
 
+            // Calcula os valores
             int prevAbertas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "preventiva" && string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
             int prevConcluidas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "preventiva" && !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
             int corrAbertas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "corretiva" && string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
             int corrConcluidas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "corretiva" && !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
+            // CÁLCULO ADICIONADO
             int servAbertos = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "servicos" && string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
             int servConcluidos = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "servicos" && !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
-            var sb = new StringBuilder();
-            string tipoFiltro = criteria.TipoServico.ToLowerInvariant();
-
-            if (tipoFiltro == "todos" || tipoFiltro == "preventiva")
-            {
-                sb.AppendLine($"Preventivas: {prevAbertas} abertas, {prevConcluidas} concluídas.");
-            }
-            if (tipoFiltro == "todos" || tipoFiltro == "corretiva")
-            {
-                sb.AppendLine($"Corretivas: {corrAbertas} abertas, {corrConcluidas} concluídas.");
-            }
-            if (tipoFiltro == "todos" || tipoFiltro == "servicos")
-            {
-                sb.AppendLine($"Serviços: {servAbertos} abertos, {servConcluidos} concluídos.");
-            }
-
-            sb.Append($"Total Exibido: {dadosFiltrados.Count()}");
-
-            return sb.ToString();
+            // Atualiza cada TextBlock individualmente
+            PreventivasStatsText.Text = $"{prevAbertas} abertas, {prevConcluidas} concluídas";
+            CorretivasStatsText.Text = $"{corrAbertas} abertas, {corrConcluidas} concluídas";
+            // TEXTBLOCK ADICIONADO
+            ServicosStatsText.Text = $"{servAbertos} abertos, {servConcluidos} concluídos";
+            TotalStatsText.Text = dadosFiltrados.Count().ToString();
         }
     }
 }
