@@ -156,7 +156,6 @@ namespace ManutMap
         {
             if (dadosFiltrados == null) return;
 
-            // Calcula os valores (comparação sem considerar maiúsculas/minúsculas)
             int prevAbertas = dadosFiltrados.Count(item =>
                 string.Equals(item["TIPO"]?.ToString().Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase) &&
                 string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
@@ -171,7 +170,6 @@ namespace ManutMap
                 string.Equals(item["TIPO"]?.ToString().Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase) &&
                 !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
-            // Cálculo para serviços
             int servAbertos = dadosFiltrados.Count(item =>
                 string.Equals(item["TIPO"]?.ToString().Trim(), "SERVICOS", StringComparison.OrdinalIgnoreCase) &&
                 string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
@@ -182,7 +180,6 @@ namespace ManutMap
             // Atualiza cada TextBlock individualmente
             PreventivasStatsText.Text = $"{prevAbertas} abertas, {prevConcluidas} concluídas";
             CorretivasStatsText.Text = $"{corrAbertas} abertas, {corrConcluidas} concluídas";
-            // TEXTBLOCK ADICIONADO
             ServicosStatsText.Text = $"{servAbertos} abertos, {servConcluidos} concluídos";
             TotalStatsText.Text = dadosFiltrados.Count().ToString();
         }
