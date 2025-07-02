@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +17,16 @@ namespace ManutMap.Services
         private const string SiteHostname = "oneengenharia.sharepoint.com";
         private const string SitePath = "/sites/OneEngenharia";
         private const string LibraryName = "ArquivosJSON";
-        private const string FileNameFilter = "Manutencao_AC2025";
+        // Padrões dos arquivos a serem baixados
+        private static readonly string[] FileNameFilters = new[]
+        {
+            "Manutencao_AC2025",
+            "Manutencao_AC2024",
+            "Manutencao_AC2023",
+            "Manutencao_MT"
+        };
+
+        public DateTime LastUpdate { get; private set; }
 
         public SharePointService()
         {
@@ -34,22 +43,38 @@ namespace ManutMap.Services
             if (drive == null) throw new InvalidOperationException($"Biblioteca '{LibraryName}' não encontrada.");
 
             var children = await _client.Drives[drive.Id].Items["root"].Children.GetAsync();
-            var target = children.Value.FirstOrDefault(f =>
-                f.Name.Contains(FileNameFilter, StringComparison.OrdinalIgnoreCase) &&
-                f.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase));
-            if (target == null) throw new InvalidOperationException($"Nenhum arquivo com '{FileNameFilter}' encontrado.");
 
-            using var stream = await _client.Drives[drive.Id].Items[target.Id].Content.GetAsync();
-            var local = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manutencoes_latest.json");
-            // Use a scoped FileStream so it's closed before reading the file
-            using (var fs = new FileStream(local, FileMode.Create, FileAccess.Write, FileShare.Read))
+            var merged = new JArray();
+            foreach (var filter in FileNameFilters)
             {
-                await stream.CopyToAsync(fs);
+                var target = children.Value
+                    .Where(f => f.Name.Contains(filter, StringComparison.OrdinalIgnoreCase) &&
+                                f.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                    .OrderByDescending(f => f.LastModifiedDateTime)
+                    .FirstOrDefault();
+
+                if (target == null) continue;
+
+                using var stream = await _client.Drives[drive.Id].Items[target.Id].Content.GetAsync();
+                var localName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{filter}_latest.json");
+                using (var fs = new FileStream(localName, FileMode.Create, FileAccess.Write, FileShare.Read))
+                {
+                    await stream.CopyToAsync(fs);
+                }
+
+                var json = File.ReadAllText(localName);
+                var root = JObject.Parse(json);
+                if (root["manutencoes"] is JArray arr)
+                    merged.Merge(arr);
             }
 
-            var json = File.ReadAllText(local);
-            var root = JObject.Parse(json);
-            return (JArray)root["manutencoes"];
+            var mergedLocal = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manutencoes_latest.json");
+            var mergedRoot = new JObject { ["manutencoes"] = merged };
+            File.WriteAllText(mergedLocal, mergedRoot.ToString());
+
+            LastUpdate = DateTime.Now;
+
+            return merged;
         }
     }
 }

@@ -195,6 +195,8 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0" Text="Preventivas:" FontWeight="Bold" Margin="0,0,8,0" />
@@ -208,6 +210,8 @@
 
                     <TextBlock Grid.Column="6" Text="Total Exibido:" FontWeight="Bold" Margin="15,0,8,0" />
                     <TextBlock Grid.Column="7" x:Name="TotalStatsText" Text="0" />
+                    <TextBlock Grid.Column="8" Text="Atualizado:" FontWeight="Bold" Margin="15,0,8,0" />
+                    <TextBlock Grid.Column="9" x:Name="LastUpdatedText" Text="-" />
                 </Grid>
             </Border>
         </Grid>

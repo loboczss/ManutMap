@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using Newtonsoft.Json.Linq;
@@ -27,6 +28,7 @@ namespace ManutMap
         };
 
         private readonly DispatcherTimer _debounceTimer;
+        private readonly DispatcherTimer _updateTimer;
 
         public MainWindow()
         {
@@ -38,10 +40,20 @@ namespace ManutMap
             };
             _debounceTimer.Tick += DebouncedApplyFilters;
 
+            _updateTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMinutes(30)
+            };
+            _updateTimer.Tick += async (_, __) => await DownloadAndRefresh();
+
             _mapService = new MapService(MapView);
             _mapService.InitializeAsync();
 
-            this.Loaded += (_, __) => LoadLocalAndPopulate();
+            this.Loaded += (_, __) =>
+            {
+                LoadLocalAndPopulate();
+                _updateTimer.Start();
+            };
 
             // Associa todos os eventos de filtro a um único handler
             SigfiFilterCombo.SelectionChanged += FiltersChanged;
@@ -68,6 +80,9 @@ namespace ManutMap
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manutencoes_latest.json");
             _manutList = _fileService.LoadLocalJson(path) ?? new JArray();
+
+            if (File.Exists(path))
+                LastUpdatedText.Text = File.GetLastWriteTime(path).ToString("dd/MM/yyyy HH:mm");
 
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
             PopulateComboBox(TipoFilterCombo, "TIPO");
@@ -110,6 +125,12 @@ namespace ManutMap
         private async void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
             DownloadButton.IsEnabled = false;
+            await DownloadAndRefresh();
+            DownloadButton.IsEnabled = true;
+        }
+
+        private async Task DownloadAndRefresh()
+        {
             _manutList = await _spService.DownloadLatestJsonAsync();
 
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
@@ -118,7 +139,7 @@ namespace ManutMap
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
             ApplyFilters();
-            DownloadButton.IsEnabled = true;
+            LastUpdatedText.Text = _spService.LastUpdate.ToString("dd/MM/yyyy HH:mm");
         }
 
         private void FiltersChanged(object sender, RoutedEventArgs e)
