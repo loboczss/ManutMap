@@ -50,9 +50,10 @@ namespace ManutMap
             _mapService = new MapService(MapView);
             _mapService.InitializeAsync();
 
-            this.Loaded += (_, __) =>
+            this.Loaded += async (_, __) =>
             {
                 LoadLocalAndPopulate();
+                await DownloadAndRefresh();
                 _updateTimer.Start();
             };
 
