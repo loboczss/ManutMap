@@ -178,7 +178,9 @@ namespace ManutMap
                 prevConcluidas = 0,
                 corrAbertas = 0,
                 corrConcluidas = 0,
-                servConcluidos = 0;
+                servAbertos = 0,
+                servConcluidos = 0,
+                totalConcluidos = 0;
 
             foreach (var item in result)
             {
@@ -189,7 +191,7 @@ namespace ManutMap
                 bool isClosed = !string.IsNullOrWhiteSpace(dtCon);
 
                 if (isClosed)
-                    servConcluidos++;
+                    totalConcluidos++;
 
                 if (tipo == "preventiva")
                 {
@@ -200,6 +202,11 @@ namespace ManutMap
                 {
                     if (isOpen) corrAbertas++;
                     if (isClosed) corrConcluidas++;
+                }
+                else if (tipo == "servicos")
+                {
+                    if (isOpen) servAbertos++;
+                    if (isClosed) servConcluidos++;
                 }
             }
 
@@ -222,7 +229,14 @@ namespace ManutMap
                 sb.AppendLine($"Corretivas concluídas: {corrConcluidas}");
             }
 
-            sb.AppendLine($"Serviços concluídos: {servConcluidos}");
+            if (criteria.TipoServico == "Todos" ||
+                criteria.TipoServico.Equals("servicos", System.StringComparison.OrdinalIgnoreCase))
+            {
+                sb.AppendLine($"Serviços abertos: {servAbertos}");
+                sb.AppendLine($"Serviços concluídos: {servConcluidos}");
+            }
+
+            sb.AppendLine($"Total concluídos: {totalConcluidos}");
             sb.Append($"Total de serviços: {totalServicos}");
 
             StatsTextBlock.Text = sb.ToString();
