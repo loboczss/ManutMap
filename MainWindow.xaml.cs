@@ -156,16 +156,28 @@ namespace ManutMap
         {
             if (dadosFiltrados == null) return;
 
-            // Calcula os valores
-            int prevAbertas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "preventiva" && string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
-            int prevConcluidas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "preventiva" && !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            // Calcula os valores (comparação sem considerar maiúsculas/minúsculas)
+            int prevAbertas = dadosFiltrados.Count(item =>
+                string.Equals(item["TIPO"]?.ToString().Trim(), "preventiva", StringComparison.OrdinalIgnoreCase) &&
+                string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            int prevConcluidas = dadosFiltrados.Count(item =>
+                string.Equals(item["TIPO"]?.ToString().Trim(), "preventiva", StringComparison.OrdinalIgnoreCase) &&
+                !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
-            int corrAbertas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "corretiva" && string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
-            int corrConcluidas = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "corretiva" && !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            int corrAbertas = dadosFiltrados.Count(item =>
+                string.Equals(item["TIPO"]?.ToString().Trim(), "corretiva", StringComparison.OrdinalIgnoreCase) &&
+                string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            int corrConcluidas = dadosFiltrados.Count(item =>
+                string.Equals(item["TIPO"]?.ToString().Trim(), "corretiva", StringComparison.OrdinalIgnoreCase) &&
+                !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
-            // CÁLCULO ADICIONADO
-            int servAbertos = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "servicos" && string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
-            int servConcluidos = dadosFiltrados.Count(item => item["TIPO"]?.ToString() == "servicos" && !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            // Cálculo para serviços
+            int servAbertos = dadosFiltrados.Count(item =>
+                string.Equals(item["TIPO"]?.ToString().Trim(), "servicos", StringComparison.OrdinalIgnoreCase) &&
+                string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            int servConcluidos = dadosFiltrados.Count(item =>
+                string.Equals(item["TIPO"]?.ToString().Trim(), "servicos", StringComparison.OrdinalIgnoreCase) &&
+                !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
             // Atualiza cada TextBlock individualmente
             PreventivasStatsText.Text = $"{prevAbertas} abertas, {prevConcluidas} concluídas";
