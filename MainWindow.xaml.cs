@@ -6,6 +6,7 @@ using System.Text;
 using System.Windows;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using Microsoft.Win32;
 using System.Windows.Threading;
 using Newtonsoft.Json.Linq;
 using ManutMap.Models;
@@ -254,6 +255,17 @@ namespace ManutMap
 
             var criteria = GetCurrentCriteria();
             var filtered = _filterSvc.Apply(_manutList, criteria);
+
+            var dialog = new SaveFileDialog
+            {
+                Filter = "CSV Files (*.csv)|*.csv",
+                FileName = $"manutencoes_{DateTime.Now:yyyyMMddHHmmss}.csv",
+                DefaultExt = "csv"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                _fileService.SaveCsv(filtered, dialog.FileName, criteria.LatLonField);
+            }
             var html = Helpers.MapHtmlHelper.GetHtmlWithData(filtered,
                                                             criteria.ColorByTipoSigfi,
                                                             criteria.ShowOpen,
