@@ -11,60 +11,42 @@
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="PrimaryBlueBrush" Color="#0078D4"/>
-        <SolidColorBrush x:Key="PrimaryBlueHoverBrush" Color="#005A9E"/>
-        <SolidColorBrush x:Key="PrimaryTextBrush" Color="#1F1F1F"/>
-        <SolidColorBrush x:Key="SecondaryTextBrush" Color="#605E5C"/>
-        <SolidColorBrush x:Key="BorderBrush" Color="#D1D1D1"/>
-        <SolidColorBrush x:Key="PanelBackgroundBrush" Color="White"/>
-        <SolidColorBrush x:Key="ControlBackgroundHover" Color="#F3F2F1"/>
-
-        <Thickness x:Key="HeaderMargin">20</Thickness>
-        <Thickness x:Key="PanelPadding">20,0</Thickness>
-        <Thickness x:Key="ControlMargin">0,15,0,0</Thickness>
-        <Thickness x:Key="LabelMargin">0,0,0,5</Thickness>
+        <SolidColorBrush x:Key="BrandBlue" Color="#0078D4"/>
+        <SolidColorBrush x:Key="BrandBlue.Hover" Color="#005A9E"/>
+        <SolidColorBrush x:Key="Text.Primary" Color="#1F1F1F"/>
+        <SolidColorBrush x:Key="Text.Secondary" Color="#605E5C"/>
+        <SolidColorBrush x:Key="Border.Default" Color="#D1D1D1"/>
+        <SolidColorBrush x:Key="Background.Panel" Color="White"/>
+        <SolidColorBrush x:Key="Background.Hover" Color="#F3F2F1"/>
 
         <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource Text.Primary}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
-        <Style x:Key="LabelTextBlock" TargetType="TextBlock">
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Text.Secondary}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Margin" Value="{StaticResource LabelMargin}"/>
-            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
         </Style>
 
-        <Style TargetType="TextBox">
+        <Style x:Key="InputControlStyle" TargetType="Control">
             <Setter Property="Padding" Value="8,5"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Border.Default}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border CornerRadius="4" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                            <ScrollViewer x:Name="PART_ContentHost"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
-        <Style TargetType="ComboBox">
-            <Setter Property="Padding" Value="8,5"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
-        </Style>
-
-        <Style TargetType="DatePicker">
-            <Setter Property="Padding" Value="8,5"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
-        </Style>
+        <Style TargetType="TextBox" BasedOn="{StaticResource InputControlStyle}"/>
+        <Style TargetType="ComboBox" BasedOn="{StaticResource InputControlStyle}"/>
+        <Style TargetType="DatePicker" BasedOn="{StaticResource InputControlStyle}"/>
 
         <Style x:Key="PrimaryButton" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource PrimaryBlueBrush}"/>
+            <Setter Property="Background" Value="{StaticResource BrandBlue}"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Padding" Value="10,8"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Template">
@@ -75,7 +57,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryBlueHoverBrush}"/>
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource BrandBlue.Hover}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.6"/>
@@ -86,35 +68,51 @@
             </Setter>
         </Style>
 
+        <Style x:Key="SidebarToggle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource Text.Secondary}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Background.Hover}"/>
+                    <Setter Property="Foreground" Value="{StaticResource BrandBlue}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource Background.Panel}"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect ShadowDepth="1" Color="#E0E0E0" Opacity="0.8" BlurRadius="5"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="Expander">
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Expander">
                         <StackPanel>
-                            <ToggleButton x:Name="HeaderSite"
-                                          IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-                                          OverridesDefaultStyle="True">
+                            <ToggleButton IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}">
                                 <ToggleButton.Template>
                                     <ControlTemplate TargetType="ToggleButton">
-                                        <Border Padding="0,5" Background="Transparent">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Path x:Name="Arrow"
-                                                      Grid.Column="0"
-                                                      SnapsToDevicePixels="True"
-                                                      Fill="{StaticResource SecondaryTextBrush}"
-                                                      Data="M 0 0 L 4 4 L 8 0 Z"
-                                                      VerticalAlignment="Center"
-                                                      Margin="0,0,8,0"/>
-                                                <ContentPresenter Grid.Column="1"
-                                                                  ContentSource="Content"
-                                                                  RecognizesAccessKey="True"/>
-                                            </Grid>
-                                        </Border>
+                                        <Grid Background="Transparent">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Header, RelativeSource={RelativeSource AncestorType=Expander}}" FontWeight="Bold" FontSize="16"/>
+                                            <Path x:Name="Arrow" Grid.Column="1" Data="M 0 0 L 4 4 L 8 0 Z" Fill="{StaticResource Text.Secondary}" VerticalAlignment="Center"/>
+                                        </Grid>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsChecked" Value="True">
                                                 <Setter TargetName="Arrow" Property="Data" Value="M 0 4 L 4 0 L 8 4 Z"/>
@@ -122,56 +120,12 @@
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                 </ToggleButton.Template>
-                                <TextBlock Text="{TemplateBinding Header}" FontWeight="Bold" FontSize="16"/>
                             </ToggleButton>
-                            <ContentPresenter x:Name="ExpandSite" Visibility="Collapsed" Margin="5,10,5,10"/>
+                            <ContentPresenter x:Name="Content" Margin="0,15,0,5" Visibility="Collapsed"/>
                         </StackPanel>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsExpanded" Value="True">
-                                <Setter TargetName="ExpandSite" Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="GroupBox">
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="0,8,0,12"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="GroupBox">
-                        <StackPanel Margin="{StaticResource ControlMargin}">
-                            <TextBlock Text="{TemplateBinding Header}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource PrimaryTextBrush}" Margin="0,0,0,8"/>
-                            <ContentPresenter Margin="10,5,0,0"/>
-                            <Separator Margin="0,15,0,0" />
-                        </StackPanel>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="SidebarToggleButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Width" Value="22"/>
-            <Setter Property="Height" Value="50"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4" SnapsToDevicePixels="True">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource ControlBackgroundHover}"/>
-                                <Setter Property="Foreground" Value="{StaticResource PrimaryBlueBrush}"/>
+                                <Setter TargetName="Content" Property="Visibility" Value="Visible"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -179,169 +133,186 @@
             </Setter>
         </Style>
     </Window.Resources>
-
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="SidebarColumn" Width="340"/>
+            <ColumnDefinition x:Name="SidebarColumn" Width="380"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" x:Name="SidebarBorder" Background="{StaticResource PanelBackgroundBrush}" BorderThickness="0,0,1,0" BorderBrush="{StaticResource BorderBrush}">
+        <Border Grid.Column="0" x:Name="SidebarBorder" Background="{StaticResource Background.Panel}" BorderThickness="0,0,1,0" BorderBrush="{StaticResource Border.Default}" Padding="20">
             <DockPanel>
-                <StackPanel DockPanel.Dock="Top" Margin="{StaticResource HeaderMargin}">
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,20">
                     <TextBlock Text="ManutMap" FontSize="24" FontWeight="Bold"/>
-                    <TextBlock Text="Filtros e Visualização" FontSize="14" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,4,0,0"/>
+                    <TextBlock Text="Filtros e Visualização" FontSize="14" Foreground="{StaticResource Text.Secondary}"/>
                 </StackPanel>
 
-                <Grid DockPanel.Dock="Bottom" Margin="{StaticResource HeaderMargin}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button x:Name="DownloadButton" Grid.Column="0" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click" Margin="0,0,5,0"/>
-                    <Button x:Name="ShareButton" Grid.Column="1" Content="Compartilhar" Style="{StaticResource PrimaryButton}" Click="ShareButton_Click" Margin="5,0,5,0"/>
-                    <Button x:Name="ClearFiltersButton" Grid.Column="2" Content="Limpar Filtros" Style="{StaticResource PrimaryButton}" Click="ClearFiltersButton_Click" Margin="5,0,5,0"/>
-                    <Button x:Name="DatalogButton" Grid.Column="3" Content="Buscar Datalog" Style="{StaticResource PrimaryButton}" Click="DatalogButton_Click"/>
-                </Grid>
+                <UniformGrid DockPanel.Dock="Bottom" Columns="2" Rows="2" Margin="0,15,0,0">
+                    <Button x:Name="DownloadButton" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click" Margin="0,0,5,5"/>
+                    <Button x:Name="ShareButton" Content="Compartilhar" Style="{StaticResource PrimaryButton}" Click="ShareButton_Click" Margin="5,0,0,5"/>
+                    <Button x:Name="ClearFiltersButton" Content="Limpar Filtros" Style="{StaticResource PrimaryButton}" Click="ClearFiltersButton_Click" Margin="0,5,5,0"/>
+                    <Button x:Name="DatalogButton" Content="Buscar Datalog" Style="{StaticResource PrimaryButton}" Click="DatalogButton_Click" Margin="5,5,0,0"/>
+                </UniformGrid>
 
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource PanelPadding}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel>
-                        <Expander Header="Busca por Atributos" IsExpanded="True">
-                            <StackPanel>
-                                <TextBlock Text="Tipo SIGFI" Style="{StaticResource LabelTextBlock}"/>
-                                <ComboBox x:Name="SigfiFilterCombo" SelectionChanged="FiltersChanged"/>
-                                <TextBlock Text="Tipo Serviço" Style="{StaticResource LabelTextBlock}" Margin="{StaticResource ControlMargin}"/>
-                                <ComboBox x:Name="TipoFilterCombo" SelectionChanged="FiltersChanged"/>
-                                <TextBlock Text="Número da OS" Style="{StaticResource LabelTextBlock}" Margin="{StaticResource ControlMargin}"/>
-                                <TextBox x:Name="NumOsFilterBox" TextChanged="FiltersChanged"/>
-                                <TextBlock Text="ID SIGFI" Style="{StaticResource LabelTextBlock}" Margin="{StaticResource ControlMargin}"/>
-                                <TextBox x:Name="IdSigfiFilterBox" TextChanged="FiltersChanged"/>
-                                <TextBlock Text="Regional" Style="{StaticResource LabelTextBlock}" Margin="{StaticResource ControlMargin}"/>
-                                <ComboBox x:Name="RegionalFilterCombo" SelectionChanged="RegionalChanged"/>
-                                <TextBlock Text="Rota" Style="{StaticResource LabelTextBlock}" Margin="{StaticResource ControlMargin}"/>
-                                <ComboBox x:Name="RotaFilterCombo" SelectionChanged="FiltersChanged"/>
-                            </StackPanel>
-                        </Expander>
+                        <Border Style="{StaticResource Card}">
+                            <Expander Header="Busca por Atributos" IsExpanded="True">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
 
-                        <Expander Header="Período de Execução" IsExpanded="True" Margin="{StaticResource ControlMargin}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="Data Inicial" Style="{StaticResource LabelTextBlock}"/>
-                                    <DatePicker x:Name="StartDatePicker" SelectedDateChanged="FiltersChanged"/>
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="a" Margin="10,0" VerticalAlignment="Bottom" Padding="0,0,0,8"/>
-                                <StackPanel Grid.Column="2">
-                                    <TextBlock Text="Data Final" Style="{StaticResource LabelTextBlock}"/>
-                                    <DatePicker x:Name="EndDatePicker" SelectedDateChanged="FiltersChanged"/>
-                                </StackPanel>
-                            </Grid>
-                        </Expander>
-
-                        <Expander Header="Visualização e Camadas" IsExpanded="True" Margin="{StaticResource ControlMargin}">
-                            <StackPanel>
-                                <GroupBox Header="Status das OS">
-                                    <StackPanel>
-                                        <CheckBox x:Name="ChbOpen" Content="Exibir OS Abertas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                        <TextBlock Text="Cor (Aberto):" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <ComboBox x:Name="ColorOpenCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,10">
-                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000" IsSelected="True"/>
-                                            <ComboBoxItem Content="Verde" Tag="#008000"/>
-                                            <ComboBoxItem Content="Azul" Tag="#0000FF"/>
-                                            <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
-                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
-                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
-                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
-                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
-                                        </ComboBox>
-                                        <CheckBox x:Name="ChbClosed" Content="Exibir OS Concluídas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                        <TextBlock Text="Cor (Concluído):" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <ComboBox x:Name="ColorClosedCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,0">
-                                            <ComboBoxItem Content="Verde" Tag="#008000" IsSelected="True"/>
-                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
-                                            <ComboBoxItem Content="Azul" Tag="#0000FF"/>
-                                            <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
-                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
-                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
-                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
-                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
-                                        </ComboBox>
+                                    <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                                        <TextBlock Text="Tipo SIGFI" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="SigfiFilterCombo" SelectionChanged="FiltersChanged"/>
                                     </StackPanel>
-                                </GroupBox>
 
+                                    <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                                        <TextBlock Text="Tipo Serviço" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="TipoFilterCombo" SelectionChanged="FiltersChanged"/>
+                                    </StackPanel>
 
-                                <GroupBox Header="Colorir por Tipo de Serviço">
-                                    <StackPanel>
-                                        <CheckBox x:Name="ChbColorPrev" Content="Colorir Preventiva" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                        <TextBlock Text="Cor Preventiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <ComboBox x:Name="ColorTipoPrevCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,5">
-                                            <ComboBoxItem Content="Azul" Tag="#0000FF" IsSelected="True"/>
-                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
-                                            <ComboBoxItem Content="Verde" Tag="#008000"/>
-                                            <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
-                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
-                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
-                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
-                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
-                                        </ComboBox>
-                                        <CheckBox x:Name="ChbColorCorr" Content="Colorir Corretiva" Margin="0,5,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                        <TextBlock Text="Cor Corretiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <ComboBox x:Name="ColorTipoCorrCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,5">
-                                            <ComboBoxItem Content="Laranja" Tag="#FFA500" IsSelected="True"/>
-                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
-                                            <ComboBoxItem Content="Verde" Tag="#008000"/>
-                                            <ComboBoxItem Content="Azul" Tag="#0000FF"/>
-                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
-                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
-                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
-                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
-                                        </ComboBox>
-                                        <CheckBox x:Name="ChbColorServ" Content="Colorir Serviços" Margin="0,5,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                        <TextBlock Text="Cor Serviços:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <ComboBox x:Name="ColorTipoServCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,0">
+                                    <StackPanel Grid.Row="2" Margin="0,0,0,10">
+                                        <TextBlock Text="Número da OS" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox x:Name="NumOsFilterBox" TextChanged="FiltersChanged"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="3" Margin="0,0,0,10">
+                                        <TextBlock Text="ID SIGFI" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox x:Name="IdSigfiFilterBox" TextChanged="FiltersChanged"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="4" Margin="0,0,0,10">
+                                        <TextBlock Text="Regional" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="RegionalFilterCombo" SelectionChanged="RegionalChanged"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="5">
+                                        <TextBlock Text="Rota" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="RotaFilterCombo" SelectionChanged="FiltersChanged"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Expander>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <Expander Header="Período de Execução" IsExpanded="True">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Data Inicial" Style="{StaticResource LabelStyle}"/>
+                                        <DatePicker x:Name="StartDatePicker" SelectedDateChanged="FiltersChanged"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="a" Margin="10,0" VerticalAlignment="Bottom" Padding="0,0,0,8"/>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Data Final" Style="{StaticResource LabelStyle}"/>
+                                        <DatePicker x:Name="EndDatePicker" SelectedDateChanged="FiltersChanged"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Expander>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <Expander Header="Visualização e Camadas" IsExpanded="True">
+                                <StackPanel>
+                                    <CheckBox x:Name="ChbOpen" Content="Exibir OS Abertas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                    <CheckBox x:Name="ChbClosed" Content="Exibir OS Concluídas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged" Margin="0,5,0,15"/>
+
+                                    <CheckBox x:Name="ChbColorPrev" Content="Colorir por Preventiva" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                    <CheckBox x:Name="ChbColorCorr" Content="Colorir por Corretiva" Margin="0,5,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                    <CheckBox x:Name="ChbColorServ" Content="Colorir por Serviços" Margin="0,5,0,15" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+
+                                    <Separator Margin="0,0,0,15"/>
+
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                            <TextBlock Text="Cor (Aberto):" Style="{StaticResource LabelStyle}"/>
+                                            <ComboBox x:Name="ColorOpenCombo" SelectionChanged="FiltersChanged" Width="120">
+                                                <ComboBoxItem Content="Vermelho" Tag="#FF0000" IsSelected="True"/>
+                                                <ComboBoxItem Content="Verde" Tag="#008000"/>
+                                                <ComboBoxItem Content="Azul" Tag="#0000FF"/>
+                                                <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
+                                                <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
+                                                <ComboBoxItem Content="Roxo" Tag="#800080"/>
+                                            </ComboBox>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                            <TextBlock Text="Cor (Concluído):" Style="{StaticResource LabelStyle}"/>
+                                            <ComboBox x:Name="ColorClosedCombo" SelectionChanged="FiltersChanged" Width="120">
+                                                <ComboBoxItem Content="Verde" Tag="#008000" IsSelected="True"/>
+                                                <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
+                                                <ComboBoxItem Content="Azul" Tag="#0000FF"/>
+                                                <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
+                                                <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
+                                                <ComboBoxItem Content="Roxo" Tag="#800080"/>
+                                            </ComboBox>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                            <TextBlock Text="Cor Preventiva:" Style="{StaticResource LabelStyle}"/>
+                                            <ComboBox x:Name="ColorTipoPrevCombo" SelectionChanged="FiltersChanged" Width="120">
+                                                <ComboBoxItem Content="Azul" Tag="#0000FF" IsSelected="True"/>
+                                                <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
+                                                <ComboBoxItem Content="Verde" Tag="#008000"/>
+                                                <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
+                                            </ComboBox>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                            <TextBlock Text="Cor Corretiva:" Style="{StaticResource LabelStyle}"/>
+                                            <ComboBox x:Name="ColorTipoCorrCombo" SelectionChanged="FiltersChanged" Width="120">
+                                                <ComboBoxItem Content="Laranja" Tag="#FFA500" IsSelected="True"/>
+                                                <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
+                                                <ComboBoxItem Content="Verde" Tag="#008000"/>
+                                                <ComboBoxItem Content="Azul" Tag="#0000FF"/>
+                                            </ComboBox>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <StackPanel Margin="0,0,0,15">
+                                        <TextBlock Text="Cor Serviços:" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="ColorTipoServCombo" SelectionChanged="FiltersChanged" Width="120">
                                             <ComboBoxItem Content="Teal" Tag="#008080" IsSelected="True"/>
                                             <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
                                             <ComboBoxItem Content="Verde" Tag="#008000"/>
                                             <ComboBoxItem Content="Azul" Tag="#0000FF"/>
-                                            <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
-                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
-                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
-                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
-                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
                                         </ComboBox>
                                     </StackPanel>
-                                </GroupBox>
 
-                                <GroupBox Header="Campo de Coordenadas">
-                                    <StackPanel>
-                                        <TextBlock Text="Selecione o campo com coordenadas:" Style="{StaticResource LabelTextBlock}"/>
-                                        <ComboBox x:Name="LatLonFieldCombo" SelectionChanged="FiltersChanged" Width="150" Margin="0,5,0,0">
-                                            <ComboBoxItem Content="LATLON" IsSelected="True"/>
-                                            <ComboBoxItem Content="LATLONCON"/>
-                                        </ComboBox>
-                                    </StackPanel>
-                                </GroupBox>
-                            </StackPanel>
-                        </Expander>
+                                    <Separator Margin="0,0,0,15"/>
+
+                                    <TextBlock Text="Campo de Coordenadas:" Style="{StaticResource LabelStyle}"/>
+                                    <ComboBox x:Name="LatLonFieldCombo" SelectionChanged="FiltersChanged" SelectedIndex="0">
+                                        <ComboBoxItem Content="LATLON"/>
+                                        <ComboBoxItem Content="LATLONCON"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Expander>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </DockPanel>
         </Border>
-
-        <Button Grid.Column="1"
-                x:Name="ToggleSidebarButton"
-                Click="ToggleSidebarButton_Click"
-                Style="{StaticResource SidebarToggleButtonStyle}"
-                ToolTip="Recolher/Expandir Painel">
-            ◄
-        </Button>
+        <Button Grid.Column="1" x:Name="ToggleSidebarButton" Click="ToggleSidebarButton_Click" Style="{StaticResource SidebarToggle}" ToolTip="Recolher/Expandir Painel" Content="◄"/>
 
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
@@ -351,7 +322,7 @@
 
             <wv2:WebView2 Grid.Row="0" x:Name="MapView"/>
 
-            <Border Grid.Row="1" Background="{StaticResource PanelBackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="15,10">
+            <Border Grid.Row="1" Background="{StaticResource Background.Panel}" BorderThickness="0,1,0,0" BorderBrush="{StaticResource Border.Default}" Padding="15,10">
                 <WrapPanel Orientation="Horizontal" ItemHeight="20">
                     <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
                         <TextBlock Text="Preventivas:" FontWeight="Bold" Margin="0,0,8,0"/>
