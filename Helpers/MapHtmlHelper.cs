@@ -270,7 +270,8 @@ namespace ManutMap.Helpers
     }
     </script>
 </body></html>
-        """;
+
+""";
 
         public static string GetHtmlWithData(IEnumerable<JObject> data,
                                              bool colorBySigfi,
