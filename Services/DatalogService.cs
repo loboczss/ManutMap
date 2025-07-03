@@ -242,7 +242,7 @@ namespace ManutMap.Services
         }
 
         public async Task<List<(string Url, DateTime Date)>> GetPastasInstalacaoAsync(string driveId,
-                                                                                      string? idSigfi)
+                                             string? idSigfi)
         {
             var all = await GetAllRootFoldersAsync(driveId);
 
@@ -258,6 +258,36 @@ namespace ManutMap.Services
                         (i.LastModifiedDateTime ?? i.CreatedDateTime ?? DateTimeOffset.MinValue)
                             .UtcDateTime))
                     .ToList();
+        }
+
+        public async Task<Dictionary<string, string>> GetAllDatalogFoldersAsync()
+        {
+            var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
+            string driveId = await GetDriveId(site.Id, DriveDatalog);
+
+            var all = await GetAllRootFoldersAsync(driveId);
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var it in all)
+            {
+                string name = it.Name!.Trim();
+                string url = it.WebUrl ??
+                              $"https://{Domain}/sites/{SitePath}/{DriveDatalog}/{name}";
+
+                dict[name] = url;
+
+                int idx = name.IndexOf('_');
+                if (idx > 0)
+                {
+                    string prefix = name[..idx];
+                    dict.TryAdd(prefix, url);
+
+                    if (idx == name.Length - 1)
+                        dict.TryAdd(prefix.TrimEnd('_'), url);
+                }
+            }
+
+            return dict;
         }
     }
 }
