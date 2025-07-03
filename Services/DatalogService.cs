@@ -25,13 +25,6 @@ namespace ManutMap.Services
         private const string DriveDatalog = "DatalogGERAL";
         private const string DriveJson = "ArquivosJSON";
 
-        private static readonly string[] JsonSuffixes =
-        {
-            "__Manutencao_AC2025.json",
-            "__Manutencao_AC2024.json",
-            "__Manutencao_AC2023.json",
-            "__Manutencao_MT.json"
-        };
 
         private readonly GraphServiceClient _graph;
 
@@ -130,7 +123,7 @@ namespace ManutMap.Services
             var pg = await _graph.Drives[driveId].Items["root"].Children.GetAsync();
             var list = new List<DriveItem>();
 
-            foreach (var suf in JsonSuffixes)
+            foreach (var suf in JsonFileConstants.JsonSuffixes)
             {
                 var arquivos = pg.Value
                     .Where(f => f.File != null &&
