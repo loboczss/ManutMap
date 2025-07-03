@@ -191,6 +191,82 @@ namespace ManutMap.Helpers
         map.fitBounds(grp.getBounds().pad(0.2));
       }
     }
+
+    function addMarkersByTipoServicoIcon(data, showOpen, showClosed, latLonField){
+      clearMarkers();
+
+      var iconPrev = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+        shadowUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+        iconSize: [25,41],
+        iconAnchor: [12,41],
+        popupAnchor: [1,-34],
+        shadowSize: [41,41]
+      });
+      var iconCorr = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+        shadowUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+        iconSize: [25,41],
+        iconAnchor: [12,41],
+        popupAnchor: [1,-34],
+        shadowSize: [41,41]
+      });
+      var iconServ = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+        shadowUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+        iconSize: [25,41],
+        iconAnchor: [12,41],
+        popupAnchor: [1,-34],
+        shadowSize: [41,41]
+      });
+
+      data.forEach(function(item){
+        var dtRec = item.DTAHORARECLAMACAO ? item.DTAHORARECLAMACAO.trim() : '';
+        var dtCon = item.DTCONCLUSAO     ? item.DTCONCLUSAO.trim()     : '';
+        var isOpen   = dtRec !== '' && dtCon === '';
+        var isClosed = dtCon !== '';
+        if((isOpen && !showOpen) || (isClosed && !showClosed)) return;
+
+        var coord = null;
+        if(latLonField === 'LATLON')
+          coord = item.LATLON;
+        else if(latLonField === 'LATLONCON')
+          coord = item.LATLONCON;
+        if(!coord || coord.trim() === '') return;
+
+        var coordStr = coord.trim();
+        var nums = coordStr.match(/-?\d+(?:[.,]\d+)?/g);
+        if(!nums || nums.length < 2) return;
+        var lat = parseFloat(nums[0].replace(',', '.')),
+            lng = parseFloat(nums[1].replace(',', '.'));
+        if(isNaN(lat) || isNaN(lng)) return;
+
+        var tipo = (item.TIPO || '').toString().trim().toLowerCase();
+        var icon = tipo === 'preventiva' ? iconPrev :
+                    tipo === 'corretiva' ? iconCorr : iconServ;
+
+        var m = L.marker([lat,lng],{ icon: icon }).addTo(map);
+
+        var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
+                    '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
+                    (isOpen?'<b>Status:</b> Aberto<br>' : '<b>Status:</b> Concluído<br>')+
+                    (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
+                    (dtCon?'<b>Conclusão:</b> '+dtCon+'<br>':'')+
+                    '<b>Rota:</b> '+item.ROTA+'<br>'+
+                    '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
+                    '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
+                    '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    '<b>LatLon ('+latLonField+'):</b> '+coordStr;
+
+        m.bindPopup(popup);
+        markers.push(m);
+      });
+
+      if(markers.length>0){
+        var grp = L.featureGroup(markers);
+        map.fitBounds(grp.getBounds().pad(0.2));
+      }
+    }
   </script>
 </body></html>";
 
@@ -204,12 +280,15 @@ namespace ManutMap.Helpers
                                              string colorPrev,
                                              string colorCorr,
                                              string colorServ,
-                                             string latLonField)
+                                             string latLonField,
+                                             bool iconByTipo = false)
         {
             var baseHtml = GetHtml();
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(data);
             string call;
-            if(colorByTipo)
+            if(iconByTipo)
+                call = $"addMarkersByTipoServicoIcon(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{latLonField}');";
+            else if(colorByTipo)
                 call = $"addMarkersByTipoServico(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorPrev}','{colorCorr}','{colorServ}','{latLonField}');";
             else if(colorBySigfi)
                 call = $"addMarkersByTipoSigfi(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorPrev}','{colorCorr}','{latLonField}');";

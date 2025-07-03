@@ -86,5 +86,20 @@ namespace ManutMap.Services
             else
                 _view.ExecuteScriptAsync(script);
         }
+
+        public void AddMarkersByTipoServicoIcon(IEnumerable<JObject> data,
+                                               bool showOpen,
+                                               bool showClosed,
+                                               string latLonField = "LATLON")
+        {
+            var json = JsonConvert.SerializeObject(data);
+            var script =
+                $"addMarkersByTipoServicoIcon({json},{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{latLonField}');";
+
+            if (!_ready)
+                _pendingScripts.Add(script);
+            else
+                _view.ExecuteScriptAsync(script);
+        }
     }
 }
