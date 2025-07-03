@@ -351,5 +351,12 @@ namespace ManutMap
 
             ApplyFilters();
         }
+
+        private void DatalogButton_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new DatalogWindow();
+            win.Owner = this;
+            win.Show();
+        }
     }
 }

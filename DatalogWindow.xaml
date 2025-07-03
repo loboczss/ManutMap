@@ -1,0 +1,50 @@
+<Window x:Class="ManutMap.DatalogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Buscar Datalog" Height="450" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="Início:" VerticalAlignment="Center"/>
+            <DatePicker x:Name="DpInicio" SelectedDate="{x:Static sys:DateTime.Today}"/>
+            <TextBlock Text="Fim:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+            <DatePicker x:Name="DpFim" SelectedDate="{x:Static sys:DateTime.Today}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" Margin="0,10,0,10">
+            <ComboBox x:Name="CmbFiltro" Width="120">
+                <ComboBoxItem Content="OS"/>
+                <ComboBoxItem Content="IDSIGFI"/>
+                <ComboBoxItem Content="Rota"/>
+                <ComboBoxItem Content="Instalação"/>
+            </ComboBox>
+            <TextBox x:Name="TxtBusca" Width="200"/>
+            <ComboBox x:Name="CmbRegional" Width="100" Margin="10,0,0,0">
+                <ComboBoxItem Content="Todas"/>
+                <ComboBoxItem Content="AC"/>
+                <ComboBoxItem Content="MT"/>
+            </ComboBox>
+            <Button x:Name="BtnBuscar" Content="Buscar" Click="BtnBuscar_Click"/>
+        </StackPanel>
+
+        <DataGrid Grid.Row="2" x:Name="GridOs" AutoGenerateColumns="False" Margin="0,0,0,10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>
+                <DataGridTextColumn Header="IDSIGFI" Binding="{Binding IdSigfi}" Width="*"/>
+                <DataGridTextColumn Header="Rota" Binding="{Binding Rota}" Width="*"/>
+                <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="*"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
+                <DataGridHyperlinkColumn Header="Pasta" Binding="{Binding FolderUrl}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBlock Grid.Row="3" x:Name="TxtResumo"/>
+    </Grid>
+</Window>
