@@ -3,8 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Azure.Identity;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
+using Microsoft.Kiota.Abstractions;
 using Newtonsoft.Json.Linq;
 
 namespace ManutMap.Services
@@ -18,14 +21,8 @@ namespace ManutMap.Services
         private const string SiteHostname = "oneengenharia.sharepoint.com";
         private const string SitePath = "/sites/OneEngenharia";
         private const string LibraryName = "ArquivosJSON";
-        // Padrões dos arquivos a serem baixados
-        private static readonly string[] FileNameFilters = new[]
-        {
-            "Manutencao_AC2025",
-            "Manutencao_AC2024",
-            "Manutencao_AC2023",
-            "Manutencao_MT"
-        };
+        // Prefixo utilizado pelos arquivos de manutenção
+        private const string FilePrefix = "Manutencao_";
 
         public DateTime LastUpdate { get; private set; }
 
@@ -43,28 +40,34 @@ namespace ManutMap.Services
                 d.Name.Equals(LibraryName, StringComparison.OrdinalIgnoreCase));
             if (drive == null) throw new InvalidOperationException($"Biblioteca '{LibraryName}' não encontrada.");
 
-            var children = await _client.Drives[drive.Id].Items["root"].Children.GetAsync();
+            var pg = await _client.Drives[drive.Id].Items["root"].Children.GetAsync();
+            var all = pg.Value.ToList();
+
+            while (pg.OdataNextLink is string next)
+            {
+                var req = new Microsoft.Kiota.Abstractions.RequestInformation
+                {
+                    HttpMethod = Microsoft.Kiota.Abstractions.Method.GET,
+                    UrlTemplate = next,
+                    PathParameters = new Dictionary<string, object>()
+                };
+                pg = await _client.RequestAdapter.SendAsync(
+                        req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
+                all.AddRange(pg!.Value);
+            }
+
+            var jsonFiles = all.Where(f => f.File != null &&
+                                           f.Name.StartsWith(FilePrefix, StringComparison.OrdinalIgnoreCase) &&
+                                           f.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                                .OrderBy(f => f.Name)
+                                .ToList();
 
             var merged = new JArray();
-            foreach (var filter in FileNameFilters)
+            foreach (var file in jsonFiles)
             {
-                var target = children.Value
-                    .Where(f => f.Name.Contains(filter, StringComparison.OrdinalIgnoreCase) &&
-                                f.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-                    .OrderByDescending(f => f.LastModifiedDateTime)
-                    .FirstOrDefault();
-
-                if (target == null) continue;
-
-                using var stream = await _client.Drives[drive.Id].Items[target.Id].Content.GetAsync();
-                var localName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{filter}_latest.json");
-                using (var fs = new FileStream(localName, FileMode.Create, FileAccess.Write, FileShare.Read))
-                {
-                    await stream.CopyToAsync(fs);
-                }
-
-                var json = File.ReadAllText(localName);
-                var root = JObject.Parse(json);
+                using var stream = await _client.Drives[drive.Id].Items[file.Id].Content.GetAsync();
+                using var sr = new StreamReader(stream, Encoding.UTF8);
+                var root = JObject.Parse(await sr.ReadToEndAsync());
                 if (root["manutencoes"] is JArray arr)
                     merged.Merge(arr);
             }
