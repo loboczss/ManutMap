@@ -77,6 +77,11 @@ namespace ManutMap
             ChbColorBySigfi.Unchecked += FiltersChanged;
             TxtColorPrev.TextChanged += FiltersChanged;
             TxtColorCorr.TextChanged += FiltersChanged;
+            ChbColorByTipo.Checked += FiltersChanged;
+            ChbColorByTipo.Unchecked += FiltersChanged;
+            TxtColorTipoPrev.TextChanged += FiltersChanged;
+            TxtColorTipoCorr.TextChanged += FiltersChanged;
+            TxtColorTipoServ.TextChanged += FiltersChanged;
         }
 
         private void LoadLocalAndPopulate()
@@ -177,6 +182,10 @@ namespace ManutMap
                 ColorByTipoSigfi = ChbColorBySigfi.IsChecked == true,
                 ColorPreventiva = TxtColorPrev.Text.Trim(),
                 ColorCorretiva = TxtColorCorr.Text.Trim(),
+                ColorByTipoServico = ChbColorByTipo.IsChecked == true,
+                ColorServicoPreventiva = TxtColorTipoPrev.Text.Trim(),
+                ColorServicoCorretiva = TxtColorTipoCorr.Text.Trim(),
+                ColorServicoOutros = TxtColorTipoServ.Text.Trim(),
                 LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON"
             };
         }
@@ -203,7 +212,17 @@ namespace ManutMap
 
             var filteredResult = _filterSvc.Apply(_manutList, criteria);
 
-            if (criteria.ColorByTipoSigfi)
+            if (criteria.ColorByTipoServico)
+            {
+                _mapService.AddMarkersByTipoServico(filteredResult,
+                                                   criteria.ShowOpen,
+                                                   criteria.ShowClosed,
+                                                   criteria.ColorServicoPreventiva,
+                                                   criteria.ColorServicoCorretiva,
+                                                   criteria.ColorServicoOutros,
+                                                   criteria.LatLonField);
+            }
+            else if (criteria.ColorByTipoSigfi)
             {
                 _mapService.AddMarkersByTipoSigfi(filteredResult, criteria.ShowOpen, criteria.ShowClosed, criteria.ColorPreventiva, criteria.ColorCorretiva, criteria.LatLonField);
             }
@@ -256,12 +275,14 @@ namespace ManutMap
             var filtered = _filterSvc.Apply(_manutList, criteria);
             var html = Helpers.MapHtmlHelper.GetHtmlWithData(filtered,
                                                             criteria.ColorByTipoSigfi,
+                                                            criteria.ColorByTipoServico,
                                                             criteria.ShowOpen,
                                                             criteria.ShowClosed,
                                                             criteria.ColorOpen,
                                                             criteria.ColorClosed,
-                                                            criteria.ColorPreventiva,
-                                                            criteria.ColorCorretiva,
+                                                            criteria.ColorByTipoServico ? criteria.ColorServicoPreventiva : criteria.ColorPreventiva,
+                                                            criteria.ColorByTipoServico ? criteria.ColorServicoCorretiva : criteria.ColorCorretiva,
+                                                            criteria.ColorServicoOutros,
                                                             criteria.LatLonField);
 
             var fileName = $"mapa_{DateTime.Now:yyyyMMddHHmmss}.html";

@@ -175,6 +175,20 @@
                                     </StackPanel>
                                 </GroupBox>
 
+                                <GroupBox Header="Colorir por Tipo de Serviço">
+                                    <StackPanel Margin="10,5,0,0">
+                                        <CheckBox x:Name="ChbColorByTipo" Content="Ativar Coloração por Serviço" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                        <TextBlock Text="Cor Preventiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
+                                        <TextBox x:Name="TxtColorTipoPrev" Width="100" Margin="10,0,0,5" Text="#0000FF"/>
+
+                                        <TextBlock Text="Cor Corretiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
+                                        <TextBox x:Name="TxtColorTipoCorr" Width="100" Margin="10,0,0,5" Text="#FFA500"/>
+
+                                        <TextBlock Text="Cor Serviços:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
+                                        <TextBox x:Name="TxtColorTipoServ" Width="100" Margin="10,0,0,0" Text="#008080"/>
+                                    </StackPanel>
+                                </GroupBox>
+
                                 <GroupBox Header="Campo de Coordenadas">
                                     <StackPanel Margin="10,5,0,0">
                                         <TextBlock Text="Selecione o campo com coordenadas:" Style="{StaticResource LabelTextBlock}"/>
