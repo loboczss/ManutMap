@@ -6,6 +6,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="Services/FileService.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Azure.Identity" Version="1.14.1" />
 		<PackageReference Include="Microsoft.Graph" Version="5.83.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
