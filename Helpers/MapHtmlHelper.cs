@@ -137,24 +137,84 @@ namespace ManutMap.Helpers
         map.fitBounds(grp.getBounds().pad(0.2));
       }
     }
+
+    function addMarkersByTipoServico(data, showOpen, showClosed, colorPrev, colorCorr, colorServ, latLonField){
+      clearMarkers();
+
+      data.forEach(function(item){
+        var dtRec = item.DTAHORARECLAMACAO ? item.DTAHORARECLAMACAO.trim() : '';
+        var dtCon = item.DTCONCLUSAO     ? item.DTCONCLUSAO.trim()     : '';
+        var isOpen   = dtRec !== '' && dtCon === '';
+        var isClosed = dtCon !== '';
+        if((isOpen && !showOpen) || (isClosed && !showClosed)) return;
+
+        var coord = null;
+        if(latLonField === 'LATLON')
+          coord = item.LATLON;
+        else if(latLonField === 'LATLONCON')
+          coord = item.LATLONCON;
+        if(!coord || coord.trim() === '') return;
+
+        var coordStr = coord.trim();
+        var nums = coordStr.match(/-?\d+(?:[.,]\d+)?/g);
+        if(!nums || nums.length < 2) return;
+        var lat = parseFloat(nums[0].replace(',', '.')),
+            lng = parseFloat(nums[1].replace(',', '.'));
+        if(isNaN(lat) || isNaN(lng)) return;
+
+        var tipo = (item.TIPO || '').toString().trim().toLowerCase();
+        var color = tipo === 'preventiva' ? colorPrev :
+                    tipo === 'corretiva' ? colorCorr : colorServ;
+
+        var m = L.circleMarker([lat,lng],{
+          radius:6, fillColor:color, color:'#fff', weight:1.2, fillOpacity:0.9
+        }).addTo(map);
+
+        var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
+                    '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
+                    (isOpen?'<b>Status:</b> <span style="'+'color:'+color+'"'+'>Aberto</span><br>'
+                           :'<b>Status:</b> <span style="'+'color:'+color+'"'+'>Concluído</span><br>')+
+                    (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
+                    (dtCon?'<b>Conclusão:</b> '+dtCon+'<br>':'')+
+                    '<b>Rota:</b> '+item.ROTA+'<br>'+
+                    '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
+                    '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
+                    '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    '<b>LatLon ('+latLonField+'):</b> '+coordStr;
+
+        m.bindPopup(popup);
+        markers.push(m);
+      });
+
+      if(markers.length>0){
+        var grp = L.featureGroup(markers);
+        map.fitBounds(grp.getBounds().pad(0.2));
+      }
+    }
   </script>
 </body></html>";
 
         public static string GetHtmlWithData(IEnumerable<Newtonsoft.Json.Linq.JObject> data,
                                              bool colorBySigfi,
+                                             bool colorByTipo,
                                              bool showOpen,
                                              bool showClosed,
                                              string colorOpen,
                                              string colorClosed,
                                              string colorPrev,
                                              string colorCorr,
+                                             string colorServ,
                                              string latLonField)
         {
             var baseHtml = GetHtml();
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(data);
-            var call = colorBySigfi
-                ? $"addMarkersByTipoSigfi(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorPrev}','{colorCorr}','{latLonField}');"
-                : $"addMarkers(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorOpen}','{colorClosed}','{latLonField}');";
+            string call;
+            if(colorByTipo)
+                call = $"addMarkersByTipoServico(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorPrev}','{colorCorr}','{colorServ}','{latLonField}');";
+            else if(colorBySigfi)
+                call = $"addMarkersByTipoSigfi(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorPrev}','{colorCorr}','{latLonField}');";
+            else
+                call = $"addMarkers(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorOpen}','{colorClosed}','{latLonField}');";
             var script = $"<script>var data = {json};window.onload=function(){{{call}}}</script>";
             return baseHtml.Replace("</body></html>", script + "</body></html>");
         }

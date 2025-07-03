@@ -25,6 +25,12 @@ namespace ManutMap.Models
         public string ColorPreventiva { get; set; } = "#0000FF";
         public string ColorCorretiva { get; set; } = "#FFA500";
 
+        // Cores por tipo de serviço (Preventiva/Corretiva/Serviços)
+        public bool ColorByTipoServico { get; set; }
+        public string ColorServicoPreventiva { get; set; } = "#0000FF";
+        public string ColorServicoCorretiva { get; set; } = "#FFA500";
+        public string ColorServicoOutros { get; set; } = "#008080";
+
         // NOVO: qual campo de coordenada usar
         // "LATLON" ou "LATLONCON"
         public string LatLonField { get; set; } = "LATLON";
