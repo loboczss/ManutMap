@@ -3,10 +3,15 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
+		<ApplicationIcon>ChatGPT-Image-3-de-jul.-de-2025_-09_07_24.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<Compile Include="Services/FileService.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="ChatGPT-Image-3-de-jul.-de-2025_-09_07_24.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
