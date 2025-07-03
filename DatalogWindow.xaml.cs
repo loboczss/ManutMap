@@ -48,6 +48,8 @@ namespace ManutMap
             try
             {
                 var lista = await _service.BuscarAsync(ini, fim, termo, tipoFiltro, regionalSel);
+                if (Owner is MainWindow mainWin)
+                    mainWin.UpdateDatalogMap(lista);
                 TxtResumo.Text =
                     $"Total: {lista.Count} | Com datalog: {lista.Count(i => i.TemDatalog)} | Sem datalog: {lista.Count(i => !i.TemDatalog)}";
                 GridOs.ItemsSource = lista;

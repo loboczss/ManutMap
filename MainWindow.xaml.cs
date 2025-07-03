@@ -19,8 +19,10 @@ namespace ManutMap
         private readonly SharePointService _spService = new SharePointService();
         private readonly FileService _fileService = new FileService();
         private readonly FilterService _filterSvc = new FilterService();
+        private readonly DatalogService _datalogService = new DatalogService();
         private MapService _mapService;
         private JArray _manutList;
+        private Dictionary<string, string> _datalogMap;
         private readonly Dictionary<string, List<string>> _regionalRotas = new()
         {
             {"Cruzeiro do Sul", new List<string>{"01","02","03","04","05","14","15","16","17","30","32","34","36","39","40","42","06"}},
@@ -142,6 +144,9 @@ namespace ManutMap
         {
             _manutList = await _spService.DownloadLatestJsonAsync();
 
+            _datalogMap = await _datalogService.GetAllDatalogFoldersAsync();
+            AnnotateDatalogInfo();
+
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
             PopulateComboBox(TipoFilterCombo, "TIPO");
             PopulateComboBox(RotaFilterCombo, "ROTA");
@@ -259,6 +264,56 @@ namespace ManutMap
             CorretivasStatsText.Text = $"{corrAbertas} abertas, {corrConcluidas} concluídas";
             ServicosStatsText.Text = $"{servAbertos} abertos, {servConcluidos} concluídos";
             TotalStatsText.Text = dadosFiltrados.Count().ToString();
+        }
+
+        private void AnnotateDatalogInfo()
+        {
+            if (_manutList == null || _datalogMap == null) return;
+
+            foreach (var obj in _manutList.OfType<JObject>())
+            {
+                string num = (obj["NUMOS"]?.ToString() ?? string.Empty).Trim();
+                if (string.IsNullOrEmpty(num)) continue;
+
+                if (_datalogMap.TryGetValue(num, out var url))
+                {
+                    obj["TEMDATALOG"] = true;
+                    obj["FOLDERURL"] = url;
+                }
+                else
+                {
+                    obj["TEMDATALOG"] = false;
+                    obj["FOLDERURL"] = null;
+                }
+            }
+        }
+
+        public void UpdateDatalogMap(IEnumerable<OsInfo> infos)
+        {
+            if (infos == null) return;
+            if (_datalogMap == null)
+                _datalogMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var info in infos)
+            {
+                if (info.TemDatalog && !string.IsNullOrWhiteSpace(info.FolderUrl))
+                {
+                    _datalogMap[info.NumOS] = info.FolderUrl!;
+
+                    if (_manutList != null)
+                    {
+                        foreach (var obj in _manutList.OfType<JObject>())
+                        {
+                            string num = (obj["NUMOS"]?.ToString() ?? string.Empty).Trim();
+                            if (num.Equals(info.NumOS, StringComparison.OrdinalIgnoreCase))
+                            {
+                                obj["TEMDATALOG"] = true;
+                                obj["FOLDERURL"] = info.FolderUrl;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private async void ShareButton_Click(object sender, RoutedEventArgs e)
