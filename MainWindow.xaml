@@ -12,10 +12,17 @@
 
     <Window.Resources>
         <SolidColorBrush x:Key="PrimaryBlueBrush" Color="#0078D4"/>
+        <SolidColorBrush x:Key="PrimaryBlueHoverBrush" Color="#005A9E"/>
         <SolidColorBrush x:Key="PrimaryTextBrush" Color="#1F1F1F"/>
         <SolidColorBrush x:Key="SecondaryTextBrush" Color="#605E5C"/>
         <SolidColorBrush x:Key="BorderBrush" Color="#D1D1D1"/>
         <SolidColorBrush x:Key="PanelBackgroundBrush" Color="White"/>
+        <SolidColorBrush x:Key="ControlBackgroundHover" Color="#F3F2F1"/>
+
+        <Thickness x:Key="HeaderMargin">20</Thickness>
+        <Thickness x:Key="PanelPadding">20,0</Thickness>
+        <Thickness x:Key="ControlMargin">0,15,0,0</Thickness>
+        <Thickness x:Key="LabelMargin">0,0,0,5</Thickness>
 
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
@@ -24,7 +31,7 @@
 
         <Style x:Key="LabelTextBlock" TargetType="TextBlock">
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="Margin" Value="{StaticResource LabelMargin}"/>
             <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
         </Style>
 
@@ -32,7 +39,6 @@
             <Setter Property="Padding" Value="8,5"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
@@ -44,11 +50,14 @@
             </Setter>
         </Style>
 
-        <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Style TargetType="ComboBox">
             <Setter Property="Padding" Value="8,5"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
         </Style>
 
         <Style x:Key="PrimaryButton" TargetType="Button">
@@ -61,12 +70,15 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" CornerRadius="4" Background="{TemplateBinding Background}">
+                        <Border x:Name="border" CornerRadius="4" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#005A9E"/>
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryBlueHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.6"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -75,12 +87,94 @@
         </Style>
 
         <Style TargetType="Expander">
-            <Setter Property="Margin" Value="0,0,0,10"/>
-            <Setter Property="HeaderTemplate">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Template">
                 <Setter.Value>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" FontWeight="Bold" FontSize="16" Margin="0,5"/>
-                    </DataTemplate>
+                    <ControlTemplate TargetType="Expander">
+                        <StackPanel>
+                            <ToggleButton x:Name="HeaderSite"
+                                          IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                          OverridesDefaultStyle="True">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Padding="0,5" Background="Transparent">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Path x:Name="Arrow"
+                                                      Grid.Column="0"
+                                                      SnapsToDevicePixels="True"
+                                                      Fill="{StaticResource SecondaryTextBrush}"
+                                                      Data="M 0 0 L 4 4 L 8 0 Z"
+                                                      VerticalAlignment="Center"
+                                                      Margin="0,0,8,0"/>
+                                                <ContentPresenter Grid.Column="1"
+                                                                  ContentSource="Content"
+                                                                  RecognizesAccessKey="True"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="Arrow" Property="Data" Value="M 0 4 L 4 0 L 8 4 Z"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                                <TextBlock Text="{TemplateBinding Header}" FontWeight="Bold" FontSize="16"/>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="ExpandSite" Visibility="Collapsed" Margin="5,10,5,10"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Setter TargetName="ExpandSite" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="GroupBox">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0,8,0,12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <StackPanel Margin="{StaticResource ControlMargin}">
+                            <TextBlock Text="{TemplateBinding Header}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource PrimaryTextBrush}" Margin="0,0,0,8"/>
+                            <ContentPresenter Margin="10,5,0,0"/>
+                            <Separator Margin="0,15,0,0" />
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SidebarToggleButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4" SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource ControlBackgroundHover}"/>
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryBlueBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
@@ -89,49 +183,47 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="SidebarColumn" Width="340"/>
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border x:Name="SidebarBorder" Grid.Column="0" Background="{StaticResource PanelBackgroundBrush}" BorderThickness="0,0,1,0" BorderBrush="{StaticResource BorderBrush}">
+        <Border Grid.Column="0" x:Name="SidebarBorder" Background="{StaticResource PanelBackgroundBrush}" BorderThickness="0,0,1,0" BorderBrush="{StaticResource BorderBrush}">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="ManutMap" FontSize="24" FontWeight="Bold" Margin="20,20,20,10"/>
-                <TextBlock DockPanel.Dock="Top" Text="Filtros e Visualização" FontSize="14" Foreground="{StaticResource SecondaryTextBrush}" Margin="20,0,20,20"/>
+                <StackPanel DockPanel.Dock="Top" Margin="{StaticResource HeaderMargin}">
+                    <TextBlock Text="ManutMap" FontSize="24" FontWeight="Bold"/>
+                    <TextBlock Text="Filtros e Visualização" FontSize="14" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,4,0,0"/>
+                </StackPanel>
 
-                <Grid DockPanel.Dock="Bottom" Margin="20">
+                <Grid DockPanel.Dock="Bottom" Margin="{StaticResource HeaderMargin}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Button x:Name="DownloadButton" Grid.Column="0" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click" Margin="0,0,5,-6"/>
-                    <Button x:Name="ShareButton" Grid.Column="1" Content="Compartilhar" Style="{StaticResource PrimaryButton}" Click="ShareButton_Click" Margin="5,0,0,-6"/>
+                    <Button x:Name="DownloadButton" Grid.Column="0" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click" Margin="0,0,5,0"/>
+                    <Button x:Name="ShareButton" Grid.Column="1" Content="Compartilhar" Style="{StaticResource PrimaryButton}" Click="ShareButton_Click" Margin="5,0,0,0"/>
                 </Grid>
 
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource PanelPadding}">
                     <StackPanel>
                         <Expander Header="Busca por Atributos" IsExpanded="True">
-                            <StackPanel Margin="5,10,5,0">
+                            <StackPanel>
                                 <TextBlock Text="Tipo SIGFI" Style="{StaticResource LabelTextBlock}"/>
                                 <ComboBox x:Name="SigfiFilterCombo" SelectionChanged="FiltersChanged"/>
-
-                                <TextBlock Text="Tipo Serviço" Style="{StaticResource LabelTextBlock}" Margin="0,10,0,5"/>
+                                <TextBlock Text="Tipo Serviço" Style="{StaticResource LabelTextBlock}" Margin="{StaticResource ControlMargin}"/>
                                 <ComboBox x:Name="TipoFilterCombo" SelectionChanged="FiltersChanged"/>
-
-                                <TextBlock Text="Número da OS" Style="{StaticResource LabelTextBlock}" Margin="0,10,0,5"/>
+                                <TextBlock Text="Número da OS" Style="{StaticResource LabelTextBlock}" Margin="{StaticResource ControlMargin}"/>
                                 <TextBox x:Name="NumOsFilterBox" TextChanged="FiltersChanged"/>
-
-                                <TextBlock Text="ID SIGFI" Style="{StaticResource LabelTextBlock}" Margin="0,10,0,5"/>
+                                <TextBlock Text="ID SIGFI" Style="{StaticResource LabelTextBlock}" Margin="{StaticResource ControlMargin}"/>
                                 <TextBox x:Name="IdSigfiFilterBox" TextChanged="FiltersChanged"/>
-
-                                <TextBlock Text="Regional" Style="{StaticResource LabelTextBlock}" Margin="0,10,0,5"/>
+                                <TextBlock Text="Regional" Style="{StaticResource LabelTextBlock}" Margin="{StaticResource ControlMargin}"/>
                                 <ComboBox x:Name="RegionalFilterCombo" SelectionChanged="RegionalChanged"/>
-
-                                <TextBlock Text="Rota" Style="{StaticResource LabelTextBlock}" Margin="0,10,0,5"/>
+                                <TextBlock Text="Rota" Style="{StaticResource LabelTextBlock}" Margin="{StaticResource ControlMargin}"/>
                                 <ComboBox x:Name="RotaFilterCombo" SelectionChanged="FiltersChanged"/>
                             </StackPanel>
                         </Expander>
 
-                        <Expander Header="Período de Execução" IsExpanded="True">
-                            <Grid Margin="5,10,5,0">
+                        <Expander Header="Período de Execução" IsExpanded="True" Margin="{StaticResource ControlMargin}">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
@@ -149,15 +241,13 @@
                             </Grid>
                         </Expander>
 
-                        <Expander Header="Visualização e Camadas" IsExpanded="True">
-                            <StackPanel Margin="5,10,5,0" Orientation="Vertical">
-
+                        <Expander Header="Visualização e Camadas" IsExpanded="True" Margin="{StaticResource ControlMargin}">
+                            <StackPanel>
                                 <GroupBox Header="Status das OS">
-                                    <StackPanel Margin="10,5,0,0">
+                                    <StackPanel>
                                         <CheckBox x:Name="ChbOpen" Content="Exibir OS Abertas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                         <TextBlock Text="Cor (Aberto):" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
                                         <TextBox x:Name="TxtColorOpen" Width="100" Margin="10,0,0,10" Text="#FF0000"/>
-
                                         <CheckBox x:Name="ChbClosed" Content="Exibir OS Concluídas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                         <TextBlock Text="Cor (Concluído):" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
                                         <TextBox x:Name="TxtColorClosed" Width="100" Margin="10,0,0,0" Text="#008000"/>
@@ -165,7 +255,7 @@
                                 </GroupBox>
 
                                 <GroupBox Header="Colorir por Tipo SIGFI">
-                                    <StackPanel Margin="10,5,0,0">
+                                    <StackPanel>
                                         <CheckBox x:Name="ChbColorBySigfi" Content="Ativar Coloração por Tipo SIGFI" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                         <TextBlock Text="Cor Preventiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
                                         <TextBox x:Name="TxtColorPrev" Width="100" Margin="10,0,0,5" Text="#0000FF"/>
@@ -176,7 +266,7 @@
                                 </GroupBox>
 
                                 <GroupBox Header="Colorir por Tipo de Serviço">
-                                    <StackPanel Margin="10,5,0,0">
+                                    <StackPanel>
                                         <CheckBox x:Name="ChbColorByTipo" Content="Ativar Coloração por Serviço" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                         <TextBlock Text="Cor Preventiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
                                         <TextBox x:Name="TxtColorTipoPrev" Width="100" Margin="10,0,0,5" Text="#0000FF"/>
@@ -190,15 +280,14 @@
                                 </GroupBox>
 
                                 <GroupBox Header="Campo de Coordenadas">
-                                    <StackPanel Margin="10,5,0,0">
+                                    <StackPanel>
                                         <TextBlock Text="Selecione o campo com coordenadas:" Style="{StaticResource LabelTextBlock}"/>
                                         <ComboBox x:Name="LatLonFieldCombo" SelectionChanged="FiltersChanged" Width="150" Margin="0,5,0,0">
-                                            <ComboBoxItem Content="LATLON"/>
+                                            <ComboBoxItem Content="LATLON" IsSelected="True"/>
                                             <ComboBoxItem Content="LATLONCON"/>
                                         </ComboBox>
                                     </StackPanel>
                                 </GroupBox>
-
                             </StackPanel>
                         </Expander>
                     </StackPanel>
@@ -206,54 +295,40 @@
             </DockPanel>
         </Border>
 
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <Button Grid.Column="1"
+                x:Name="ToggleSidebarButton"
+                Click="ToggleSidebarButton_Click"
+                Style="{StaticResource SidebarToggleButtonStyle}"
+                ToolTip="Recolher/Expandir Painel">
+            ◄
+        </Button>
 
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button x:Name="ToggleSidebarButton" Content="◄" Width="25" Height="40" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ToggleSidebarButton_Click" />
-                <wv2:WebView2 x:Name="MapView" Grid.Column="1" />
-            </Grid>
+        <Grid Grid.Column="2">
+            <wv2:WebView2 x:Name="MapView"/>
 
-            <Border Grid.Row="1" 
-                    Background="{StaticResource PanelBackgroundBrush}" 
-                    BorderBrush="{StaticResource BorderBrush}"
-                    BorderThickness="0 1 0 0"
-                    Padding="15,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0" Text="Preventivas:" FontWeight="Bold" Margin="0,0,8,0" />
-                    <TextBlock Grid.Column="1" x:Name="PreventivasStatsText" Text="0 abertas, 0 concluídas" />
-
-                    <TextBlock Grid.Column="2" Text="Corretivas:" FontWeight="Bold" Margin="15,0,8,0" />
-                    <TextBlock Grid.Column="3" x:Name="CorretivasStatsText" Text="0 abertas, 0 concluídas" />
-
-                    <TextBlock Grid.Column="4" Text="Serviços:" FontWeight="Bold" Margin="15,0,8,0" />
-                    <TextBlock Grid.Column="5" x:Name="ServicosStatsText" Text="0 abertos, 0 concluídos" />
-
-                    <TextBlock Grid.Column="6" Text="Total Exibido:" FontWeight="Bold" Margin="15,0,8,0" />
-                    <TextBlock Grid.Column="7" x:Name="TotalStatsText" Text="0" />
-                    <TextBlock Grid.Column="8" Text="Atualizado:" FontWeight="Bold" Margin="15,0,8,0" />
-                    <TextBlock Grid.Column="9" x:Name="LastUpdatedText" Text="-" />
-                </Grid>
+            <Border VerticalAlignment="Bottom" Background="{StaticResource PanelBackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="15,10">
+                <WrapPanel Orientation="Horizontal" ItemHeight="20">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                        <TextBlock Text="Preventivas:" FontWeight="Bold" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="PreventivasStatsText" Text="0 abertas, 0 concluídas"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                        <TextBlock Text="Corretivas:" FontWeight="Bold" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="CorretivasStatsText" Text="0 abertas, 0 concluídas"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                        <TextBlock Text="Serviços:" FontWeight="Bold" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="ServicosStatsText" Text="0 abertos, 0 concluídos"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                        <TextBlock Text="Total Exibido:" FontWeight="Bold" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="TotalStatsText" Text="0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Atualizado:" FontWeight="Bold" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="LastUpdatedText" Text="--"/>
+                    </StackPanel>
+                </WrapPanel>
             </Border>
         </Grid>
     </Grid>
