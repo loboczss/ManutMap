@@ -247,10 +247,28 @@
                                     <StackPanel>
                                         <CheckBox x:Name="ChbOpen" Content="Exibir OS Abertas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                         <TextBlock Text="Cor (Aberto):" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <TextBox x:Name="TxtColorOpen" Width="100" Margin="10,0,0,10" Text="#FF0000"/>
+                                        <ComboBox x:Name="ColorOpenCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,10">
+                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000" IsSelected="True"/>
+                                            <ComboBoxItem Content="Verde" Tag="#008000"/>
+                                            <ComboBoxItem Content="Azul" Tag="#0000FF"/>
+                                            <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
+                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
+                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
+                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
+                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
+                                        </ComboBox>
                                         <CheckBox x:Name="ChbClosed" Content="Exibir OS Concluídas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                         <TextBlock Text="Cor (Concluído):" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <TextBox x:Name="TxtColorClosed" Width="100" Margin="10,0,0,0" Text="#008000"/>
+                                        <ComboBox x:Name="ColorClosedCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,0">
+                                            <ComboBoxItem Content="Verde" Tag="#008000" IsSelected="True"/>
+                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
+                                            <ComboBoxItem Content="Azul" Tag="#0000FF"/>
+                                            <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
+                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
+                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
+                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
+                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
+                                        </ComboBox>
                                     </StackPanel>
                                 </GroupBox>
 
@@ -258,10 +276,28 @@
                                     <StackPanel>
                                         <CheckBox x:Name="ChbColorBySigfi" Content="Ativar Coloração por Tipo SIGFI" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                         <TextBlock Text="Cor Preventiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <TextBox x:Name="TxtColorPrev" Width="100" Margin="10,0,0,5" Text="#0000FF"/>
+                                        <ComboBox x:Name="ColorPrevCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,5">
+                                            <ComboBoxItem Content="Azul" Tag="#0000FF" IsSelected="True"/>
+                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
+                                            <ComboBoxItem Content="Verde" Tag="#008000"/>
+                                            <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
+                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
+                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
+                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
+                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
+                                        </ComboBox>
 
                                         <TextBlock Text="Cor Corretiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <TextBox x:Name="TxtColorCorr" Width="100" Margin="10,0,0,0" Text="#FFA500"/>
+                                        <ComboBox x:Name="ColorCorrCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,0">
+                                            <ComboBoxItem Content="Laranja" Tag="#FFA500" IsSelected="True"/>
+                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
+                                            <ComboBoxItem Content="Verde" Tag="#008000"/>
+                                            <ComboBoxItem Content="Azul" Tag="#0000FF"/>
+                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
+                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
+                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
+                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
+                                        </ComboBox>
                                     </StackPanel>
                                 </GroupBox>
 
@@ -269,13 +305,41 @@
                                     <StackPanel>
                                         <CheckBox x:Name="ChbColorByTipo" Content="Ativar Coloração por Serviço" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                         <TextBlock Text="Cor Preventiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <TextBox x:Name="TxtColorTipoPrev" Width="100" Margin="10,0,0,5" Text="#0000FF"/>
+                                        <ComboBox x:Name="ColorTipoPrevCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,5">
+                                            <ComboBoxItem Content="Azul" Tag="#0000FF" IsSelected="True"/>
+                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
+                                            <ComboBoxItem Content="Verde" Tag="#008000"/>
+                                            <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
+                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
+                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
+                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
+                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
+                                        </ComboBox>
 
                                         <TextBlock Text="Cor Corretiva:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <TextBox x:Name="TxtColorTipoCorr" Width="100" Margin="10,0,0,5" Text="#FFA500"/>
+                                        <ComboBox x:Name="ColorTipoCorrCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,5">
+                                            <ComboBoxItem Content="Laranja" Tag="#FFA500" IsSelected="True"/>
+                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
+                                            <ComboBoxItem Content="Verde" Tag="#008000"/>
+                                            <ComboBoxItem Content="Azul" Tag="#0000FF"/>
+                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
+                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
+                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
+                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
+                                        </ComboBox>
 
                                         <TextBlock Text="Cor Serviços:" Style="{StaticResource LabelTextBlock}" Margin="10,5,0,2"/>
-                                        <TextBox x:Name="TxtColorTipoServ" Width="100" Margin="10,0,0,0" Text="#008080"/>
+                                        <ComboBox x:Name="ColorTipoServCombo" SelectionChanged="FiltersChanged" Width="120" Margin="10,0,0,0">
+                                            <ComboBoxItem Content="Teal" Tag="#008080" IsSelected="True"/>
+                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
+                                            <ComboBoxItem Content="Verde" Tag="#008000"/>
+                                            <ComboBoxItem Content="Azul" Tag="#0000FF"/>
+                                            <ComboBoxItem Content="Laranja" Tag="#FFA500"/>
+                                            <ComboBoxItem Content="Amarelo" Tag="#FFFF00"/>
+                                            <ComboBoxItem Content="Roxo" Tag="#800080"/>
+                                            <ComboBoxItem Content="Preto" Tag="#000000"/>
+                                            <ComboBoxItem Content="Cinza" Tag="#808080"/>
+                                        </ComboBox>
                                     </StackPanel>
                                 </GroupBox>
 

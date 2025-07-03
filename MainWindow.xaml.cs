@@ -72,17 +72,17 @@ namespace ManutMap
             ChbOpen.Unchecked += FiltersChanged;
             ChbClosed.Checked += FiltersChanged;
             ChbClosed.Unchecked += FiltersChanged;
-            TxtColorOpen.TextChanged += FiltersChanged;
-            TxtColorClosed.TextChanged += FiltersChanged;
+            ColorOpenCombo.SelectionChanged += FiltersChanged;
+            ColorClosedCombo.SelectionChanged += FiltersChanged;
             ChbColorBySigfi.Checked += FiltersChanged;
             ChbColorBySigfi.Unchecked += FiltersChanged;
-            TxtColorPrev.TextChanged += FiltersChanged;
-            TxtColorCorr.TextChanged += FiltersChanged;
+            ColorPrevCombo.SelectionChanged += FiltersChanged;
+            ColorCorrCombo.SelectionChanged += FiltersChanged;
             ChbColorByTipo.Checked += FiltersChanged;
             ChbColorByTipo.Unchecked += FiltersChanged;
-            TxtColorTipoPrev.TextChanged += FiltersChanged;
-            TxtColorTipoCorr.TextChanged += FiltersChanged;
-            TxtColorTipoServ.TextChanged += FiltersChanged;
+            ColorTipoPrevCombo.SelectionChanged += FiltersChanged;
+            ColorTipoCorrCombo.SelectionChanged += FiltersChanged;
+            ColorTipoServCombo.SelectionChanged += FiltersChanged;
         }
 
         private void LoadLocalAndPopulate()
@@ -178,15 +178,15 @@ namespace ManutMap
                 EndDate = EndDatePicker.SelectedDate,
                 ShowOpen = ChbOpen.IsChecked == true,
                 ShowClosed = ChbClosed.IsChecked == true,
-                ColorOpen = TxtColorOpen.Text.Trim(),
-                ColorClosed = TxtColorClosed.Text.Trim(),
+                ColorOpen = (ColorOpenCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FF0000",
+                ColorClosed = (ColorClosedCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#008000",
                 ColorByTipoSigfi = ChbColorBySigfi.IsChecked == true,
-                ColorPreventiva = TxtColorPrev.Text.Trim(),
-                ColorCorretiva = TxtColorCorr.Text.Trim(),
+                ColorPreventiva = (ColorPrevCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#0000FF",
+                ColorCorretiva = (ColorCorrCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FFA500",
                 ColorByTipoServico = ChbColorByTipo.IsChecked == true,
-                ColorServicoPreventiva = TxtColorTipoPrev.Text.Trim(),
-                ColorServicoCorretiva = TxtColorTipoCorr.Text.Trim(),
-                ColorServicoOutros = TxtColorTipoServ.Text.Trim(),
+                ColorServicoPreventiva = (ColorTipoPrevCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#0000FF",
+                ColorServicoCorretiva = (ColorTipoCorrCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FFA500",
+                ColorServicoOutros = (ColorTipoServCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#008080",
                 LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON"
             };
         }
