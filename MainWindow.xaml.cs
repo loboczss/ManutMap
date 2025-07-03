@@ -215,13 +215,10 @@ namespace ManutMap
 
             if (criteria.ColorByTipoServico)
             {
-                _mapService.AddMarkersByTipoServico(filteredResult,
-                                                   criteria.ShowOpen,
-                                                   criteria.ShowClosed,
-                                                   criteria.ColorServicoPreventiva,
-                                                   criteria.ColorServicoCorretiva,
-                                                   criteria.ColorServicoOutros,
-                                                   criteria.LatLonField);
+                _mapService.AddMarkersByTipoServicoIcon(filteredResult,
+                                                       criteria.ShowOpen,
+                                                       criteria.ShowClosed,
+                                                       criteria.LatLonField);
             }
             else if (criteria.ColorByTipoSigfi)
             {
@@ -295,7 +292,8 @@ namespace ManutMap
                                                             criteria.ColorByTipoServico ? criteria.ColorServicoPreventiva : criteria.ColorPreventiva,
                                                             criteria.ColorByTipoServico ? criteria.ColorServicoCorretiva : criteria.ColorCorretiva,
                                                             criteria.ColorServicoOutros,
-                                                            criteria.LatLonField);
+                                                            criteria.LatLonField,
+                                                            criteria.ColorByTipoServico);
 
             var fileName = $"mapa_{DateTime.Now:yyyyMMddHHmmss}.html";
             var link = await _spService.UploadHtmlAndShareAsync(fileName, html);
