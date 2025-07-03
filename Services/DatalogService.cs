@@ -50,6 +50,23 @@ namespace ManutMap.Services
         {
             var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
 
+            if (tipoFiltro == 3)
+            {
+                string dataDrive = await GetDriveId(site.Id, DriveDatalog);
+                var inst = await GetPastasInstalacaoAsync(dataDrive, termo, regional);
+                return inst.OrderBy(i => i.Name)
+                           .Select(i => new OsInfo
+                           {
+                               NumOS = i.Name,
+                               IdSigfi = i.Name,
+                               Rota = "-",
+                               Data = i.Date,
+                               TemDatalog = true,
+                               FolderUrl = i.Url
+                           })
+                           .ToList();
+            }
+
             string jsonDriveId = await GetDriveId(site.Id, DriveJson);
             var jsonItens = await GetLatestJsonsAsync(jsonDriveId);
 
@@ -144,8 +161,17 @@ namespace ManutMap.Services
             using var sr = new StreamReader(st, Encoding.UTF8);
             var root = JObject.Parse(await sr.ReadToEndAsync());
 
-            if (root["manutencoes"] is not JArray arr)
-                throw new InvalidOperationException("JSON sem 'manutencoes'.");
+            JArray? arr = root["manutencoes"] as JArray;
+            if (arr == null)
+            {
+                var prop = root.Properties()
+                    .FirstOrDefault(p =>
+                        string.Equals(p.Name, "manutencoes",
+                                      StringComparison.OrdinalIgnoreCase));
+                arr = prop?.Value as JArray;
+            }
+            if (arr == null)
+                return new List<OsInfo>();
 
             var list = new List<OsInfo>();
 
@@ -243,8 +269,9 @@ namespace ManutMap.Services
             return dict;
         }
 
-        public async Task<List<(string Url, DateTime Date)>> GetPastasInstalacaoAsync(string driveId,
-                                             string? idSigfi)
+        public async Task<List<(string Name, string Url, DateTime Date)>> GetPastasInstalacaoAsync(string driveId,
+                                             string? idSigfi,
+                                             string? regional)
         {
             var all = await GetAllRootFoldersAsync(driveId);
 
@@ -254,7 +281,11 @@ namespace ManutMap.Services
             if (!string.IsNullOrWhiteSpace(idSigfi))
                 q = q.Where(i => i.Name!.StartsWith(idSigfi, StringComparison.OrdinalIgnoreCase));
 
+            if (!string.IsNullOrWhiteSpace(regional))
+                q = q.Where(i => i.Name!.StartsWith(regional, StringComparison.OrdinalIgnoreCase));
+
             return q.Select(i => (
+                        i.Name!.Trim(),
                         i.WebUrl ??
                         $"https://{Domain}/sites/{SitePath}/{DriveDatalog}/{i.Name!.Trim()}",
                         (i.LastModifiedDateTime ?? i.CreatedDateTime ?? DateTimeOffset.MinValue)
