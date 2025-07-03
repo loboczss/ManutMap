@@ -12,7 +12,10 @@ namespace ManutMap.Helpers
   <meta charset='utf-8'/>
   <title>Mapa</title>
   <link rel='stylesheet' href='https://unpkg.com/leaflet/dist/leaflet.css'/>
+  <link rel='stylesheet' href='https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css'/>
+  <link rel='stylesheet' href='https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css'/>
   <script src='https://unpkg.com/leaflet/dist/leaflet.js'></script>
+  <script src='https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js'></script>
   <style>html, body, #map { height:100%; margin:0; padding:0; }</style>
 </head><body>
   <div id='map'></div>
@@ -28,10 +31,11 @@ namespace ManutMap.Helpers
     osm.addTo(map);
     L.control.layers({'Mapa': osm, 'Satélite': sat}).addTo(map);
 
-    var markers = [];
+    var markerGroup = L.markerClusterGroup();
+    map.addLayer(markerGroup);
+
     function clearMarkers(){
-      markers.forEach(m=>map.removeLayer(m));
-      markers = [];
+      markerGroup.clearLayers();
     }
 
     function addMarkers(data, showOpen, showClosed, colorOpen, colorClosed, latLonField){
@@ -61,7 +65,8 @@ namespace ManutMap.Helpers
 
         var m = L.circleMarker([lat,lng],{
           radius:6, fillColor:color, color:'#fff', weight:1.2, fillOpacity:0.9
-        }).addTo(map);
+        });
+        markerGroup.addLayer(m);
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -76,12 +81,10 @@ namespace ManutMap.Helpers
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
-        markers.push(m);
       });
 
-      if(markers.length>0){
-        var grp = L.featureGroup(markers);
-        map.fitBounds(grp.getBounds().pad(0.2));
+      if(markerGroup.getLayers().length>0){
+        map.fitBounds(markerGroup.getBounds().pad(0.2));
       }
     }
 
@@ -115,7 +118,8 @@ namespace ManutMap.Helpers
 
         var m = L.circleMarker([lat,lng],{
           radius:6, fillColor:color, color:'#fff', weight:1.2, fillOpacity:0.9
-        }).addTo(map);
+        });
+        markerGroup.addLayer(m);
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -130,12 +134,10 @@ namespace ManutMap.Helpers
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
-        markers.push(m);
       });
 
-      if(markers.length>0){
-        var grp = L.featureGroup(markers);
-        map.fitBounds(grp.getBounds().pad(0.2));
+      if(markerGroup.getLayers().length>0){
+        map.fitBounds(markerGroup.getBounds().pad(0.2));
       }
     }
 
@@ -169,7 +171,8 @@ namespace ManutMap.Helpers
 
         var m = L.circleMarker([lat,lng],{
           radius:6, fillColor:color, color:'#fff', weight:1.2, fillOpacity:0.9
-        }).addTo(map);
+        });
+        markerGroup.addLayer(m);
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -184,12 +187,10 @@ namespace ManutMap.Helpers
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
-        markers.push(m);
       });
 
-      if(markers.length>0){
-        var grp = L.featureGroup(markers);
-        map.fitBounds(grp.getBounds().pad(0.2));
+      if(markerGroup.getLayers().length>0){
+        map.fitBounds(markerGroup.getBounds().pad(0.2));
       }
     }
 
@@ -246,7 +247,8 @@ namespace ManutMap.Helpers
         var icon = tipo === 'preventiva' ? iconPrev :
                     tipo === 'corretiva' ? iconCorr : iconServ;
 
-        var m = L.marker([lat,lng],{ icon: icon }).addTo(map);
+        var m = L.marker([lat,lng],{ icon: icon });
+        markerGroup.addLayer(m);
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -260,12 +262,10 @@ namespace ManutMap.Helpers
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
-        markers.push(m);
       });
 
-      if(markers.length>0){
-        var grp = L.featureGroup(markers);
-        map.fitBounds(grp.getBounds().pad(0.2));
+      if(markerGroup.getLayers().length>0){
+        map.fitBounds(markerGroup.getBounds().pad(0.2));
       }
     }
     </script>
