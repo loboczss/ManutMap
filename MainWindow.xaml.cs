@@ -362,13 +362,13 @@ namespace ManutMap
             {
                 SidebarColumn.Width = new GridLength(0);
                 SidebarBorder.Visibility = Visibility.Collapsed;
-                ToggleSidebarButton.Content = "►";
+                ToggleSidebarButton.Content = ">";
             }
             else
             {
                 SidebarColumn.Width = new GridLength(340);
                 SidebarBorder.Visibility = Visibility.Visible;
-                ToggleSidebarButton.Content = "◄";
+                ToggleSidebarButton.Content = "<";
             }
 
             _sidebarVisible = !_sidebarVisible;
