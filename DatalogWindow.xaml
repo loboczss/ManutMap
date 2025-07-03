@@ -3,6 +3,9 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Buscar Datalog" Height="450" Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -41,7 +44,16 @@
                 <DataGridTextColumn Header="Rota" Binding="{Binding Rota}" Width="*"/>
                 <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="*"/>
                 <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
-                <DataGridHyperlinkColumn Header="Pasta" Binding="{Binding FolderUrl}" Width="*"/>
+                <DataGridTemplateColumn Header="Pasta" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Abrir pasta"
+                                    Command="{Binding DataContext.CmdAbrir, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding FolderUrl}"
+                                    Visibility="{Binding TemDatalog, Converter={StaticResource BoolToVis}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 
