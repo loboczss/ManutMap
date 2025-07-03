@@ -56,11 +56,22 @@ namespace ManutMap.Services
                 all.AddRange(pg!.Value);
             }
 
-            var jsonFiles = all.Where(f => f.File != null &&
-                                           f.Name.Contains(FilePrefix, StringComparison.OrdinalIgnoreCase) &&
-                                           f.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-                                .OrderBy(f => f.Name)
-                                .ToList();
+            var jsonFiles = new List<DriveItem>();
+
+            foreach (var suf in JsonFileConstants.JsonSuffixes)
+            {
+                var arquivos = all
+                    .Where(f => f.File != null &&
+                                f.Name.EndsWith(suf, StringComparison.OrdinalIgnoreCase))
+                    .OrderByDescending(f => f.LastModifiedDateTime)
+                    .ToList();
+
+                if (arquivos.Count > 0)
+                    jsonFiles.Add(arquivos.First());
+            }
+
+            if (jsonFiles.Count == 0)
+                throw new InvalidOperationException("Nenhum JSON de manutenção encontrado.");
 
             var merged = new JArray();
             foreach (var file in jsonFiles)
@@ -68,7 +79,16 @@ namespace ManutMap.Services
                 using var stream = await _client.Drives[drive.Id].Items[file.Id].Content.GetAsync();
                 using var sr = new StreamReader(stream, Encoding.UTF8);
                 var root = JObject.Parse(await sr.ReadToEndAsync());
-                if (root["manutencoes"] is JArray arr)
+
+                JArray? arr = root["manutencoes"] as JArray;
+                if (arr == null)
+                {
+                    var prop = root.Properties()
+                        .FirstOrDefault(p => string.Equals(p.Name, "manutencoes", StringComparison.OrdinalIgnoreCase));
+                    arr = prop?.Value as JArray;
+                }
+
+                if (arr != null)
                     merged.Merge(arr);
             }
 
