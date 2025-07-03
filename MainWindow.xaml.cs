@@ -74,6 +74,8 @@ namespace ManutMap
             ChbOpen.Unchecked += FiltersChanged;
             ChbClosed.Checked += FiltersChanged;
             ChbClosed.Unchecked += FiltersChanged;
+            ChbOnlyDatalog.Checked += FiltersChanged;
+            ChbOnlyDatalog.Unchecked += FiltersChanged;
             ColorOpenCombo.SelectionChanged += FiltersChanged;
             ColorClosedCombo.SelectionChanged += FiltersChanged;
             ChbColorPrev.Checked += FiltersChanged;
@@ -191,7 +193,8 @@ namespace ManutMap
                 ColorServicoPreventiva = (ColorTipoPrevCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#0000FF",
                 ColorServicoCorretiva = (ColorTipoCorrCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FFA500",
                 ColorServicoOutros = (ColorTipoServCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#008080",
-                LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON"
+                LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON",
+                OnlyDatalog = ChbOnlyDatalog.IsChecked == true
             };
         }
 
@@ -390,6 +393,7 @@ namespace ManutMap
 
             ChbOpen.IsChecked = true;
             ChbClosed.IsChecked = true;
+            ChbOnlyDatalog.IsChecked = false;
 
             ColorOpenCombo.SelectedIndex = 0;
             ColorClosedCombo.SelectedIndex = 0;

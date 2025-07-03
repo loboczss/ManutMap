@@ -57,6 +57,12 @@ namespace ManutMap.Services
                             return false;
                     }
 
+                    if (c.OnlyDatalog)
+                    {
+                        var tem = item["TEMDATALOG"]?.ToObject<bool>() ?? false;
+                        if (!tem) return false;
+                    }
+
                     var dtRec = item["DTAHORARECLAMACAO"]?.ToString();
                     var dtCon = item["DTCONCLUSAO"]?.ToString();
                     bool isOpen = !string.IsNullOrWhiteSpace(dtRec) && string.IsNullOrWhiteSpace(dtCon);
