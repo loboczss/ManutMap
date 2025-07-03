@@ -68,6 +68,9 @@ namespace ManutMap.Helpers
         });
         markerGroup.addLayer(m);
 
+        var temDat = item.TemDatalog || item.TEMDATALOG || false;
+        var datUrl = item.FolderUrl || item.FOLDERURL || '';
+
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
@@ -78,6 +81,8 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
+                    (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
@@ -123,6 +128,9 @@ namespace ManutMap.Helpers
         });
         markerGroup.addLayer(m);
 
+        var temDat = item.TemDatalog || item.TEMDATALOG || false;
+        var datUrl = item.FolderUrl || item.FOLDERURL || '';
+
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
@@ -133,6 +141,8 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
+                    (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
@@ -176,6 +186,9 @@ namespace ManutMap.Helpers
         });
         markerGroup.addLayer(m);
 
+        var temDat = item.TemDatalog || item.TEMDATALOG || false;
+        var datUrl = item.FolderUrl || item.FOLDERURL || '';
+
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
@@ -186,6 +199,8 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
+                    (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
@@ -229,6 +244,9 @@ namespace ManutMap.Helpers
         });
         markerGroup.addLayer(m);
 
+        var temDat = item.TemDatalog || item.TEMDATALOG || false;
+        var datUrl = item.FolderUrl || item.FOLDERURL || '';
+
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
@@ -239,6 +257,8 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
+                    (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
@@ -305,6 +325,9 @@ namespace ManutMap.Helpers
         var m = L.marker([lat,lng],{ icon: icon });
         markerGroup.addLayer(m);
 
+        var temDat = item.TemDatalog || item.TEMDATALOG || false;
+        var datUrl = item.FolderUrl || item.FOLDERURL || '';
+
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> Aberto<br>' : '<b>Status:</b> Concluído<br>')+
@@ -314,6 +337,8 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
+                    (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
