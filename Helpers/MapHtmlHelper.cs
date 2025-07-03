@@ -268,8 +268,9 @@ namespace ManutMap.Helpers
         map.fitBounds(grp.getBounds().pad(0.2));
       }
     }
-  </script>
-</body></html>""";
+    </script>
+</body></html>
+        """;
 
         public static string GetHtmlWithData(IEnumerable<JObject> data,
                                              bool colorBySigfi,
