@@ -11,22 +11,22 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Spacing="10">
-            <TextBlock Text="Início:" VerticalAlignment="Center"/>
-            <DatePicker x:Name="DpInicio" SelectedDate="{x:Static sys:DateTime.Today}"/>
-            <TextBlock Text="Fim:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Início:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <DatePicker x:Name="DpInicio" SelectedDate="{x:Static sys:DateTime.Today}" Margin="0,0,10,0"/>
+            <TextBlock Text="Fim:" VerticalAlignment="Center" Margin="20,0,10,0"/>
             <DatePicker x:Name="DpFim" SelectedDate="{x:Static sys:DateTime.Today}"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" Margin="0,10,0,10">
-            <ComboBox x:Name="CmbFiltro" Width="120">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10">
+            <ComboBox x:Name="CmbFiltro" Width="120" Margin="0,0,10,0">
                 <ComboBoxItem Content="OS"/>
                 <ComboBoxItem Content="IDSIGFI"/>
                 <ComboBoxItem Content="Rota"/>
                 <ComboBoxItem Content="Instalação"/>
             </ComboBox>
-            <TextBox x:Name="TxtBusca" Width="200"/>
-            <ComboBox x:Name="CmbRegional" Width="100" Margin="10,0,0,0">
+            <TextBox x:Name="TxtBusca" Width="200" Margin="0,0,10,0"/>
+            <ComboBox x:Name="CmbRegional" Width="100" Margin="0,0,10,0">
                 <ComboBoxItem Content="Todas"/>
                 <ComboBoxItem Content="AC"/>
                 <ComboBoxItem Content="MT"/>
