@@ -31,6 +31,9 @@ namespace ManutMap.Models
         // NOVO: qual campo de coordenada usar
         // "LATLON" ou "LATLONCON"
         public string LatLonField { get; set; } = "LATLON";
+
+        // Exibir apenas itens com datalog disponível
+        public bool OnlyDatalog { get; set; }
     }
 }
 
