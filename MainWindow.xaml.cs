@@ -49,7 +49,7 @@ namespace ManutMap
             {
                 Interval = TimeSpan.FromMinutes(30)
             };
-            _updateTimer.Tick += async (_, __) => await DownloadAndRefresh();
+            _updateTimer.Tick += async (_, __) => await SyncAndRefresh();
 
             _mapService = new MapService(MapView);
             _mapService.InitializeAsync();
@@ -57,7 +57,7 @@ namespace ManutMap
             this.Loaded += async (_, __) =>
             {
                 LoadLocalAndPopulate();
-                await DownloadAndRefresh();
+                await SyncAndRefresh();
                 _updateTimer.Start();
             };
 
@@ -133,14 +133,14 @@ namespace ManutMap
             comboBox.SelectedIndex = 0;
         }
 
-        private async void DownloadButton_Click(object sender, RoutedEventArgs e)
+        private async void SyncButton_Click(object sender, RoutedEventArgs e)
         {
-            DownloadButton.IsEnabled = false;
-            await DownloadAndRefresh();
-            DownloadButton.IsEnabled = true;
+            SyncButton.IsEnabled = false;
+            await SyncAndRefresh();
+            SyncButton.IsEnabled = true;
         }
 
-        private async Task DownloadAndRefresh()
+        private async Task SyncAndRefresh()
         {
             _manutList = await _spService.DownloadLatestJsonAsync();
 

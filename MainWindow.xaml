@@ -148,7 +148,7 @@
                 </StackPanel>
 
                 <UniformGrid DockPanel.Dock="Bottom" Columns="2" Rows="2" Margin="0,15,0,0">
-                    <Button x:Name="DownloadButton" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click" Margin="0,0,5,5"/>
+                    <Button x:Name="SyncButton" Content="Sincronizar Agora" Style="{StaticResource PrimaryButton}" Click="SyncButton_Click" Margin="0,0,5,5"/>
                     <Button x:Name="ShareButton" Content="Compartilhar" Style="{StaticResource PrimaryButton}" Click="ShareButton_Click" Margin="5,0,0,5"/>
                     <Button x:Name="ClearFiltersButton" Content="Limpar Filtros" Style="{StaticResource PrimaryButton}" Click="ClearFiltersButton_Click" Margin="0,5,5,0"/>
                     <Button x:Name="DatalogButton" Content="Buscar Datalog" Style="{StaticResource PrimaryButton}" Click="DatalogButton_Click" Margin="5,5,0,0"/>
