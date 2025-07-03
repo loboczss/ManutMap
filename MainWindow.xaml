@@ -304,9 +304,14 @@
         </Button>
 
         <Grid Grid.Column="2">
-            <wv2:WebView2 x:Name="MapView"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <Border VerticalAlignment="Bottom" Background="{StaticResource PanelBackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="15,10">
+            <wv2:WebView2 Grid.Row="0" x:Name="MapView"/>
+
+            <Border Grid.Row="1" Background="{StaticResource PanelBackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="15,10">
                 <WrapPanel Orientation="Horizontal" ItemHeight="20">
                     <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
                         <TextBlock Text="Preventivas:" FontWeight="Bold" Margin="0,0,8,0"/>
