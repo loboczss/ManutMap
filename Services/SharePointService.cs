@@ -57,7 +57,7 @@ namespace ManutMap.Services
             }
 
             var jsonFiles = all.Where(f => f.File != null &&
-                                           f.Name.StartsWith(FilePrefix, StringComparison.OrdinalIgnoreCase) &&
+                                           f.Name.Contains(FilePrefix, StringComparison.OrdinalIgnoreCase) &&
                                            f.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                                 .OrderBy(f => f.Name)
                                 .ToList();
