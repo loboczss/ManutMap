@@ -18,7 +18,7 @@ namespace ManutMap.Services
 
         public List<JObject> Apply(JArray source, FilterCriteria c)
         {
-            return source.OfType<JObject>()
+            var filtered = source.OfType<JObject>()
                 .Where(item =>
                 {
                     if (c.Sigfi != "Todos")
@@ -85,6 +85,12 @@ namespace ManutMap.Services
 
                     return true;
                 })
+                .ToList();
+
+            return filtered
+                .GroupBy(o => (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
+                         StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
                 .ToList();
         }
     }
