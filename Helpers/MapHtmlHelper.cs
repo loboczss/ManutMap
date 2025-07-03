@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 namespace ManutMap.Helpers
 {
     public static class MapHtmlHelper
     {
-        public static string GetHtml() => @"
+        public static string GetHtml() => """
 <!DOCTYPE html>
 <html><head>
   <meta charset='utf-8'/>
@@ -64,8 +65,8 @@ namespace ManutMap.Helpers
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
-                    (isOpen?'<b>Status:</b> <span style=""color:'+color+'"">Aberto</span><br>'
-                           :'<b>Status:</b> <span style=""color:'+color+'"">Concluído</span><br>')+
+                    (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
+                           :'<b>Status:</b> <span style="color:'+color+'">Concluído</span><br>')+
                     (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
                     (dtCon?'<b>Conclusão:</b> '+dtCon+'<br>':'')+
                     '<b>Rota:</b> '+item.ROTA+'<br>'+
@@ -118,8 +119,8 @@ namespace ManutMap.Helpers
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
-                    (isOpen?'<b>Status:</b> <span style=""color:'+color+'"">Aberto</span><br>'
-                           :'<b>Status:</b> <span style=""color:'+color+'"">Concluído</span><br>')+
+                    (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
+                           :'<b>Status:</b> <span style="color:'+color+'">Concluído</span><br>')+
                     (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
                     (dtCon?'<b>Conclusão:</b> '+dtCon+'<br>':'')+
                     '<b>Rota:</b> '+item.ROTA+'<br>'+
@@ -172,8 +173,8 @@ namespace ManutMap.Helpers
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
-                    (isOpen?'<b>Status:</b> <span style="'+'color:'+color+'"'+'>Aberto</span><br>'
-                           :'<b>Status:</b> <span style="'+'color:'+color+'"'+'>Concluído</span><br>')+
+                    (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
+                           :'<b>Status:</b> <span style="color:'+color+'">Concluído</span><br>')+
                     (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
                     (dtCon?'<b>Conclusão:</b> '+dtCon+'<br>':'')+
                     '<b>Rota:</b> '+item.ROTA+'<br>'+
@@ -268,9 +269,9 @@ namespace ManutMap.Helpers
       }
     }
   </script>
-</body></html>";
+</body></html>""";
 
-        public static string GetHtmlWithData(IEnumerable<Newtonsoft.Json.Linq.JObject> data,
+        public static string GetHtmlWithData(IEnumerable<JObject> data,
                                              bool colorBySigfi,
                                              bool colorByTipo,
                                              bool showOpen,
@@ -284,7 +285,7 @@ namespace ManutMap.Helpers
                                              bool iconByTipo = false)
         {
             var baseHtml = GetHtml();
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+            var json = JsonConvert.SerializeObject(data);
             string call;
             if(iconByTipo)
                 call = $"addMarkersByTipoServicoIcon(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{latLonField}');";
