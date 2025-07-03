@@ -198,9 +198,11 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Button x:Name="DownloadButton" Grid.Column="0" Content="Baixar JSON" Style="{StaticResource PrimaryButton}" Click="DownloadButton_Click" Margin="0,0,5,0"/>
-                    <Button x:Name="ShareButton" Grid.Column="1" Content="Compartilhar" Style="{StaticResource PrimaryButton}" Click="ShareButton_Click" Margin="5,0,0,0"/>
+                    <Button x:Name="ShareButton" Grid.Column="1" Content="Compartilhar" Style="{StaticResource PrimaryButton}" Click="ShareButton_Click" Margin="5,0,5,0"/>
+                    <Button x:Name="ClearFiltersButton" Grid.Column="2" Content="Limpar Filtros" Style="{StaticResource PrimaryButton}" Click="ClearFiltersButton_Click"/>
                 </Grid>
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource PanelPadding}">

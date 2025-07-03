@@ -318,5 +318,38 @@ namespace ManutMap
 
             _sidebarVisible = !_sidebarVisible;
         }
+
+        private void ClearFiltersButton_Click(object sender, RoutedEventArgs e)
+        {
+            SigfiFilterCombo.SelectedIndex = 0;
+            TipoFilterCombo.SelectedIndex = 0;
+            NumOsFilterBox.Text = string.Empty;
+            IdSigfiFilterBox.Text = string.Empty;
+
+            RegionalFilterCombo.SelectedIndex = 0;
+            PopulateComboBox(RotaFilterCombo, "ROTA");
+            RotaFilterCombo.SelectedIndex = 0;
+
+            StartDatePicker.SelectedDate = null;
+            EndDatePicker.SelectedDate = null;
+
+            ChbOpen.IsChecked = true;
+            ChbClosed.IsChecked = true;
+
+            ColorOpenCombo.SelectedIndex = 0;
+            ColorClosedCombo.SelectedIndex = 0;
+
+            ChbColorPrev.IsChecked = false;
+            ChbColorCorr.IsChecked = false;
+            ChbColorServ.IsChecked = false;
+
+            ColorTipoPrevCombo.SelectedIndex = 0;
+            ColorTipoCorrCombo.SelectedIndex = 0;
+            ColorTipoServCombo.SelectedIndex = 0;
+
+            LatLonFieldCombo.SelectedIndex = 0;
+
+            ApplyFilters();
+        }
     }
 }
