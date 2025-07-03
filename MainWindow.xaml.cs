@@ -74,12 +74,12 @@ namespace ManutMap
             ChbClosed.Unchecked += FiltersChanged;
             ColorOpenCombo.SelectionChanged += FiltersChanged;
             ColorClosedCombo.SelectionChanged += FiltersChanged;
-            ChbColorBySigfi.Checked += FiltersChanged;
-            ChbColorBySigfi.Unchecked += FiltersChanged;
-            ColorPrevCombo.SelectionChanged += FiltersChanged;
-            ColorCorrCombo.SelectionChanged += FiltersChanged;
-            ChbColorByTipo.Checked += FiltersChanged;
-            ChbColorByTipo.Unchecked += FiltersChanged;
+            ChbColorPrev.Checked += FiltersChanged;
+            ChbColorPrev.Unchecked += FiltersChanged;
+            ChbColorCorr.Checked += FiltersChanged;
+            ChbColorCorr.Unchecked += FiltersChanged;
+            ChbColorServ.Checked += FiltersChanged;
+            ChbColorServ.Unchecked += FiltersChanged;
             ColorTipoPrevCombo.SelectionChanged += FiltersChanged;
             ColorTipoCorrCombo.SelectionChanged += FiltersChanged;
             ColorTipoServCombo.SelectionChanged += FiltersChanged;
@@ -180,10 +180,9 @@ namespace ManutMap
                 ShowClosed = ChbClosed.IsChecked == true,
                 ColorOpen = (ColorOpenCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FF0000",
                 ColorClosed = (ColorClosedCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#008000",
-                ColorByTipoSigfi = ChbColorBySigfi.IsChecked == true,
-                ColorPreventiva = (ColorPrevCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#0000FF",
-                ColorCorretiva = (ColorCorrCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FFA500",
-                ColorByTipoServico = ChbColorByTipo.IsChecked == true,
+                ColorPrevOn = ChbColorPrev.IsChecked == true,
+                ColorCorrOn = ChbColorCorr.IsChecked == true,
+                ColorServOn = ChbColorServ.IsChecked == true,
                 ColorServicoPreventiva = (ColorTipoPrevCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#0000FF",
                 ColorServicoCorretiva = (ColorTipoCorrCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FFA500",
                 ColorServicoOutros = (ColorTipoServCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#008080",
@@ -213,21 +212,18 @@ namespace ManutMap
 
             var filteredResult = _filterSvc.Apply(_manutList, criteria);
 
-            if (criteria.ColorByTipoServico)
-            {
-                _mapService.AddMarkersByTipoServicoIcon(filteredResult,
-                                                       criteria.ShowOpen,
-                                                       criteria.ShowClosed,
-                                                       criteria.LatLonField);
-            }
-            else if (criteria.ColorByTipoSigfi)
-            {
-                _mapService.AddMarkersByTipoSigfi(filteredResult, criteria.ShowOpen, criteria.ShowClosed, criteria.ColorPreventiva, criteria.ColorCorretiva, criteria.LatLonField);
-            }
-            else
-            {
-                _mapService.AddMarkers(filteredResult, criteria.ShowOpen, criteria.ShowClosed, criteria.ColorOpen, criteria.ColorClosed, criteria.LatLonField);
-            }
+            _mapService.AddMarkersSelective(filteredResult,
+                                            criteria.ShowOpen,
+                                            criteria.ShowClosed,
+                                            criteria.ColorOpen,
+                                            criteria.ColorClosed,
+                                            criteria.ColorServicoPreventiva,
+                                            criteria.ColorServicoCorretiva,
+                                            criteria.ColorServicoOutros,
+                                            criteria.ColorPrevOn,
+                                            criteria.ColorCorrOn,
+                                            criteria.ColorServOn,
+                                            criteria.LatLonField);
 
             AtualizarPainelEstatisticas(filteredResult);
         }
@@ -283,17 +279,17 @@ namespace ManutMap
                 _fileService.SaveCsv(filtered, dialog.FileName, criteria.LatLonField);
             }
             var html = Helpers.MapHtmlHelper.GetHtmlWithData(filtered,
-                                                            criteria.ColorByTipoSigfi,
-                                                            criteria.ColorByTipoServico,
                                                             criteria.ShowOpen,
                                                             criteria.ShowClosed,
                                                             criteria.ColorOpen,
                                                             criteria.ColorClosed,
-                                                            criteria.ColorByTipoServico ? criteria.ColorServicoPreventiva : criteria.ColorPreventiva,
-                                                            criteria.ColorByTipoServico ? criteria.ColorServicoCorretiva : criteria.ColorCorretiva,
+                                                            criteria.ColorServicoPreventiva,
+                                                            criteria.ColorServicoCorretiva,
                                                             criteria.ColorServicoOutros,
-                                                            criteria.LatLonField,
-                                                            criteria.ColorByTipoServico);
+                                                            criteria.ColorPrevOn,
+                                                            criteria.ColorCorrOn,
+                                                            criteria.ColorServOn,
+                                                            criteria.LatLonField);
 
             var fileName = $"mapa_{DateTime.Now:yyyyMMddHHmmss}.html";
             var link = await _spService.UploadHtmlAndShareAsync(fileName, html);

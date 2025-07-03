@@ -50,6 +50,31 @@ namespace ManutMap.Services
                 _view.ExecuteScriptAsync(script);
         }
 
+        public void AddMarkersSelective(IEnumerable<JObject> data,
+                                         bool showOpen,
+                                         bool showClosed,
+                                         string colorOpen,
+                                         string colorClosed,
+                                         string colorPrev,
+                                         string colorCorr,
+                                         string colorServ,
+                                         bool colorPrevOn,
+                                         bool colorCorrOn,
+                                         bool colorServOn,
+                                         string latLonField = "LATLON")
+        {
+            var json = JsonConvert.SerializeObject(data);
+            var script =
+                $"addMarkersSelective({json},{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()}," +
+                $"'{colorOpen}','{colorClosed}','{colorPrev}','{colorCorr}','{colorServ}'," +
+                $"{colorPrevOn.ToString().ToLower()},{colorCorrOn.ToString().ToLower()},{colorServOn.ToString().ToLower()},'{latLonField}');";
+
+            if (!_ready)
+                _pendingScripts.Add(script);
+            else
+                _view.ExecuteScriptAsync(script);
+        }
+
         public void AddMarkersByTipoSigfi(IEnumerable<JObject> data,
                                            bool showOpen,
                                            bool showClosed,
