@@ -20,13 +20,10 @@ namespace ManutMap.Models
         public string ColorOpen { get; set; } = "#FF0000";
         public string ColorClosed { get; set; } = "#008000";
 
-        // Se true, usa cores baseadas no Tipo SIGFI
-        public bool ColorByTipoSigfi { get; set; }
-        public string ColorPreventiva { get; set; } = "#0000FF";
-        public string ColorCorretiva { get; set; } = "#FFA500";
-
-        // Cores por tipo de serviço (Preventiva/Corretiva/Serviços)
-        public bool ColorByTipoServico { get; set; }
+        // Configurações de cor por tipo de serviço
+        public bool ColorPrevOn { get; set; }
+        public bool ColorCorrOn { get; set; }
+        public bool ColorServOn { get; set; }
         public string ColorServicoPreventiva { get; set; } = "#0000FF";
         public string ColorServicoCorretiva { get; set; } = "#FFA500";
         public string ColorServicoOutros { get; set; } = "#008080";

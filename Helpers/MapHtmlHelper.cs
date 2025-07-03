@@ -88,6 +88,61 @@ namespace ManutMap.Helpers
       }
     }
 
+    function addMarkersSelective(data, showOpen, showClosed, colorOpen, colorClosed, colorPrev, colorCorr, colorServ, doPrev, doCorr, doServ, latLonField){
+      clearMarkers();
+
+      data.forEach(function(item){
+        var dtRec = item.DTAHORARECLAMACAO ? item.DTAHORARECLAMACAO.trim() : '';
+        var dtCon = item.DTCONCLUSAO     ? item.DTCONCLUSAO.trim()     : '';
+        var isOpen   = dtRec !== '' && dtCon === '';
+        var isClosed = dtCon !== '';
+        if((isOpen && !showOpen) || (isClosed && !showClosed)) return;
+
+        var coord = null;
+        if(latLonField === 'LATLON')
+          coord = item.LATLON;
+        else if(latLonField === 'LATLONCON')
+          coord = item.LATLONCON;
+        if(!coord || coord.trim() === '') return;
+
+        var coordStr = coord.trim();
+        var nums = coordStr.match(/-?\d+(?:[.,]\d+)?/g);
+        if(!nums || nums.length < 2) return;
+        var lat = parseFloat(nums[0].replace(',', '.')),
+            lng = parseFloat(nums[1].replace(',', '.'));
+        if(isNaN(lat) || isNaN(lng)) return;
+
+        var tipo = (item.TIPO || '').toString().trim().toLowerCase();
+        var color = isOpen ? colorOpen : colorClosed;
+        if(tipo === 'preventiva' && doPrev) color = colorPrev;
+        else if(tipo === 'corretiva' && doCorr) color = colorCorr;
+        else if(tipo !== 'preventiva' && tipo !== 'corretiva' && doServ) color = colorServ;
+
+        var m = L.circleMarker([lat,lng],{
+          radius:6, fillColor:color, color:'#fff', weight:1.2, fillOpacity:0.9
+        });
+        markerGroup.addLayer(m);
+
+        var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
+                    '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
+                    (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
+                           :'<b>Status:</b> <span style="color:'+color+'">Concluído</span><br>')+
+                    (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
+                    (dtCon?'<b>Conclusão:</b> '+dtCon+'<br>':'')+
+                    '<b>Rota:</b> '+item.ROTA+'<br>'+
+                    '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
+                    '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
+                    '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    '<b>LatLon ('+latLonField+'):</b> '+coordStr;
+
+        m.bindPopup(popup);
+      });
+
+      if(markerGroup.getLayers().length>0){
+        map.fitBounds(markerGroup.getBounds().pad(0.2));
+      }
+    }
+
     function addMarkersByTipoSigfi(data, showOpen, showClosed, colorPrev, colorCorr, latLonField){
       clearMarkers();
 
@@ -274,8 +329,6 @@ namespace ManutMap.Helpers
 """;
 
         public static string GetHtmlWithData(IEnumerable<JObject> data,
-                                             bool colorBySigfi,
-                                             bool colorByTipo,
                                              bool showOpen,
                                              bool showClosed,
                                              string colorOpen,
@@ -283,6 +336,9 @@ namespace ManutMap.Helpers
                                              string colorPrev,
                                              string colorCorr,
                                              string colorServ,
+                                             bool colorPrevOn,
+                                             bool colorCorrOn,
+                                             bool colorServOn,
                                              string latLonField,
                                              bool iconByTipo = false)
         {
@@ -291,12 +347,8 @@ namespace ManutMap.Helpers
             string call;
             if(iconByTipo)
                 call = $"addMarkersByTipoServicoIcon(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{latLonField}');";
-            else if(colorByTipo)
-                call = $"addMarkersByTipoServico(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorPrev}','{colorCorr}','{colorServ}','{latLonField}');";
-            else if(colorBySigfi)
-                call = $"addMarkersByTipoSigfi(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorPrev}','{colorCorr}','{latLonField}');";
             else
-                call = $"addMarkers(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorOpen}','{colorClosed}','{latLonField}');";
+                call = $"addMarkersSelective(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorOpen}','{colorClosed}','{colorPrev}','{colorCorr}','{colorServ}',{colorPrevOn.ToString().ToLower()},{colorCorrOn.ToString().ToLower()},{colorServOn.ToString().ToLower()},'{latLonField}');";
             var script = $"<script>var data = {json};window.onload=function(){{{call}}}</script>";
             return baseHtml.Replace("</body></html>", script + "</body></html>");
         }
