@@ -262,10 +262,14 @@ namespace ManutMap
                 string.Equals(item["TIPO"]?.ToString().Trim(), "SERVICOS", StringComparison.OrdinalIgnoreCase) &&
                 !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
 
+            int datalogCount = dadosFiltrados.Count(item =>
+                item["TEMDATALOG"]?.ToObject<bool>() == true);
+
             // Atualiza cada TextBlock individualmente
             PreventivasStatsText.Text = $"{prevAbertas} abertas, {prevConcluidas} concluídas";
             CorretivasStatsText.Text = $"{corrAbertas} abertas, {corrConcluidas} concluídas";
             ServicosStatsText.Text = $"{servAbertos} abertos, {servConcluidos} concluídos";
+            DatalogStatsText.Text = datalogCount.ToString();
             TotalStatsText.Text = dadosFiltrados.Count().ToString();
         }
 
