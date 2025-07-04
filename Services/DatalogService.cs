@@ -173,7 +173,8 @@ namespace ManutMap.Services
         {
             var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
 
-            if (tipoFiltro == 3)
+            // When searching for installation folders (combo index 0)
+            if (tipoFiltro == 0)
             {
                 string dataDrive = await GetDriveId(site.Id, DriveDatalog);
                 var inst = await GetPastasInstalacaoAsync(dataDrive, termo, regional);
@@ -195,10 +196,19 @@ namespace ManutMap.Services
 
             var mapa = new Dictionary<string, OsInfo>(StringComparer.OrdinalIgnoreCase);
 
+            // Map combo indexes to GetOsInfosAsync filters
+            int infosFiltro = tipoFiltro switch
+            {
+                1 => 0, // OS
+                2 => 1, // IDSIGFI
+                3 => 2, // ROTA
+                _ => tipoFiltro
+            };
+
             foreach (var itm in jsonItens)
             {
                 var infos = await GetOsInfosAsync(jsonDriveId, itm.Id!, ini, fim,
-                                                termo, tipoFiltro, termo != null, regional);
+                                                termo, infosFiltro, termo != null, regional);
                 foreach (var inf in infos)
                     mapa[inf.NumOS] = inf;
             }
