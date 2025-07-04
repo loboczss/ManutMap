@@ -364,25 +364,18 @@ namespace ManutMap
             }
         }
 
-        private async void ShareButton_Click(object sender, RoutedEventArgs e)
+        private void ShareButton_Click(object sender, RoutedEventArgs e)
         {
             if (_manutList == null) return;
 
-            var result = MessageBox.Show(
-                "Como deseja exportar os dados?\n\n" +
-                "Sim: baixar mapa em HTML para visualização offline.\n" +
-                "Não: baixar arquivo CSV para QGIS/Google Maps.",
-                "Exportar Dados",
-                MessageBoxButton.YesNoCancel,
-                MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Cancel || result == MessageBoxResult.None)
+            var win = new ShareDialog { Owner = this };
+            if (win.ShowDialog() != true)
                 return;
 
             var criteria = GetCurrentCriteria();
             var filtered = _filterSvc.Apply(_manutList, criteria);
 
-            if (result == MessageBoxResult.No)
+            if (win.Selected == ShareDialog.ShareOption.Csv)
             {
                 var dialog = new SaveFileDialog
                 {
@@ -397,7 +390,7 @@ namespace ManutMap
                 return;
             }
 
-            if (result == MessageBoxResult.Yes)
+            if (win.Selected == ShareDialog.ShareOption.Html)
             {
                 var html = Helpers.MapHtmlHelper.GetHtmlWithData(filtered,
                                                                 criteria.ShowOpen,
