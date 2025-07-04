@@ -142,7 +142,10 @@ namespace ManutMap
         private async void SyncButton_Click(object sender, RoutedEventArgs e)
         {
             SyncButton.IsEnabled = false;
-            var progress = new Progress<string>(msg => UpdateProgress(msg));
+            var progress = new Progress<(int Percent, string Message)>(p =>
+            {
+                UpdateProgress(p.Percent, p.Message);
+            });
             ShowProgress();
             await SyncAndRefresh(progress);
             HideProgress();
@@ -151,14 +154,20 @@ namespace ManutMap
 
         private void ShowProgress()
         {
-            SyncProgressBar.IsIndeterminate = true;
+            SyncProgressBar.IsIndeterminate = false;
+            SyncProgressBar.Minimum = 0;
+            SyncProgressBar.Maximum = 100;
+            SyncProgressBar.Value = 0;
             SyncProgressBar.Visibility = Visibility.Visible;
             SyncProgressText.Visibility = Visibility.Visible;
         }
 
-        private void UpdateProgress(string message)
+        private void UpdateProgress(int percent, string message)
         {
-            SyncProgressText.Text = message;
+            if (percent < 0) percent = 0;
+            if (percent > 100) percent = 100;
+            SyncProgressBar.Value = percent;
+            SyncProgressText.Text = $"{percent}% - {message}";
         }
 
         private void HideProgress()
@@ -167,25 +176,27 @@ namespace ManutMap
             SyncProgressText.Visibility = Visibility.Collapsed;
         }
 
-        private async Task SyncAndRefresh(IProgress<string>? progress = null)
+        private async Task SyncAndRefresh(IProgress<(int Percent, string Message)>? progress = null)
         {
-            progress?.Report("Baixando dados...");
+            progress?.Report((0, "Iniciando..."));
+
+            progress?.Report((10, "Baixando dados..."));
             _manutList = await _spService.DownloadLatestJsonAsync();
 
-            progress?.Report("Sincronizando datalog...");
+            progress?.Report((40, "Sincronizando datalog..."));
             _datalogMap = await _datalogService.GetAllDatalogFoldersAsync();
             AnnotateDatalogInfo();
 
-            progress?.Report("Atualizando filtros...");
+            progress?.Report((70, "Atualizando filtros..."));
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
             PopulateComboBox(TipoFilterCombo, "TIPO");
             PopulateComboBox(RotaFilterCombo, "ROTA");
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
-            progress?.Report("Aplicando filtros...");
+            progress?.Report((85, "Aplicando filtros..."));
             ApplyFilters();
             LastUpdatedText.Text = _spService.LastUpdate.ToString("dd/MM/yyyy HH:mm");
-            progress?.Report("Concluído");
+            progress?.Report((100, "Concluído"));
         }
 
         private void FiltersChanged(object sender, RoutedEventArgs e)
