@@ -26,6 +26,8 @@ namespace ManutMap.Services
 
         private static readonly string OfflinePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                                                                   "manutencoes_latest.json");
+        private static readonly string FuncCsvPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                                                                  "funcionarios.csv");
 
         private readonly string[] _filePatterns =
         {
@@ -80,6 +82,60 @@ namespace ManutMap.Services
             }
 
             return dados;
+        }
+
+        public async Task<Dictionary<string, string>> DownloadFuncionariosAsync()
+        {
+            bool fromInternet = false;
+            string csv = string.Empty;
+
+            if (HasInternet())
+            {
+                try
+                {
+                    string driveId = await GetDriveIdAsync();
+                    using var stream = await _client.Drives[driveId].Root.ItemWithPath("funcionarios.csv").Content.GetAsync();
+                    using var sr = new StreamReader(stream, Encoding.UTF8);
+                    csv = await sr.ReadToEndAsync();
+                    File.WriteAllText(FuncCsvPath, csv);
+                    fromInternet = true;
+                }
+                catch
+                {
+                    // fallback to cache
+                }
+            }
+
+            if (!fromInternet && File.Exists(FuncCsvPath))
+            {
+                csv = File.ReadAllText(FuncCsvPath, Encoding.UTF8);
+            }
+
+            return ParseFuncionariosCsv(csv);
+        }
+
+        private static Dictionary<string, string> ParseFuncionariosCsv(string csv)
+        {
+            var dict = new Dictionary<string, string>();
+            if (string.IsNullOrWhiteSpace(csv)) return dict;
+
+            foreach (var line in csv.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var trimmed = line.Trim();
+                if (trimmed.Length == 0) continue;
+                var firstComma = trimmed.IndexOf(',');
+                if (firstComma <= 0) continue;
+                var matricula = trimmed.Substring(0, firstComma).Trim('"').Trim();
+                var rest = trimmed.Substring(firstComma + 1).Trim();
+                var secondComma = rest.IndexOf(',');
+                var nomePart = secondComma >= 0 ? rest.Substring(0, secondComma) : rest;
+                var nome = nomePart.Trim('"').Trim();
+                matricula = matricula.TrimStart('0');
+                if (!dict.ContainsKey(matricula))
+                    dict[matricula] = nome;
+            }
+
+            return dict;
         }
 
         private static bool HasInternet()
