@@ -54,10 +54,14 @@ namespace ManutMap
             _mapService = new MapService(MapView);
             _mapService.InitializeAsync();
 
-            this.Loaded += async (_, __) =>
+            this.Loaded += (_, __) =>
             {
                 LoadLocalAndPopulate();
-                await SyncAndRefresh();
+                _datalogMap = _datalogService.GetCachedDatalogFolders();
+                AnnotateDatalogInfo();
+                ApplyFilters();
+
+                _ = SyncAndRefresh();
                 _updateTimer.Start();
             };
 
