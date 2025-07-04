@@ -476,5 +476,12 @@ namespace ManutMap
             win.Owner = this;
             win.Show();
         }
+
+        private void SearchEmployeeButton_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new FuncionarioWindow();
+            win.Owner = this;
+            win.Show();
+        }
     }
 }
