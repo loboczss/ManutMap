@@ -25,6 +25,45 @@ namespace ManutMap.Services
         private const string DriveDatalog = "DatalogGERAL";
         private const string DriveJson = "ArquivosJSON";
 
+        private static readonly string CachePath = Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "datalog_folders_cache.json");
+
+        private Dictionary<string, string>? _folderCache;
+        private DateTime _cacheDate;
+
+        private void LoadCache()
+        {
+            if (_folderCache != null) return;
+            if (!File.Exists(CachePath))
+            {
+                _folderCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                _cacheDate = DateTime.MinValue;
+                return;
+            }
+
+            var obj = JObject.Parse(File.ReadAllText(CachePath));
+            _cacheDate = obj.Value<DateTime?>("lastUpdate") ?? DateTime.MinValue;
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (obj["folders"] is JObject folders)
+            {
+                foreach (var p in folders.Properties())
+                    dict[p.Name] = p.Value?.ToString() ?? string.Empty;
+            }
+            _folderCache = dict;
+        }
+
+        private void SaveCache()
+        {
+            if (_folderCache == null) return;
+            var obj = new JObject
+            {
+                ["lastUpdate"] = _cacheDate,
+                ["folders"] = JObject.FromObject(_folderCache)
+            };
+            File.WriteAllText(CachePath, obj.ToString());
+        }
+
 
         private readonly GraphServiceClient _graph;
 
@@ -33,6 +72,75 @@ namespace ManutMap.Services
             _graph = new GraphServiceClient(
                 new ClientSecretCredential(TenantId, ClientId, ClientSecret),
                 new[] { "https://graph.microsoft.com/.default" });
+        }
+
+        private async Task<List<DriveItem>> GetNewRootFoldersAsync(string driveId)
+        {
+            if (_cacheDate == DateTime.MinValue)
+                return await GetAllRootFoldersAsync(driveId);
+
+            var list = new List<DriveItem>();
+            var page = await _graph.Drives[driveId].Items["root"].Children.GetAsync(rc =>
+            {
+                rc.QueryParameters.Filter = $"createdDateTime ge {_cacheDate:O}";
+            });
+
+            list.AddRange(page.Value.Where(i => i.Folder != null));
+
+            while (page.OdataNextLink is string next)
+            {
+                var req = new RequestInformation
+                {
+                    HttpMethod = Method.GET,
+                    UrlTemplate = next,
+                    PathParameters = new Dictionary<string, object>()
+                };
+                page = await _graph.RequestAdapter.SendAsync(req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
+                list.AddRange(page!.Value.Where(i => i.Folder != null));
+            }
+            return list;
+        }
+
+        private void MergeFolders(IEnumerable<DriveItem> items)
+        {
+            LoadCache();
+            foreach (var it in items)
+            {
+                string name = it.Name!.Trim();
+                string url = it.WebUrl ??
+                              $"https://{Domain}/sites/{SitePath}/{DriveDatalog}/{name}";
+
+                _folderCache![name] = url;
+
+                int idx = name.IndexOf('_');
+                if (idx > 0)
+                {
+                    string prefix = name[..idx];
+                    _folderCache.TryAdd(prefix, url);
+
+                    if (idx == name.Length - 1)
+                        _folderCache.TryAdd(prefix.TrimEnd('_'), url);
+                }
+            }
+        }
+
+        private async Task EnsureCacheUpdatedAsync()
+        {
+            var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
+            string driveId = await GetDriveId(site.Id, DriveDatalog);
+
+            var novos = await GetNewRootFoldersAsync(driveId);
+            if (novos.Count > 0)
+            {
+                MergeFolders(novos);
+                _cacheDate = DateTime.UtcNow;
+                SaveCache();
+            }
+            else if (_folderCache == null)
+            {
+                // no cache existed and no folders found
+                _folderCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            }
         }
 
         public async Task<List<OsInfo>> BuscarAsync(DateTime ini,
@@ -73,13 +181,11 @@ namespace ManutMap.Services
                     mapa[inf.NumOS] = inf;
             }
 
-            string dataDriveId = await GetDriveId(site.Id, DriveDatalog);
-            var pastas = await GetPastasPeriodoAsync(dataDriveId, ini, fim,
-                                                     termo != null, termo,
-                                                     tipoFiltro, regional);
+            await EnsureCacheUpdatedAsync();
+            LoadCache();
 
             foreach (var inf in mapa.Values)
-                if (pastas.TryGetValue(inf.NumOS, out var url))
+                if (_folderCache!.TryGetValue(inf.NumOS, out var url))
                 {
                     inf.TemDatalog = true;
                     inf.FolderUrl = url;
@@ -288,32 +394,9 @@ namespace ManutMap.Services
 
         public async Task<Dictionary<string, string>> GetAllDatalogFoldersAsync()
         {
-            var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
-            string driveId = await GetDriveId(site.Id, DriveDatalog);
-
-            var all = await GetAllRootFoldersAsync(driveId);
-            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var it in all)
-            {
-                string name = it.Name!.Trim();
-                string url = it.WebUrl ??
-                              $"https://{Domain}/sites/{SitePath}/{DriveDatalog}/{name}";
-
-                dict[name] = url;
-
-                int idx = name.IndexOf('_');
-                if (idx > 0)
-                {
-                    string prefix = name[..idx];
-                    dict.TryAdd(prefix, url);
-
-                    if (idx == name.Length - 1)
-                        dict.TryAdd(prefix.TrimEnd('_'), url);
-                }
-            }
-
-            return dict;
+            await EnsureCacheUpdatedAsync();
+            LoadCache();
+            return _folderCache!;
         }
     }
 }
