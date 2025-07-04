@@ -368,39 +368,60 @@ namespace ManutMap
         {
             if (_manutList == null) return;
 
+            var result = MessageBox.Show(
+                "Como deseja exportar os dados?\n\n" +
+                "Sim: baixar mapa em HTML para visualização offline.\n" +
+                "Não: baixar arquivo CSV para QGIS/Google Maps.",
+                "Exportar Dados",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Cancel || result == MessageBoxResult.None)
+                return;
+
             var criteria = GetCurrentCriteria();
             var filtered = _filterSvc.Apply(_manutList, criteria);
 
-            var dialog = new SaveFileDialog
+            if (result == MessageBoxResult.No)
             {
-                Filter = "CSV Files (*.csv)|*.csv",
-                FileName = $"manutencoes_{DateTime.Now:yyyyMMddHHmmss}.csv",
-                DefaultExt = "csv"
-            };
-            if (dialog.ShowDialog() == true)
-            {
-                _fileService.SaveCsv(filtered, dialog.FileName, criteria.LatLonField);
+                var dialog = new SaveFileDialog
+                {
+                    Filter = "CSV Files (*.csv)|*.csv",
+                    FileName = $"manutencoes_{DateTime.Now:yyyyMMddHHmmss}.csv",
+                    DefaultExt = "csv"
+                };
+                if (dialog.ShowDialog() == true)
+                {
+                    _fileService.SaveCsv(filtered, dialog.FileName, criteria.LatLonField);
+                }
+                return;
             }
-            var html = Helpers.MapHtmlHelper.GetHtmlWithData(filtered,
-                                                            criteria.ShowOpen,
-                                                            criteria.ShowClosed,
-                                                            criteria.ColorOpen,
-                                                            criteria.ColorClosed,
-                                                            criteria.ColorServicoPreventiva,
-                                                            criteria.ColorServicoCorretiva,
-                                                            criteria.ColorServicoOutros,
-                                                            criteria.ColorPrevOn,
-                                                            criteria.ColorCorrOn,
-                                                            criteria.ColorServOn,
-                                                            criteria.LatLonField);
 
-            var fileName = $"mapa_{DateTime.Now:yyyyMMddHHmmss}.html";
-            var link = await _spService.UploadHtmlAndShareAsync(fileName, html);
-            if (!string.IsNullOrEmpty(link))
+            if (result == MessageBoxResult.Yes)
             {
-                Clipboard.SetText(link);
-                MessageBox.Show("Link copiado para a área de transferência:\n" + link,
-                                "Link Compartilhado", MessageBoxButton.OK, MessageBoxImage.Information);
+                var html = Helpers.MapHtmlHelper.GetHtmlWithData(filtered,
+                                                                criteria.ShowOpen,
+                                                                criteria.ShowClosed,
+                                                                criteria.ColorOpen,
+                                                                criteria.ColorClosed,
+                                                                criteria.ColorServicoPreventiva,
+                                                                criteria.ColorServicoCorretiva,
+                                                                criteria.ColorServicoOutros,
+                                                                criteria.ColorPrevOn,
+                                                                criteria.ColorCorrOn,
+                                                                criteria.ColorServOn,
+                                                                criteria.LatLonField);
+
+                var dialog = new SaveFileDialog
+                {
+                    Filter = "HTML Files (*.html)|*.html",
+                    FileName = $"mapa_{DateTime.Now:yyyyMMddHHmmss}.html",
+                    DefaultExt = "html"
+                };
+                if (dialog.ShowDialog() == true)
+                {
+                    File.WriteAllText(dialog.FileName, html, Encoding.UTF8);
+                }
             }
         }
 
