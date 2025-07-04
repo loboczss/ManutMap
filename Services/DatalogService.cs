@@ -64,6 +64,12 @@ namespace ManutMap.Services
             File.WriteAllText(CachePath, obj.ToString());
         }
 
+        public Dictionary<string, string> GetCachedDatalogFolders()
+        {
+            LoadCache();
+            return _folderCache ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
 
         private readonly GraphServiceClient _graph;
 
