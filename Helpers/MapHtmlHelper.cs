@@ -34,6 +34,25 @@ namespace ManutMap.Helpers
     var markerGroup = L.markerClusterGroup();
     map.addLayer(markerGroup);
 
+    function fmtDate(str){
+      if(!str) return '';
+      var d = new Date(str.replace(' ', 'T'));
+      if(isNaN(d.getTime())){
+        var m = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s*(\d{1,2}):(\d{1,2}))?/);
+        if(m){
+          var day = parseInt(m[1]), mon = parseInt(m[2])-1,
+              yr = parseInt(m[3]), hh = m[4]?parseInt(m[4]):0,
+              mm = m[5]?parseInt(m[5]):0;
+          d = new Date(yr, mon, day, hh, mm);
+        } else return str;
+      }
+      return ('0'+d.getDate()).slice(-2)+'/'+
+             ('0'+(d.getMonth()+1)).slice(-2)+'/'+
+             d.getFullYear()+' '+
+             ('0'+d.getHours()).slice(-2)+':'+
+             ('0'+d.getMinutes()).slice(-2);
+    }
+
     function clearMarkers(){
       markerGroup.clearLayers();
     }
@@ -42,8 +61,8 @@ namespace ManutMap.Helpers
       clearMarkers();
 
       data.forEach(function(item) {
-        var dtRec = item.DTAHORARECLAMACAO ? item.DTAHORARECLAMACAO.trim() : '';
-        var dtCon = item.DTCONCLUSAO     ? item.DTCONCLUSAO.trim()     : '';
+        var dtRec = item.DTAHORARECLAMACAO ? fmtDate(item.DTAHORARECLAMACAO.trim()) : '';
+        var dtCon = item.DTCONCLUSAO     ? fmtDate(item.DTCONCLUSAO.trim())     : '';
         var isOpen   = dtRec !== '' && dtCon === '';
         var isClosed = dtCon !== '';
         if ((isOpen && !showOpen) || (isClosed && !showClosed)) return;
@@ -97,8 +116,8 @@ namespace ManutMap.Helpers
       clearMarkers();
 
       data.forEach(function(item){
-        var dtRec = item.DTAHORARECLAMACAO ? item.DTAHORARECLAMACAO.trim() : '';
-        var dtCon = item.DTCONCLUSAO     ? item.DTCONCLUSAO.trim()     : '';
+        var dtRec = item.DTAHORARECLAMACAO ? fmtDate(item.DTAHORARECLAMACAO.trim()) : '';
+        var dtCon = item.DTCONCLUSAO     ? fmtDate(item.DTCONCLUSAO.trim())     : '';
         var isOpen   = dtRec !== '' && dtCon === '';
         var isClosed = dtCon !== '';
         if((isOpen && !showOpen) || (isClosed && !showClosed)) return;
@@ -157,8 +176,8 @@ namespace ManutMap.Helpers
       clearMarkers();
 
       data.forEach(function(item){
-        var dtRec = item.DTAHORARECLAMACAO ? item.DTAHORARECLAMACAO.trim() : '';
-        var dtCon = item.DTCONCLUSAO     ? item.DTCONCLUSAO.trim()     : '';
+        var dtRec = item.DTAHORARECLAMACAO ? fmtDate(item.DTAHORARECLAMACAO.trim()) : '';
+        var dtCon = item.DTCONCLUSAO     ? fmtDate(item.DTCONCLUSAO.trim())     : '';
         var isOpen   = dtRec !== '' && dtCon === '';
         var isClosed = dtCon !== '';
         if((isOpen && !showOpen) || (isClosed && !showClosed)) return;
@@ -215,8 +234,8 @@ namespace ManutMap.Helpers
       clearMarkers();
 
       data.forEach(function(item){
-        var dtRec = item.DTAHORARECLAMACAO ? item.DTAHORARECLAMACAO.trim() : '';
-        var dtCon = item.DTCONCLUSAO     ? item.DTCONCLUSAO.trim()     : '';
+        var dtRec = item.DTAHORARECLAMACAO ? fmtDate(item.DTAHORARECLAMACAO.trim()) : '';
+        var dtCon = item.DTCONCLUSAO     ? fmtDate(item.DTCONCLUSAO.trim())     : '';
         var isOpen   = dtRec !== '' && dtCon === '';
         var isClosed = dtCon !== '';
         if((isOpen && !showOpen) || (isClosed && !showClosed)) return;
@@ -298,8 +317,8 @@ namespace ManutMap.Helpers
       });
 
       data.forEach(function(item){
-        var dtRec = item.DTAHORARECLAMACAO ? item.DTAHORARECLAMACAO.trim() : '';
-        var dtCon = item.DTCONCLUSAO     ? item.DTCONCLUSAO.trim()     : '';
+        var dtRec = item.DTAHORARECLAMACAO ? fmtDate(item.DTAHORARECLAMACAO.trim()) : '';
+        var dtCon = item.DTCONCLUSAO     ? fmtDate(item.DTCONCLUSAO.trim())     : '';
         var isOpen   = dtRec !== '' && dtCon === '';
         var isClosed = dtCon !== '';
         if((isOpen && !showOpen) || (isClosed && !showClosed)) return;

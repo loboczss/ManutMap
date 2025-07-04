@@ -141,7 +141,7 @@
                 <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>
                 <DataGridTextColumn Header="IDSIGFI" Binding="{Binding IdSigfi}" Width="*"/>
                 <DataGridTextColumn Header="ROTA" Binding="{Binding Rota}" Width="*"/>
-                <DataGridTextColumn Header="DATA" Binding="{Binding Data, StringFormat='dd/MM/yyyy'}" Width="*"/>
+                <DataGridTextColumn Header="DATA" Binding="{Binding Data, StringFormat='dd/MM/yyyy HH:mm'}" Width="*"/>
                 <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="*"/>
                 <DataGridTemplateColumn Header="PASTA" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>

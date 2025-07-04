@@ -74,8 +74,9 @@ namespace ManutMap.Services
                     if (c.StartDate.HasValue || c.EndDate.HasValue)
                     {
                         DateTime dt;
-                        if ((isOpen && DateTime.TryParse(dtRec, out dt)) ||
-                            (isClosed && DateTime.TryParse(dtCon, out dt)))
+                        var pt = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
+                        if ((isOpen && DateTime.TryParse(dtRec, pt, System.Globalization.DateTimeStyles.None, out dt)) ||
+                            (isClosed && DateTime.TryParse(dtCon, pt, System.Globalization.DateTimeStyles.None, out dt)))
                         {
                             if (c.StartDate.HasValue && dt < c.StartDate.Value) return false;
                             if (c.EndDate.HasValue && dt > c.EndDate.Value) return false;
