@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input; // Necessário para MouseButtonEventArgs
 
 namespace ManutMap
 {
@@ -16,18 +17,31 @@ namespace ManutMap
         {
             Selected = ShareOption.Html;
             DialogResult = true;
+            this.Close(); // Fecha a janela após a seleção
         }
 
         private void BtnCsv_Click(object sender, RoutedEventArgs e)
         {
             Selected = ShareOption.Csv;
             DialogResult = true;
+            this.Close(); // Fecha a janela após a seleção
         }
 
-        private void BtnCancel_Click(object sender, RoutedEventArgs e)
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
         {
             Selected = ShareOption.None;
             DialogResult = false;
+            this.Close();
+        }
+
+        // --- MÉTODO ADICIONADO ---
+        // Permite que a janela sem borda seja arrastada com o mouse
+        private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                this.DragMove();
+            }
         }
     }
 }
