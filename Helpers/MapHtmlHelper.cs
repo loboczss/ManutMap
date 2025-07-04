@@ -89,6 +89,7 @@ namespace ManutMap.Helpers
 
         var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
+        var descExec = item.DESCADICIONALEXEC || '';
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -102,6 +103,7 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
@@ -149,6 +151,7 @@ namespace ManutMap.Helpers
 
         var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
+        var descExec = item.DESCADICIONALEXEC || '';
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -162,6 +165,7 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
@@ -207,6 +211,7 @@ namespace ManutMap.Helpers
 
         var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
+        var descExec = item.DESCADICIONALEXEC || '';
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -220,6 +225,7 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
@@ -265,6 +271,7 @@ namespace ManutMap.Helpers
 
         var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
+        var descExec = item.DESCADICIONALEXEC || '';
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -278,6 +285,7 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
@@ -346,6 +354,7 @@ namespace ManutMap.Helpers
 
         var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
+        var descExec = item.DESCADICIONALEXEC || '';
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -358,6 +367,7 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
         m.bindPopup(popup);
