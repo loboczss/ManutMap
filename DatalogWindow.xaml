@@ -23,31 +23,31 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10">
             <ComboBox x:Name="CmbFiltro" Width="120" Margin="0,0,10,0">
+                <ComboBoxItem Content="INSTALAÇÃO"/>
                 <ComboBoxItem Content="OS"/>
                 <ComboBoxItem Content="IDSIGFI"/>
-                <ComboBoxItem Content="Rota"/>
-                <ComboBoxItem Content="Instalação"/>
+                <ComboBoxItem Content="ROTA"/>
             </ComboBox>
             <TextBox x:Name="TxtBusca" Width="200" Margin="0,0,10,0"/>
             <ComboBox x:Name="CmbRegional" Width="100" Margin="0,0,10,0">
-                <ComboBoxItem Content="Todas"/>
+                <ComboBoxItem Content="TODAS"/>
                 <ComboBoxItem Content="AC"/>
                 <ComboBoxItem Content="MT"/>
             </ComboBox>
-            <Button x:Name="BtnBuscar" Content="Buscar" Click="BtnBuscar_Click"/>
+            <Button x:Name="BtnBuscar" Content="BUSCAR" Click="BtnBuscar_Click"/>
         </StackPanel>
 
         <DataGrid Grid.Row="2" x:Name="GridOs" AutoGenerateColumns="False" Margin="0,0,0,10">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>
                 <DataGridTextColumn Header="IDSIGFI" Binding="{Binding IdSigfi}" Width="*"/>
-                <DataGridTextColumn Header="Rota" Binding="{Binding Rota}" Width="*"/>
-                <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="*"/>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
-                <DataGridTemplateColumn Header="Pasta" Width="*">
+                <DataGridTextColumn Header="ROTA" Binding="{Binding Rota}" Width="*"/>
+                <DataGridTextColumn Header="DATA" Binding="{Binding Data}" Width="*"/>
+                <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="*"/>
+                <DataGridTemplateColumn Header="PASTA" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="Abrir pasta"
+                            <Button Content="ABRIR PASTA"
                                     Command="{Binding DataContext.CmdAbrir, RelativeSource={RelativeSource AncestorType=Window}}"
                                     CommandParameter="{Binding FolderUrl}"
                                     Visibility="{Binding TemDatalog, Converter={StaticResource BoolToVis}}"/>
