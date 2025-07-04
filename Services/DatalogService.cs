@@ -324,8 +324,8 @@ namespace ManutMap.Services
                     var dtStr = t.Value<string>("DATACONCLUSAO");
                     if (string.IsNullOrWhiteSpace(dtStr)) continue;
 
-                    var dt = DateTime.Parse(dtStr, CultureInfo.InvariantCulture,
-                                            DateTimeStyles.AssumeUniversal);
+                    var pt = CultureInfo.GetCultureInfo("pt-BR");
+                    var dt = DateTime.Parse(dtStr, pt, DateTimeStyles.AssumeUniversal);
                     if (dt < ini || dt > fim) continue;
                     dataJson = dt;
                 }
@@ -340,8 +340,9 @@ namespace ManutMap.Services
                     };
                     if (!ok) continue;
 
+                    var pt = CultureInfo.GetCultureInfo("pt-BR");
                     if (DateTime.TryParse(t.Value<string>("DATACONCLUSAO"),
-                                          CultureInfo.InvariantCulture,
+                                          pt,
                                           DateTimeStyles.AssumeUniversal, out var dtTmp))
                         dataJson = dtTmp;
                 }
