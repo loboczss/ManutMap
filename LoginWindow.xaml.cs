@@ -47,5 +47,14 @@ namespace ManutMap
                 StatusText.Text = "Matrícula não encontrada";
             }
         }
+
+        private void MatriculaBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                LoginButton_Click(sender, e);
+            }
+        }
+
     }
 }
