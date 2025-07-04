@@ -142,24 +142,50 @@ namespace ManutMap
         private async void SyncButton_Click(object sender, RoutedEventArgs e)
         {
             SyncButton.IsEnabled = false;
-            await SyncAndRefresh();
+            var progress = new Progress<string>(msg => UpdateProgress(msg));
+            ShowProgress();
+            await SyncAndRefresh(progress);
+            HideProgress();
             SyncButton.IsEnabled = true;
         }
 
-        private async Task SyncAndRefresh()
+        private void ShowProgress()
         {
+            SyncProgressBar.IsIndeterminate = true;
+            SyncProgressBar.Visibility = Visibility.Visible;
+            SyncProgressText.Visibility = Visibility.Visible;
+        }
+
+        private void UpdateProgress(string message)
+        {
+            SyncProgressText.Text = message;
+        }
+
+        private void HideProgress()
+        {
+            SyncProgressBar.Visibility = Visibility.Collapsed;
+            SyncProgressText.Visibility = Visibility.Collapsed;
+        }
+
+        private async Task SyncAndRefresh(IProgress<string>? progress = null)
+        {
+            progress?.Report("Baixando dados...");
             _manutList = await _spService.DownloadLatestJsonAsync();
 
+            progress?.Report("Sincronizando datalog...");
             _datalogMap = await _datalogService.GetAllDatalogFoldersAsync();
             AnnotateDatalogInfo();
 
+            progress?.Report("Atualizando filtros...");
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
             PopulateComboBox(TipoFilterCombo, "TIPO");
             PopulateComboBox(RotaFilterCombo, "ROTA");
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
+            progress?.Report("Aplicando filtros...");
             ApplyFilters();
             LastUpdatedText.Text = _spService.LastUpdate.ToString("dd/MM/yyyy HH:mm");
+            progress?.Report("Concluído");
         }
 
         private void FiltersChanged(object sender, RoutedEventArgs e)
