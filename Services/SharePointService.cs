@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Net;
 using Azure.Identity;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
@@ -21,8 +22,20 @@ namespace ManutMap.Services
         private const string SiteHostname = "oneengenharia.sharepoint.com";
         private const string SitePath = "/sites/OneEngenharia";
         private const string LibraryName = "ArquivosJSON";
-        // Prefixo utilizado pelos arquivos de manutenção
         private const string FilePrefix = "Manutencao_";
+
+        private static readonly string OfflinePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                                                                  "manutencoes_latest.json");
+
+        private readonly string[] _filePatterns =
+        {
+            "Manutencao_AC2025",
+            "Manutencao_AC2024",
+            "Manutencao_AC2023",
+            "Manutencao_MT"
+        };
+
+        private string? _driveId;
 
         public DateTime LastUpdate { get; private set; }
 
@@ -34,71 +47,152 @@ namespace ManutMap.Services
 
         public async Task<JArray> DownloadLatestJsonAsync()
         {
+            bool fromInternet = false;
+            JArray dados = new JArray();
+
+            if (HasInternet())
+            {
+                try
+                {
+                    var files = await DownloadJsonFilesInternalAsync();
+                    if (files.Count > 0)
+                    {
+                        dados = CombineJsonFiles(files);
+                        var root = new JObject { ["manutencoes"] = dados };
+                        File.WriteAllText(OfflinePath, root.ToString());
+                        LastUpdate = DateTime.Now;
+                        fromInternet = true;
+                    }
+                }
+                catch
+                {
+                    // fallback to cache
+                }
+            }
+
+            if (!fromInternet)
+            {
+                if (File.Exists(OfflinePath))
+                {
+                    var cached = JObject.Parse(File.ReadAllText(OfflinePath, Encoding.UTF8));
+                    dados = cached["manutencoes"] as JArray ?? new JArray();
+                }
+            }
+
+            return dados;
+        }
+
+        private static bool HasInternet()
+        {
+            try
+            {
+                using var wc = new System.Net.WebClient();
+                wc.DownloadString("https://www.google.com/generate_204");
+                return true;
+            }
+            catch
+            {
+                try
+                {
+                    using var wc = new System.Net.WebClient();
+                    wc.DownloadString("https://www.bing.com");
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        private async Task<string> GetDriveIdAsync()
+        {
+            if (!string.IsNullOrEmpty(_driveId))
+                return _driveId!;
+
             var site = await _client.Sites[$"{SiteHostname}:{SitePath}:"].GetAsync();
             var drives = await _client.Sites[site.Id].Drives.GetAsync();
-            var drive = drives.Value.FirstOrDefault(d =>
-                d.Name.Equals(LibraryName, StringComparison.OrdinalIgnoreCase));
-            if (drive == null) throw new InvalidOperationException($"Biblioteca '{LibraryName}' não encontrada.");
+            var drive = drives.Value.FirstOrDefault(d => d.Name.Equals(LibraryName, StringComparison.OrdinalIgnoreCase));
+            if (drive == null)
+                throw new InvalidOperationException($"Biblioteca '{LibraryName}' não encontrada.");
 
-            var pg = await _client.Drives[drive.Id].Items["root"].Children.GetAsync();
-            var all = pg.Value.ToList();
+            _driveId = drive.Id;
+            return _driveId!;
+        }
 
-            while (pg.OdataNextLink is string next)
+        private async Task<Dictionary<string, string>> DownloadJsonFilesInternalAsync()
+        {
+            string driveId = await GetDriveIdAsync();
+
+            var page = await _client.Drives[driveId].Items["root"].Children.GetAsync();
+            var items = page.Value.ToList();
+
+            while (page.OdataNextLink is string next)
             {
-                var req = new Microsoft.Kiota.Abstractions.RequestInformation
+                var req = new RequestInformation
                 {
-                    HttpMethod = Microsoft.Kiota.Abstractions.Method.GET,
+                    HttpMethod = Method.GET,
                     UrlTemplate = next,
                     PathParameters = new Dictionary<string, object>()
                 };
-                pg = await _client.RequestAdapter.SendAsync(
-                        req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
-                all.AddRange(pg!.Value);
+                page = await _client.RequestAdapter.SendAsync(req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
+                items.AddRange(page!.Value);
             }
 
-            var jsonFiles = new List<DriveItem>();
+            var result = new Dictionary<string, string>();
 
-            foreach (var suf in JsonFileConstants.JsonSuffixes)
+            foreach (var pattern in _filePatterns)
             {
-                var arquivos = all
-                    .Where(f => f.File != null &&
-                                f.Name.EndsWith(suf, StringComparison.OrdinalIgnoreCase))
+                var arquivos = items
+                    .Where(f => f.File != null && f.Name.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) >= 0)
                     .OrderByDescending(f => f.LastModifiedDateTime)
                     .ToList();
 
-                if (arquivos.Count > 0)
-                    jsonFiles.Add(arquivos.First());
-            }
+                if (!arquivos.Any())
+                    continue;
 
-            if (jsonFiles.Count == 0)
-                throw new InvalidOperationException("Nenhum JSON de manutenção encontrado.");
-
-            var merged = new JArray();
-            foreach (var file in jsonFiles)
-            {
-                using var stream = await _client.Drives[drive.Id].Items[file.Id].Content.GetAsync();
+                var meta = arquivos.First();
+                using var stream = await _client.Drives[driveId].Items[meta.Id].Content.GetAsync();
                 using var sr = new StreamReader(stream, Encoding.UTF8);
-                var root = JObject.Parse(await sr.ReadToEndAsync());
-
-                JArray? arr = root["manutencoes"] as JArray;
-                if (arr == null)
-                {
-                    var prop = root.Properties()
-                        .FirstOrDefault(p => string.Equals(p.Name, "manutencoes", StringComparison.OrdinalIgnoreCase));
-                    arr = prop?.Value as JArray;
-                }
-
-                if (arr != null)
-                    merged.Merge(arr);
+                result[pattern] = await sr.ReadToEndAsync();
             }
 
-            var mergedLocal = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manutencoes_latest.json");
-            var mergedRoot = new JObject { ["manutencoes"] = merged };
-            File.WriteAllText(mergedLocal, mergedRoot.ToString());
+            return result;
+        }
 
-            LastUpdate = DateTime.Now;
+        private static JArray CombineJsonFiles(Dictionary<string, string> arquivos)
+        {
+            var combinado = new JArray();
 
-            return merged;
+            foreach (var kv in arquivos)
+            {
+                try
+                {
+                    string conteudo = kv.Value?.Trim();
+                    if (string.IsNullOrWhiteSpace(conteudo))
+                        continue;
+
+                    var token = JToken.Parse(conteudo);
+
+                    JArray? arr = null;
+                    if (token is JArray array)
+                        arr = array;
+                    else if (token is JObject obj)
+                    {
+                        arr = obj["manutencoes"] as JArray ?? obj.Properties().FirstOrDefault()?.Value as JArray;
+                    }
+
+                    if (arr != null)
+                        foreach (var item in arr)
+                            combinado.Add(item);
+                }
+                catch
+                {
+                    // ignore invalid file
+                }
+            }
+
+            return combinado;
         }
 
         public async Task<string> UploadHtmlAndShareAsync(string fileName, string htmlContent)
