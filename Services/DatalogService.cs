@@ -79,26 +79,42 @@ namespace ManutMap.Services
             if (_cacheDate == DateTime.MinValue)
                 return await GetAllRootFoldersAsync(driveId);
 
-            var list = new List<DriveItem>();
-            var page = await _graph.Drives[driveId].Items["root"].Children.GetAsync(rc =>
+            // Graph API does not always allow filtering by createdDateTime.
+            // If the request fails, fallback to fetching all folders and filter
+            // locally.
+            try
             {
-                rc.QueryParameters.Filter = $"createdDateTime ge {_cacheDate:O}";
-            });
-
-            list.AddRange(page.Value.Where(i => i.Folder != null));
-
-            while (page.OdataNextLink is string next)
-            {
-                var req = new RequestInformation
+                var list = new List<DriveItem>();
+                var page = await _graph.Drives[driveId].Items["root"].Children.GetAsync(rc =>
                 {
-                    HttpMethod = Method.GET,
-                    UrlTemplate = next,
-                    PathParameters = new Dictionary<string, object>()
-                };
-                page = await _graph.RequestAdapter.SendAsync(req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
-                list.AddRange(page!.Value.Where(i => i.Folder != null));
+                    rc.QueryParameters.Filter = $"createdDateTime ge {_cacheDate:yyyy-MM-ddTHH:mm:ssZ}";
+                });
+
+                list.AddRange(page.Value.Where(i => i.Folder != null));
+
+                while (page.OdataNextLink is string next)
+                {
+                    var req = new RequestInformation
+                    {
+                        HttpMethod = Method.GET,
+                        UrlTemplate = next,
+                        PathParameters = new Dictionary<string, object>()
+                    };
+                    page = await _graph.RequestAdapter.SendAsync(req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
+                    list.AddRange(page!.Value.Where(i => i.Folder != null));
+                }
+
+                return list;
             }
-            return list;
+            catch
+            {
+                var all = await GetAllRootFoldersAsync(driveId);
+                return all.Where(i =>
+                        i.Folder != null &&
+                        i.CreatedDateTime.HasValue &&
+                        i.CreatedDateTime.Value.UtcDateTime >= _cacheDate)
+                       .ToList();
+            }
         }
 
         private void MergeFolders(IEnumerable<DriveItem> items)
