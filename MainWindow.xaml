@@ -338,6 +338,10 @@
                         <TextBlock x:Name="ServicosStatsText" Text="0 abertos, 0 concluídos"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                        <TextBlock Text="Datalogs:" FontWeight="Bold" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="DatalogStatsText" Text="0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
                         <TextBlock Text="Total Exibido:" FontWeight="Bold" Margin="0,0,8,0"/>
                         <TextBlock x:Name="TotalStatsText" Text="0"/>
                     </StackPanel>
