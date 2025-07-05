@@ -53,12 +53,30 @@
                        Margin="0,0,0,20"
                        Foreground="#333333"/>
 
-            <TextBlock Text="Matrícula do Funcionário:"
+            <TextBlock Text="Buscar por:"
                        Foreground="#555555"
                        Margin="0,0,0,5"/>
 
-            <TextBox x:Name="MatriculaBox"
-                     Style="{StaticResource ModernTextBox}"/>
+            <ComboBox x:Name="FieldCombo" Height="35" SelectedIndex="0">
+                <ComboBoxItem>Matrícula</ComboBoxItem>
+                <ComboBoxItem>Nome</ComboBoxItem>
+                <ComboBoxItem>Função</ComboBoxItem>
+                <ComboBoxItem>Escala</ComboBoxItem>
+                <ComboBoxItem>Departamento</ComboBoxItem>
+                <ComboBoxItem>Cidade</ComboBoxItem>
+                <ComboBoxItem>Contratação</ComboBoxItem>
+            </ComboBox>
+
+            <TextBox x:Name="SearchBox"
+                     Margin="0,5,0,0"
+                     Style="{StaticResource ModernTextBox}"
+                     TextChanged="SearchBox_TextChanged"/>
+
+            <ListBox x:Name="SuggestionsList"
+                     Margin="0,2,0,0"
+                     Visibility="Collapsed"
+                     MaxHeight="100"
+                     MouseDoubleClick="SuggestionsList_MouseDoubleClick"/>
 
             <Button x:Name="SearchButton"
                     Content="Buscar"

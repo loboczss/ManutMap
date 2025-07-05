@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
+using ManutMap.Models;
 using Azure.Identity;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
@@ -112,6 +113,98 @@ namespace ManutMap.Services
             }
 
             return ParseFuncionariosCsv(csv);
+        }
+
+        public async Task<Dictionary<string, FuncionarioInfo>> DownloadFuncionariosInfoAsync()
+        {
+            bool fromInternet = false;
+            string csv = string.Empty;
+
+            if (HasInternet())
+            {
+                try
+                {
+                    string driveId = await GetDriveIdAsync();
+                    using var stream = await _client.Drives[driveId].Root.ItemWithPath("funcionarios.csv").Content.GetAsync();
+                    using var sr = new StreamReader(stream, Encoding.UTF8);
+                    csv = await sr.ReadToEndAsync();
+                    File.WriteAllText(FuncCsvPath, csv);
+                    fromInternet = true;
+                }
+                catch
+                {
+                    // fallback to cache
+                }
+            }
+
+            if (!fromInternet && File.Exists(FuncCsvPath))
+            {
+                csv = File.ReadAllText(FuncCsvPath, Encoding.UTF8);
+            }
+
+            return ParseFuncionariosInfoCsv(csv);
+        }
+
+        private static Dictionary<string, FuncionarioInfo> ParseFuncionariosInfoCsv(string csv)
+        {
+            var dict = new Dictionary<string, FuncionarioInfo>();
+            if (string.IsNullOrWhiteSpace(csv)) return dict;
+
+            foreach (var line in csv.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var fields = SplitCsvLine(line);
+                if (fields.Length < 7) continue;
+
+                var info = new FuncionarioInfo
+                {
+                    Matricula = fields[0].Trim('"').Trim().TrimStart('0'),
+                    Nome = fields[1].Trim('"').Trim(),
+                    Funcao = fields[2].Trim('"').Trim(),
+                    Escala = fields[3].Trim('"').Trim(),
+                    Departamento = fields[4].Trim('"').Trim(),
+                    Cidade = fields[5].Trim('"').Trim(),
+                    Contratacao = fields[6].Trim('"').Trim()
+                };
+
+                if (!dict.ContainsKey(info.Matricula))
+                    dict[info.Matricula] = info;
+            }
+
+            return dict;
+        }
+
+        private static string[] SplitCsvLine(string line)
+        {
+            var fields = new List<string>();
+            var sb = new StringBuilder();
+            bool inQuotes = false;
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+                if (c == '"')
+                {
+                    if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        sb.Append('"');
+                        i++;
+                    }
+                    else
+                    {
+                        inQuotes = !inQuotes;
+                    }
+                }
+                else if (c == ',' && !inQuotes)
+                {
+                    fields.Add(sb.ToString());
+                    sb.Clear();
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+            fields.Add(sb.ToString());
+            return fields.ToArray();
         }
 
         private static Dictionary<string, string> ParseFuncionariosCsv(string csv)
