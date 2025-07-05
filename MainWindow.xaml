@@ -224,6 +224,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Button Grid.Row="0" Grid.Column="0" x:Name="SyncButton" Style="{StaticResource ActionButtonStyle}" Margin="5" Click="SyncButton_Click">
@@ -258,6 +259,13 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE721;" VerticalAlignment="Center" Margin="0,0,8,0"/>
                             <TextBlock Text="Buscar Funcionário" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Grid.Row="3" Grid.ColumnSpan="2" x:Name="PrazoButton" Style="{StaticResource ActionButtonStyle}" Margin="5" Click="PrazoButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE823;" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="Painel de Prazos" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </Grid>
