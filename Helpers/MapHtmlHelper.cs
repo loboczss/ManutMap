@@ -34,6 +34,14 @@ namespace ManutMap.Helpers
     var markerGroup = L.markerClusterGroup();
     map.addLayer(markerGroup);
 
+    function setClustering(enabled){
+      if(markerGroup){
+        map.removeLayer(markerGroup);
+      }
+      markerGroup = enabled ? L.markerClusterGroup() : L.layerGroup();
+      map.addLayer(markerGroup);
+    }
+
     function fmtDate(str){
       if(!str) return '';
       var d = new Date(str.replace(' ', 'T'));
@@ -457,7 +465,8 @@ namespace ManutMap.Helpers
                                              bool colorServOn,
                                              string latLonField,
                                              bool iconByTipo = false,
-                                             string? customIcon = null)
+                                             string? customIcon = null,
+                                             bool useClusters = true)
         {
             var baseHtml = GetHtml();
             var json = JsonConvert.SerializeObject(data);
@@ -468,7 +477,7 @@ namespace ManutMap.Helpers
                 call = $"addMarkersByTipoServicoIcon(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{latLonField}');";
             else
                 call = $"addMarkersSelective(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorOpen}','{colorClosed}','{colorPrev}','{colorCorr}','{colorServ}',{colorPrevOn.ToString().ToLower()},{colorCorrOn.ToString().ToLower()},{colorServOn.ToString().ToLower()},'{latLonField}');";
-            var script = $"<script>var data = {json};window.onload=function(){{{call}}}</script>";
+            var script = $"<script>var data = {json};window.onload=function(){{setClustering({useClusters.ToString().ToLower()});{call}}}</script>";
             return baseHtml.Replace("</body></html>", script + "</body></html>");
         }
     }

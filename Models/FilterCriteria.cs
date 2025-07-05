@@ -37,6 +37,9 @@ namespace ManutMap.Models
 
         // Exibir apenas itens com datalog disponível
         public bool OnlyDatalog { get; set; }
+
+        // Novo: habilitar agrupamento de marcadores
+        public bool UseClusters { get; set; } = true;
     }
 }
 

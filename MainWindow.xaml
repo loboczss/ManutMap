@@ -437,6 +437,8 @@
                                         <ComboBoxItem Content="LATLON"/>
                                         <ComboBoxItem Content="LATLONCON"/>
                                     </ComboBox>
+                                    <CheckBox x:Name="ChbCluster" Content="Agrupar Marcadores" IsChecked="True"
+                                              Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                 </StackPanel>
                             </Expander>
                         </Border>

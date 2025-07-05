@@ -32,6 +32,15 @@ namespace ManutMap.Services
             _view.NavigateToString(MapHtmlHelper.GetHtml());
         }
 
+        public void SetClustering(bool enabled)
+        {
+            var script = $"setClustering({enabled.ToString().ToLower()});";
+            if (!_ready)
+                _pendingScripts.Add(script);
+            else
+                _view.ExecuteScriptAsync(script);
+        }
+
         public void AddMarkers(IEnumerable<JObject> data,
                                bool showOpen,
                                bool showClosed,
