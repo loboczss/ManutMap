@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using ManutMap.Services;
+using ManutMap.Models;
 
 namespace ManutMap
 {
     public partial class FuncionarioWindow : Window
     {
         private readonly SharePointService _spService = new SharePointService();
-        private Dictionary<string, string> _funcionarios = new();
+        private Dictionary<string, FuncionarioInfo> _funcionarios = new();
 
         public FuncionarioWindow()
         {
@@ -22,7 +24,7 @@ namespace ManutMap
             ResultText.Text = "Carregando...";
             try
             {
-                _funcionarios = await _spService.DownloadFuncionariosAsync();
+                _funcionarios = await _spService.DownloadFuncionariosInfoAsync();
                 ResultText.Text = string.Empty;
             }
             catch
@@ -34,15 +36,95 @@ namespace ManutMap
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
-            var input = MatriculaBox.Text?.Trim() ?? string.Empty;
-            input = input.TrimStart('0');
-            if (_funcionarios.TryGetValue(input, out var nome))
+            var input = SearchBox.Text?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(input))
             {
-                ResultText.Text = nome;
+                ResultText.Text = string.Empty;
+                return;
+            }
+
+            FuncionarioInfo? info = null;
+            switch (FieldCombo.SelectedIndex)
+            {
+                case 0: // Matricula
+                    var key = input.TrimStart('0');
+                    _funcionarios.TryGetValue(key, out info);
+                    break;
+                case 1: // Nome
+                    info = _funcionarios.Values.FirstOrDefault(f =>
+                        f.Nome.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                    break;
+                case 2: // Funcao
+                    info = _funcionarios.Values.FirstOrDefault(f =>
+                        f.Funcao.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                    break;
+                case 3: // Escala
+                    info = _funcionarios.Values.FirstOrDefault(f =>
+                        f.Escala.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                    break;
+                case 4: // Departamento
+                    info = _funcionarios.Values.FirstOrDefault(f =>
+                        f.Departamento.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                    break;
+                case 5: // Cidade
+                    info = _funcionarios.Values.FirstOrDefault(f =>
+                        f.Cidade.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                    break;
+                case 6: // Contratacao
+                    info = _funcionarios.Values.FirstOrDefault(f =>
+                        f.Contratacao.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                    break;
+            }
+
+            if (info != null)
+            {
+                ResultText.Text = $"Matrícula: {info.Matricula}\n" +
+                                 $"Nome: {info.Nome}\n" +
+                                 $"Função: {info.Funcao}\n" +
+                                 $"Escala: {info.Escala}\n" +
+                                 $"Departamento: {info.Departamento}\n" +
+                                 $"Cidade: {info.Cidade}\n" +
+                                 $"Contratação: {info.Contratacao}";
             }
             else
             {
-                ResultText.Text = "Matrícula não encontrada";
+                ResultText.Text = "Funcionário não encontrado";
+            }
+        }
+
+        private void SearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (FieldCombo.SelectedIndex != 1)
+            {
+                SuggestionsList.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            var text = SearchBox.Text?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                SuggestionsList.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            var suggestions = _funcionarios.Values
+                .Where(f => f.Nome.StartsWith(text, StringComparison.OrdinalIgnoreCase))
+                .Select(f => f.Nome)
+                .Distinct()
+                .Take(5)
+                .ToList();
+
+            SuggestionsList.ItemsSource = suggestions;
+            SuggestionsList.Visibility = suggestions.Any() ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void SuggestionsList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (SuggestionsList.SelectedItem is string nome)
+            {
+                SearchBox.Text = nome;
+                SuggestionsList.Visibility = Visibility.Collapsed;
+                SearchButton_Click(sender, e);
             }
         }
     }
