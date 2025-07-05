@@ -98,6 +98,10 @@ namespace ManutMap.Helpers
         var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
         var descExec = item.DESCADICIONALEXEC || '';
+        var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : '';
+        var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : '';
+        var prevDias = item.PREV_DIAS;
+        var corrDias = item.CORR_DIAS;
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -111,6 +115,9 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
+                    (prevProx?'<b>Próxima Prev.:</b> '+prevProx+' <span style="color:'+(prevDias<=0?'IndianRed':(prevDias<=30?'Orange':'Green'))+'">('+prevDias+' dias)</span><br>':'')+
+                    (corrDias!==undefined?'<b>Corretiva SLA:</b> <span style="color:'+(corrDias<=0?'IndianRed':(corrDias<=2?'Orange':'Green'))+'">'+corrDias+' dias</span><br>':'')+
                     (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
@@ -173,6 +180,9 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
+                    (prevProx?'<b>Próxima Prev.:</b> '+prevProx+' <span style="color:'+(prevDias<=0?'IndianRed':(prevDias<=30?'Orange':'Green'))+'">('+prevDias+' dias)</span><br>':'')+
+                    (corrDias!==undefined?'<b>Corretiva SLA:</b> <span style="color:'+(corrDias<=0?'IndianRed':(corrDias<=2?'Orange':'Green'))+'">'+corrDias+' dias</span><br>':'')+
                     (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
@@ -233,6 +243,9 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
+                    (prevProx?'<b>Próxima Prev.:</b> '+prevProx+' <span style="color:'+(prevDias<=0?'IndianRed':(prevDias<=30?'Orange':'Green'))+'">('+prevDias+' dias)</span><br>':'')+
+                    (corrDias!==undefined?'<b>Corretiva SLA:</b> <span style="color:'+(corrDias<=0?'IndianRed':(corrDias<=2?'Orange':'Green'))+'">'+corrDias+' dias</span><br>':'')+
                     (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
@@ -293,6 +306,9 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
+                    (prevProx?'<b>Próxima Prev.:</b> '+prevProx+' <span style="color:'+(prevDias<=0?'IndianRed':(prevDias<=30?'Orange':'Green'))+'">('+prevDias+' dias)</span><br>':'')+
+                    (corrDias!==undefined?'<b>Corretiva SLA:</b> <span style="color:'+(corrDias<=0?'IndianRed':(corrDias<=2?'Orange':'Green'))+'">'+corrDias+' dias</span><br>':'')+
                     (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
@@ -375,6 +391,9 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
+                    (prevProx?'<b>Próxima Prev.:</b> '+prevProx+' <span style="color:'+(prevDias<=0?'IndianRed':(prevDias<=30?'Orange':'Green'))+'">('+prevDias+' dias)</span><br>':'')+
+                    (corrDias!==undefined?'<b>Corretiva SLA:</b> <span style="color:'+(corrDias<=0?'IndianRed':(corrDias<=2?'Orange':'Green'))+'">'+corrDias+' dias</span><br>':'')+
                     (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 
@@ -437,6 +456,9 @@ namespace ManutMap.Helpers
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
+                    (prevProx?'<b>Próxima Prev.:</b> '+prevProx+' <span style="color:'+(prevDias<=0?'IndianRed':(prevDias<=30?'Orange':'Green'))+'">('+prevDias+' dias)</span><br>':'')+
+                    (corrDias!==undefined?'<b>Corretiva SLA:</b> <span style="color:'+(corrDias<=0?'IndianRed':(corrDias<=2?'Orange':'Green'))+'">'+corrDias+' dias</span><br>':'')+
                     (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
                     '<b>LatLon ('+latLonField+'):</b> '+coordStr;
 

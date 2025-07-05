@@ -11,11 +11,22 @@ namespace ManutMap
 {
     public partial class PrazoWindow : Window
     {
+        private readonly JArray _dados;
+        private List<CorretivaInfo> _allCorretivas;
+        private List<PreventivaInfo> _allPreventivas;
+        private readonly Dictionary<string, List<string>> _regionalRotas = new()
+        {
+            {"Cruzeiro do Sul", new List<string>{"01","02","03","04","05","14","15","16","17","30","32","34","36","39","40","42","06"}},
+            {"Tarauacá", new List<string>{"07","08","09","10","21","22","23","24","33","38","37","50","51","66","67","71"}},
+            {"Sena Madureira", new List<string>{"11","12","52","54","55","57","58","59","63","65"}},
+            {"Mato Grosso", new List<string>{"501","502","503","504","505","506","507","508","509","510","511","513","514"}}
+        };
         public class CorretivaInfo
         {
             public string NumOS { get; set; } = string.Empty;
             public string IdSigfi { get; set; } = string.Empty;
             public string Cliente { get; set; } = string.Empty;
+            public string Rota { get; set; } = string.Empty;
             public DateTime Abertura { get; set; }
             public int DiasRestantes { get; set; }
         }
@@ -25,6 +36,7 @@ namespace ManutMap
             public string NumOS { get; set; } = string.Empty;
             public string IdSigfi { get; set; } = string.Empty;
             public string Cliente { get; set; } = string.Empty;
+            public string Rota { get; set; } = string.Empty;
             public DateTime Ultima { get; set; }
             public DateTime Proxima { get; set; }
             public int DiasRestantes { get; set; }
@@ -33,8 +45,12 @@ namespace ManutMap
         public PrazoWindow(JArray dados)
         {
             InitializeComponent();
-            GridCorretivas.ItemsSource = GetCorretivas(dados);
-            GridPreventivas.ItemsSource = GetPreventivas(dados);
+            _dados = dados;
+            _allCorretivas = GetCorretivas(dados);
+            _allPreventivas = GetPreventivas(dados);
+
+            PopulateCombos();
+            ApplyFilters();
         }
 
         private static List<CorretivaInfo> GetCorretivas(JArray dados)
@@ -57,6 +73,7 @@ namespace ManutMap
                         NumOS = obj["NUMOS"]?.ToString() ?? string.Empty,
                         IdSigfi = obj["IDSIGFI"]?.ToString() ?? string.Empty,
                         Cliente = obj["NOMECLIENTE"]?.ToString() ?? string.Empty,
+                        Rota = obj["ROTA"]?.ToString() ?? string.Empty,
                         Abertura = dt,
                         DiasRestantes = diasRest
                     });
@@ -67,7 +84,7 @@ namespace ManutMap
 
         private static List<PreventivaInfo> GetPreventivas(JArray dados)
         {
-            var dict = new Dictionary<string, (DateTime dt, string cliente, string numOs, string idSigfi)>();
+            var dict = new Dictionary<string, (DateTime dt, string cliente, string numOs, string idSigfi, string rota)>();
             var pt = CultureInfo.GetCultureInfo("pt-BR");
             foreach (JObject obj in dados.OfType<JObject>())
             {
@@ -87,8 +104,9 @@ namespace ManutMap
                 string cliente = obj["NOMECLIENTE"]?.ToString() ?? id;
                 string numOs = obj["NUMOS"]?.ToString() ?? string.Empty;
                 string idSigfi = obj["IDSIGFI"]?.ToString() ?? string.Empty;
+                string rota = obj["ROTA"]?.ToString() ?? string.Empty;
                 if (!dict.ContainsKey(id) || dict[id].dt < dt)
-                    dict[id] = (dt, cliente, numOs, idSigfi);
+                    dict[id] = (dt, cliente, numOs, idSigfi, rota);
             }
             var list = new List<PreventivaInfo>();
             foreach (var kv in dict)
@@ -100,6 +118,7 @@ namespace ManutMap
                     NumOS = kv.Value.numOs,
                     IdSigfi = kv.Value.idSigfi,
                     Cliente = kv.Value.cliente,
+                    Rota = kv.Value.rota,
                     Ultima = kv.Value.dt,
                     Proxima = proxima,
                     DiasRestantes = dias
@@ -144,6 +163,79 @@ namespace ManutMap
                 mw.ShowClientOnMap(id);
                 mw.Activate();
             }
+        }
+
+        private void PopulateCombos()
+        {
+            RegionalFilterCombo.Items.Clear();
+            RegionalFilterCombo.Items.Add("Todos");
+            foreach (var r in _regionalRotas.Keys)
+                RegionalFilterCombo.Items.Add(r);
+            RegionalFilterCombo.SelectedIndex = 0;
+
+            PopulateRotaCombo();
+        }
+
+        private void PopulateRotaCombo()
+        {
+            RotaFilterCombo.Items.Clear();
+            RotaFilterCombo.Items.Add("Todos");
+
+            string reg = RegionalFilterCombo.SelectedItem as string ?? "Todos";
+            IEnumerable<string> rotas;
+            if (reg != "Todos" && _regionalRotas.TryGetValue(reg, out var rts))
+                rotas = rts;
+            else
+                rotas = _dados.OfType<JObject>().Select(o => o["ROTA"]?.ToString()?.Trim())
+                               .Where(s => !string.IsNullOrEmpty(s)).Distinct().OrderBy(s => s);
+
+            foreach (var r in rotas)
+                RotaFilterCombo.Items.Add(r);
+            RotaFilterCombo.SelectedIndex = 0;
+        }
+
+        private void ApplyFilters()
+        {
+            IEnumerable<CorretivaInfo> cor = _allCorretivas;
+            IEnumerable<PreventivaInfo> prev = _allPreventivas;
+
+            string reg = RegionalFilterCombo.SelectedItem as string ?? "Todos";
+            string rota = RotaFilterCombo.SelectedItem as string ?? "Todos";
+
+            if (reg != "Todos" && _regionalRotas.TryGetValue(reg, out var rts))
+            {
+                cor = cor.Where(c => rts.Contains(c.Rota));
+                prev = prev.Where(p => rts.Contains(p.Rota));
+            }
+            if (rota != "Todos")
+            {
+                cor = cor.Where(c => c.Rota == rota);
+                prev = prev.Where(p => p.Rota == rota);
+            }
+
+            GridCorretivas.ItemsSource = cor.ToList();
+            GridPreventivas.ItemsSource = prev.ToList();
+        }
+
+        private void RegionalChanged(object sender, SelectionChangedEventArgs e)
+        {
+            PopulateRotaCombo();
+            ApplyFilters();
+        }
+
+        private void FiltersChanged(object sender, EventArgs e)
+        {
+            ApplyFilters();
+        }
+
+        private void ShowFilteredButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Owner is not MainWindow mw) return;
+            var cor = GridCorretivas.ItemsSource as IEnumerable<CorretivaInfo> ?? Enumerable.Empty<CorretivaInfo>();
+            var prev = GridPreventivas.ItemsSource as IEnumerable<PreventivaInfo> ?? Enumerable.Empty<PreventivaInfo>();
+            var ids = cor.Select(c => c.IdSigfi).Concat(prev.Select(p => p.IdSigfi)).Distinct();
+            mw.ShowClientsOnMap(ids);
+            mw.Activate();
         }
     }
 }
