@@ -19,6 +19,14 @@
                 <TextBlock Text="Rota"/>
                 <ComboBox x:Name="RotaFilterCombo" Width="80" SelectionChanged="FiltersChanged"/>
             </StackPanel>
+            <StackPanel Margin="0,0,20,0">
+                <TextBlock Text="Dias"/>
+                <TextBox x:Name="DiasTextBox" Width="60" PreviewTextInput="DiasTextBox_PreviewTextInput" TextChanged="FiltersChanged"/>
+            </StackPanel>
+            <StackPanel Margin="0,0,20,0">
+                <TextBlock Text="Tipo de Prazo"/>
+                <ComboBox x:Name="TipoPrazoCombo" Width="120" SelectionChanged="FiltersChanged"/>
+            </StackPanel>
             <Button x:Name="ShowFilteredButton" Content="Mostrar no Mapa" Padding="10,4" Margin="0,18,0,0" Click="ShowFilteredButton_Click"/>
         </StackPanel>
 
