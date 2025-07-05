@@ -544,5 +544,32 @@ namespace ManutMap
             win.Owner = this;
             win.Show();
         }
+
+        public void ShowClientOnMap(string idSigfi)
+        {
+            if (_manutList == null || string.IsNullOrWhiteSpace(idSigfi)) return;
+
+            var entries = _manutList
+                .OfType<JObject>()
+                .Where(o => string.Equals((o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
+                                        idSigfi.Trim(), StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            if (entries.Count == 0) return;
+
+            var criteria = GetCurrentCriteria();
+            _mapService.SetClustering(false);
+            _mapService.AddMarkersSelective(entries,
+                                            criteria.ShowOpen,
+                                            criteria.ShowClosed,
+                                            criteria.ColorOpen,
+                                            criteria.ColorClosed,
+                                            criteria.ColorServicoPreventiva,
+                                            criteria.ColorServicoCorretiva,
+                                            criteria.ColorServicoOutros,
+                                            criteria.ColorPrevOn,
+                                            criteria.ColorCorrOn,
+                                            criteria.ColorServOn,
+                                            criteria.LatLonField);
+        }
     }
 }

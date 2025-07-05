@@ -14,6 +14,7 @@ namespace ManutMap
         public class CorretivaInfo
         {
             public string NumOS { get; set; } = string.Empty;
+            public string IdSigfi { get; set; } = string.Empty;
             public string Cliente { get; set; } = string.Empty;
             public DateTime Abertura { get; set; }
             public int DiasRestantes { get; set; }
@@ -21,6 +22,8 @@ namespace ManutMap
 
         public class PreventivaInfo
         {
+            public string NumOS { get; set; } = string.Empty;
+            public string IdSigfi { get; set; } = string.Empty;
             public string Cliente { get; set; } = string.Empty;
             public DateTime Ultima { get; set; }
             public DateTime Proxima { get; set; }
@@ -52,6 +55,7 @@ namespace ManutMap
                     list.Add(new CorretivaInfo
                     {
                         NumOS = obj["NUMOS"]?.ToString() ?? string.Empty,
+                        IdSigfi = obj["IDSIGFI"]?.ToString() ?? string.Empty,
                         Cliente = obj["NOMECLIENTE"]?.ToString() ?? string.Empty,
                         Abertura = dt,
                         DiasRestantes = diasRest
@@ -63,7 +67,7 @@ namespace ManutMap
 
         private static List<PreventivaInfo> GetPreventivas(JArray dados)
         {
-            var dict = new Dictionary<string, (DateTime dt, string cliente)>();
+            var dict = new Dictionary<string, (DateTime dt, string cliente, string numOs, string idSigfi)>();
             var pt = CultureInfo.GetCultureInfo("pt-BR");
             foreach (JObject obj in dados.OfType<JObject>())
             {
@@ -81,8 +85,10 @@ namespace ManutMap
                 if (id == string.Empty)
                     continue;
                 string cliente = obj["NOMECLIENTE"]?.ToString() ?? id;
+                string numOs = obj["NUMOS"]?.ToString() ?? string.Empty;
+                string idSigfi = obj["IDSIGFI"]?.ToString() ?? string.Empty;
                 if (!dict.ContainsKey(id) || dict[id].dt < dt)
-                    dict[id] = (dt, cliente);
+                    dict[id] = (dt, cliente, numOs, idSigfi);
             }
             var list = new List<PreventivaInfo>();
             foreach (var kv in dict)
@@ -91,6 +97,8 @@ namespace ManutMap
                 int dias = (int)Math.Ceiling((proxima.Date - DateTime.Today).TotalDays);
                 list.Add(new PreventivaInfo
                 {
+                    NumOS = kv.Value.numOs,
+                    IdSigfi = kv.Value.idSigfi,
                     Cliente = kv.Value.cliente,
                     Ultima = kv.Value.dt,
                     Proxima = proxima,
@@ -117,6 +125,24 @@ namespace ManutMap
                 e.Row.Background = info.DiasRestantes <= 0 ? Brushes.IndianRed :
                                     info.DiasRestantes <= 30 ? Brushes.Orange :
                                     Brushes.LightGreen;
+            }
+        }
+
+        private void MapaCorretiva_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string id && Owner is MainWindow mw)
+            {
+                mw.ShowClientOnMap(id);
+                mw.Activate();
+            }
+        }
+
+        private void MapaPreventiva_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string id && Owner is MainWindow mw)
+            {
+                mw.ShowClientOnMap(id);
+                mw.Activate();
             }
         }
     }
