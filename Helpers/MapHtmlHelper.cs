@@ -102,6 +102,14 @@ namespace ManutMap.Helpers
         var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : '';
         var prevDias = item.PREV_DIAS;
         var corrDias = item.CORR_DIAS;
+        var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : '';
+        var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : '';
+        var prevDias = item.PREV_DIAS;
+        var corrDias = item.CORR_DIAS;
+        var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : '';
+        var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : '';
+        var prevDias = item.PREV_DIAS;
+        var corrDias = item.CORR_DIAS;
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -167,6 +175,10 @@ namespace ManutMap.Helpers
         var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
         var descExec = item.DESCADICIONALEXEC || '';
+        var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : "";
+        var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : "";
+        var prevDias = item.PREV_DIAS;
+        var corrDias = item.CORR_DIAS;
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -230,6 +242,10 @@ namespace ManutMap.Helpers
         var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
         var descExec = item.DESCADICIONALEXEC || '';
+        var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : "";
+        var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : "";
+        var prevDias = item.PREV_DIAS;
+        var corrDias = item.CORR_DIAS;
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
@@ -294,6 +310,10 @@ namespace ManutMap.Helpers
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
         var descExec = item.DESCADICIONALEXEC || '';
 
+        var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : "";
+        var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : "";
+        var prevDias = item.PREV_DIAS;
+        var corrDias = item.CORR_DIAS;
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
@@ -380,6 +400,10 @@ namespace ManutMap.Helpers
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
         var descExec = item.DESCADICIONALEXEC || '';
 
+        var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : "";
+        var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : "";
+        var prevDias = item.PREV_DIAS;
+        var corrDias = item.CORR_DIAS;
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> Aberto<br>' : '<b>Status:</b> Concluído<br>')+
@@ -444,6 +468,10 @@ namespace ManutMap.Helpers
         var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
         var descExec = item.DESCADICIONALEXEC || '';
+        var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : "";
+        var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : "";
+        var prevDias = item.PREV_DIAS;
+        var corrDias = item.CORR_DIAS;
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
