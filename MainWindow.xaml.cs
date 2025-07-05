@@ -31,6 +31,18 @@ namespace ManutMap
             {"Mato Grosso", new List<string>{"501","502","503","504","505","506","507","508","509","510","511","513","514"}}
         };
 
+        private readonly Dictionary<string, string> _iconUrls = new()
+        {
+            {"blue",   "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png"},
+            {"red",    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png"},
+            {"green",  "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png"},
+            {"orange", "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png"},
+            {"yellow", "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png"},
+            {"violet", "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png"},
+            {"grey",   "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png"},
+            {"black",  "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-black.png"}
+        };
+
         private readonly DispatcherTimer _debounceTimer;
         private readonly DispatcherTimer _updateTimer;
         private bool _sidebarVisible = true;
@@ -91,6 +103,7 @@ namespace ManutMap
             ColorTipoPrevCombo.SelectionChanged += FiltersChanged;
             ColorTipoCorrCombo.SelectionChanged += FiltersChanged;
             ColorTipoServCombo.SelectionChanged += FiltersChanged;
+            MarkerStyleCombo.SelectionChanged += FiltersChanged;
         }
 
         private void LoadLocalAndPopulate()
@@ -235,6 +248,7 @@ namespace ManutMap
                 ColorServicoCorretiva = (ColorTipoCorrCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FFA500",
                 ColorServicoOutros = (ColorTipoServCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#008080",
                 LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON",
+                MarkerStyle = (MarkerStyleCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "circle",
                 OnlyDatalog = ChbOnlyDatalog.IsChecked == true
             };
         }
@@ -261,18 +275,44 @@ namespace ManutMap
 
             var filteredResult = _filterSvc.Apply(_manutList, criteria);
 
-            _mapService.AddMarkersSelective(filteredResult,
-                                            criteria.ShowOpen,
-                                            criteria.ShowClosed,
-                                            criteria.ColorOpen,
-                                            criteria.ColorClosed,
-                                            criteria.ColorServicoPreventiva,
-                                            criteria.ColorServicoCorretiva,
-                                            criteria.ColorServicoOutros,
-                                            criteria.ColorPrevOn,
-                                            criteria.ColorCorrOn,
-                                            criteria.ColorServOn,
-                                            criteria.LatLonField);
+            if (criteria.MarkerStyle == "circle")
+            {
+                _mapService.AddMarkersSelective(filteredResult,
+                                                criteria.ShowOpen,
+                                                criteria.ShowClosed,
+                                                criteria.ColorOpen,
+                                                criteria.ColorClosed,
+                                                criteria.ColorServicoPreventiva,
+                                                criteria.ColorServicoCorretiva,
+                                                criteria.ColorServicoOutros,
+                                                criteria.ColorPrevOn,
+                                                criteria.ColorCorrOn,
+                                                criteria.ColorServOn,
+                                                criteria.LatLonField);
+            }
+            else if (_iconUrls.TryGetValue(criteria.MarkerStyle, out var iconUrl))
+            {
+                _mapService.AddMarkersCustomIcon(filteredResult,
+                                                 criteria.ShowOpen,
+                                                 criteria.ShowClosed,
+                                                 iconUrl,
+                                                 criteria.LatLonField);
+            }
+            else
+            {
+                _mapService.AddMarkersSelective(filteredResult,
+                                                criteria.ShowOpen,
+                                                criteria.ShowClosed,
+                                                criteria.ColorOpen,
+                                                criteria.ColorClosed,
+                                                criteria.ColorServicoPreventiva,
+                                                criteria.ColorServicoCorretiva,
+                                                criteria.ColorServicoOutros,
+                                                criteria.ColorPrevOn,
+                                                criteria.ColorCorrOn,
+                                                criteria.ColorServOn,
+                                                criteria.LatLonField);
+            }
 
             AtualizarPainelEstatisticas(filteredResult);
         }
@@ -392,6 +432,10 @@ namespace ManutMap
 
             if (win.Selected == ShareDialog.ShareOption.Html)
             {
+                string? icon = null;
+                if (criteria.MarkerStyle != "circle" && _iconUrls.TryGetValue(criteria.MarkerStyle, out var url))
+                    icon = url;
+
                 var html = Helpers.MapHtmlHelper.GetHtmlWithData(filtered,
                                                                 criteria.ShowOpen,
                                                                 criteria.ShowClosed,
@@ -403,7 +447,9 @@ namespace ManutMap
                                                                 criteria.ColorPrevOn,
                                                                 criteria.ColorCorrOn,
                                                                 criteria.ColorServOn,
-                                                                criteria.LatLonField);
+                                                                criteria.LatLonField,
+                                                                false,
+                                                                icon);
 
                 var dialog = new SaveFileDialog
                 {
@@ -465,6 +511,7 @@ namespace ManutMap
             ColorTipoCorrCombo.SelectedIndex = 0;
             ColorTipoServCombo.SelectedIndex = 0;
 
+            MarkerStyleCombo.SelectedIndex = 0;
             LatLonFieldCombo.SelectedIndex = 0;
 
             ApplyFilters();

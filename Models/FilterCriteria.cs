@@ -32,6 +32,9 @@ namespace ManutMap.Models
         // "LATLON" ou "LATLONCON"
         public string LatLonField { get; set; } = "LATLON";
 
+        // Novo: tipo de marcador (circle, blue, red ...)
+        public string MarkerStyle { get; set; } = "circle";
+
         // Exibir apenas itens com datalog disponível
         public bool OnlyDatalog { get; set; }
     }

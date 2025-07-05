@@ -409,6 +409,21 @@
 
                                     <Separator Margin="0,0,0,15"/>
 
+                                    <TextBlock Text="Tipo de Marcador:" Style="{StaticResource LabelStyle}"/>
+                                    <ComboBox x:Name="MarkerStyleCombo" SelectionChanged="FiltersChanged" SelectedIndex="0">
+                                        <ComboBoxItem Content="Círculo" Tag="circle"/>
+                                        <ComboBoxItem Content="Azul" Tag="blue"/>
+                                        <ComboBoxItem Content="Vermelho" Tag="red"/>
+                                        <ComboBoxItem Content="Verde" Tag="green"/>
+                                        <ComboBoxItem Content="Laranja" Tag="orange"/>
+                                        <ComboBoxItem Content="Amarelo" Tag="yellow"/>
+                                        <ComboBoxItem Content="Roxo" Tag="violet"/>
+                                        <ComboBoxItem Content="Cinza" Tag="grey"/>
+                                        <ComboBoxItem Content="Preto" Tag="black"/>
+                                    </ComboBox>
+
+                                    <Separator Margin="0,0,0,15"/>
+
                                     <TextBlock Text="Campo de Coordenadas:" Style="{StaticResource LabelStyle}"/>
                                     <ComboBox x:Name="LatLonFieldCombo" SelectionChanged="FiltersChanged" SelectedIndex="0">
                                         <ComboBoxItem Content="LATLON"/>
