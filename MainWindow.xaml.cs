@@ -71,6 +71,7 @@ namespace ManutMap
                 LoadLocalAndPopulate();
                 _datalogMap = _datalogService.GetCachedDatalogFolders();
                 AnnotateDatalogInfo();
+                AnnotatePrazoInfo();
                 ApplyFilters();
 
                 _ = SyncAndRefresh();
@@ -120,6 +121,8 @@ namespace ManutMap
             PopulateComboBox(TipoFilterCombo, "TIPO");
             PopulateComboBox(RotaFilterCombo, "ROTA");
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
+
+            AnnotatePrazoInfo();
 
             ApplyFilters();
         }
@@ -201,6 +204,7 @@ namespace ManutMap
             progress?.Report((40, "Sincronizando datalog..."));
             _datalogMap = await _datalogService.GetAllDatalogFoldersAsync();
             AnnotateDatalogInfo();
+            AnnotatePrazoInfo();
 
             progress?.Report((70, "Atualizando filtros..."));
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
@@ -381,6 +385,72 @@ namespace ManutMap
             }
         }
 
+        private void AnnotatePrazoInfo()
+        {
+            if (_manutList == null) return;
+
+            var pt = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
+
+            var prevDict = new Dictionary<string, (DateTime dt, string rota)>();
+            var corrDict = new Dictionary<string, int>();
+
+            foreach (var obj in _manutList.OfType<JObject>())
+            {
+                string tipo = obj["TIPO"]?.ToString()?.Trim() ?? string.Empty;
+                string id = obj["IDSIGFI"]?.ToString()?.Trim();
+                if (string.IsNullOrEmpty(id))
+                    id = obj["NOMECLIENTE"]?.ToString()?.Trim() ?? string.Empty;
+                if (string.IsNullOrEmpty(id))
+                    continue;
+
+                if (string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase))
+                {
+                    var dtStr = obj["DTCONCLUSAO"]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(dtStr) && DateTime.TryParse(dtStr, pt, System.Globalization.DateTimeStyles.None, out var dt))
+                    {
+                        var rota = obj["ROTA"]?.ToString() ?? string.Empty;
+                        if (!prevDict.ContainsKey(id) || prevDict[id].dt < dt)
+                            prevDict[id] = (dt, rota);
+                    }
+                }
+                else if (string.Equals(tipo, "CORRETIVA", StringComparison.OrdinalIgnoreCase))
+                {
+                    var rec = obj["DTAHORARECLAMACAO"]?.ToString();
+                    var con = obj["DTCONCLUSAO"]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(rec) && string.IsNullOrWhiteSpace(con) && DateTime.TryParse(rec, pt, System.Globalization.DateTimeStyles.None, out var dtRec))
+                    {
+                        int dias = 5 - (int)(DateTime.Today - dtRec.Date).TotalDays;
+                        if (!corrDict.ContainsKey(id) || dias < corrDict[id])
+                            corrDict[id] = dias;
+                    }
+                }
+            }
+
+            foreach (var obj in _manutList.OfType<JObject>())
+            {
+                string id = obj["IDSIGFI"]?.ToString()?.Trim();
+                if (string.IsNullOrEmpty(id))
+                    id = obj["NOMECLIENTE"]?.ToString()?.Trim() ?? string.Empty;
+                if (string.IsNullOrEmpty(id))
+                    continue;
+
+                if (prevDict.TryGetValue(id, out var info))
+                {
+                    var proxima = info.dt.AddMonths(4);
+                    int dias = (int)Math.Ceiling((proxima.Date - DateTime.Today).TotalDays);
+                    obj["PREV_ULTIMA"] = info.dt.ToString("yyyy-MM-dd");
+                    obj["PREV_PROXIMA"] = proxima.ToString("yyyy-MM-dd");
+                    obj["PREV_DIAS"] = dias;
+                    obj["ROTA_LAST"] = info.rota;
+                }
+
+                if (corrDict.TryGetValue(id, out var cdias))
+                {
+                    obj["CORR_DIAS"] = cdias;
+                }
+            }
+        }
+
         public void UpdateDatalogMap(IEnumerable<OsInfo> infos)
         {
             if (infos == null) return;
@@ -553,6 +623,34 @@ namespace ManutMap
                 .OfType<JObject>()
                 .Where(o => string.Equals((o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
                                         idSigfi.Trim(), StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            if (entries.Count == 0) return;
+
+            var criteria = GetCurrentCriteria();
+            _mapService.SetClustering(false);
+            _mapService.AddMarkersSelective(entries,
+                                            criteria.ShowOpen,
+                                            criteria.ShowClosed,
+                                            criteria.ColorOpen,
+                                            criteria.ColorClosed,
+                                            criteria.ColorServicoPreventiva,
+                                            criteria.ColorServicoCorretiva,
+                                            criteria.ColorServicoOutros,
+                                            criteria.ColorPrevOn,
+                                            criteria.ColorCorrOn,
+                                            criteria.ColorServOn,
+                                            criteria.LatLonField);
+        }
+
+        public void ShowClientsOnMap(IEnumerable<string> ids)
+        {
+            if (_manutList == null || ids == null) return;
+            var set = new HashSet<string>(ids.Where(id => !string.IsNullOrWhiteSpace(id)), StringComparer.OrdinalIgnoreCase);
+            if (set.Count == 0) return;
+
+            var entries = _manutList
+                .OfType<JObject>()
+                .Where(o => set.Contains((o["IDSIGFI"]?.ToString() ?? string.Empty).Trim()))
                 .ToList();
             if (entries.Count == 0) return;
 

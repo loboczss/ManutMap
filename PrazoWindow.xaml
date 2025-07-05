@@ -5,7 +5,24 @@
         Title="Painel de Prazos" Height="600" Width="900"
         WindowStartupLocation="CenterOwner" Background="#f0f0f0">
     <Grid Margin="10">
-        <TabControl>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10" Grid.Row="0">
+            <StackPanel Margin="0,0,20,0">
+                <TextBlock Text="Regional"/>
+                <ComboBox x:Name="RegionalFilterCombo" Width="150" SelectionChanged="RegionalChanged"/>
+            </StackPanel>
+            <StackPanel Margin="0,0,20,0">
+                <TextBlock Text="Rota"/>
+                <ComboBox x:Name="RotaFilterCombo" Width="80" SelectionChanged="FiltersChanged"/>
+            </StackPanel>
+            <Button x:Name="ShowFilteredButton" Content="Mostrar no Mapa" Padding="10,4" Margin="0,18,0,0" Click="ShowFilteredButton_Click"/>
+        </StackPanel>
+
+        <TabControl Grid.Row="1">
             <TabItem Header="Corretivas">
                 <DataGrid x:Name="GridCorretivas" AutoGenerateColumns="False" Margin="0,5" 
                           IsReadOnly="True" AlternatingRowBackground="#eeeeee" 
