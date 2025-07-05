@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Newtonsoft.Json.Linq;
 
@@ -174,6 +175,13 @@ namespace ManutMap
             RegionalFilterCombo.SelectedIndex = 0;
 
             PopulateRotaCombo();
+
+            TipoPrazoCombo.Items.Clear();
+            TipoPrazoCombo.Items.Add("Todos");
+            TipoPrazoCombo.Items.Add("Restantes");
+            TipoPrazoCombo.Items.Add("Vencidos");
+            TipoPrazoCombo.Items.Add("Exato");
+            TipoPrazoCombo.SelectedIndex = 0;
         }
 
         private void PopulateRotaCombo()
@@ -201,6 +209,9 @@ namespace ManutMap
 
             string reg = RegionalFilterCombo.SelectedItem as string ?? "Todos";
             string rota = RotaFilterCombo.SelectedItem as string ?? "Todos";
+            string tipoPrazo = TipoPrazoCombo.SelectedItem as string ?? "Todos";
+            int diasFiltro = 0;
+            int.TryParse(DiasTextBox.Text, out diasFiltro);
 
             if (reg != "Todos" && _regionalRotas.TryGetValue(reg, out var rts))
             {
@@ -211,6 +222,22 @@ namespace ManutMap
             {
                 cor = cor.Where(c => c.Rota == rota);
                 prev = prev.Where(p => p.Rota == rota);
+            }
+
+            if (tipoPrazo == "Restantes" && diasFiltro > 0)
+            {
+                cor = cor.Where(c => c.DiasRestantes >= 0 && c.DiasRestantes <= diasFiltro);
+                prev = prev.Where(p => p.DiasRestantes >= 0 && p.DiasRestantes <= diasFiltro);
+            }
+            else if (tipoPrazo == "Vencidos" && diasFiltro > 0)
+            {
+                cor = cor.Where(c => c.DiasRestantes < 0 && -c.DiasRestantes <= diasFiltro);
+                prev = prev.Where(p => p.DiasRestantes < 0 && -p.DiasRestantes <= diasFiltro);
+            }
+            else if (tipoPrazo == "Exato")
+            {
+                cor = cor.Where(c => Math.Abs(c.DiasRestantes) == diasFiltro);
+                prev = prev.Where(p => Math.Abs(p.DiasRestantes) == diasFiltro);
             }
 
             GridCorretivas.ItemsSource = cor.ToList();
@@ -226,6 +253,11 @@ namespace ManutMap
         private void FiltersChanged(object sender, EventArgs e)
         {
             ApplyFilters();
+        }
+
+        private void DiasTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !e.Text.All(char.IsDigit);
         }
 
         private void ShowFilteredButton_Click(object sender, RoutedEventArgs e)
