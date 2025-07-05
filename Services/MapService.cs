@@ -126,5 +126,21 @@ namespace ManutMap.Services
             else
                 _view.ExecuteScriptAsync(script);
         }
+
+        public void AddMarkersCustomIcon(IEnumerable<JObject> data,
+                                          bool showOpen,
+                                          bool showClosed,
+                                          string iconUrl,
+                                          string latLonField = "LATLON")
+        {
+            var json = JsonConvert.SerializeObject(data);
+            var script =
+                $"addMarkersCustomIcon({json},{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{iconUrl}','{latLonField}');";
+
+            if (!_ready)
+                _pendingScripts.Add(script);
+            else
+                _view.ExecuteScriptAsync(script);
+        }
     }
 }
