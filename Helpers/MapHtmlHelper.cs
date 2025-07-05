@@ -377,6 +377,68 @@ namespace ManutMap.Helpers
         map.fitBounds(markerGroup.getBounds().pad(0.2));
       }
     }
+
+    function addMarkersCustomIcon(data, showOpen, showClosed, iconUrl, latLonField){
+      clearMarkers();
+
+      var icon = new L.Icon({
+        iconUrl: iconUrl,
+        shadowUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+        iconSize: [25,41],
+        iconAnchor: [12,41],
+        popupAnchor: [1,-34],
+        shadowSize: [41,41]
+      });
+
+      data.forEach(function(item){
+        var dtRec = item.DTAHORARECLAMACAO ? fmtDate(item.DTAHORARECLAMACAO.trim()) : '';
+        var dtCon = item.DTCONCLUSAO     ? fmtDate(item.DTCONCLUSAO.trim()) : '';
+        var isOpen   = dtRec !== '' && dtCon === '';
+        var isClosed = dtCon !== '';
+        if((isOpen && !showOpen) || (isClosed && !showClosed)) return;
+
+        var coord = null;
+        if(latLonField === 'LATLON')
+          coord = item.LATLON;
+        else if(latLonField === 'LATLONCON')
+          coord = item.LATLONCON;
+        if(!coord || coord.trim() === '') return;
+
+        var coordStr = coord.trim();
+        var nums = coordStr.match(/-?\d+(?:[.,]\d+)?/g);
+        if(!nums || nums.length < 2) return;
+        var lat = parseFloat(nums[0].replace(',', '.')),
+            lng = parseFloat(nums[1].replace(',', '.'));
+        if(isNaN(lat) || isNaN(lng)) return;
+
+        var m = L.marker([lat,lng],{ icon: icon });
+        markerGroup.addLayer(m);
+
+        var temDat = item.TemDatalog || item.TEMDATALOG || false;
+        var datUrl = item.FolderUrl || item.FOLDERURL || '';
+        var descExec = item.DESCADICIONALEXEC || '';
+
+        var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
+                    '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
+                    (isOpen?'<b>Status:</b> Aberto<br>' : '<b>Status:</b> Concluído<br>')+
+                    (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
+                    (dtCon?'<b>Conclusão:</b> '+dtCon+'<br>':'')+
+                    '<b>Rota:</b> '+item.ROTA+'<br>'+
+                    '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
+                    '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
+                    '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
+                    (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
+                    (isClosed?'<b>DESCADICIONALEXEC:</b> '+descExec+'<br>':'')+
+                    '<b>LatLon ('+latLonField+'):</b> '+coordStr;
+
+        m.bindPopup(popup);
+      });
+
+      if(markerGroup.getLayers().length>0){
+        map.fitBounds(markerGroup.getBounds().pad(0.2));
+      }
+    }
     </script>
 </body></html>
 
@@ -394,12 +456,15 @@ namespace ManutMap.Helpers
                                              bool colorCorrOn,
                                              bool colorServOn,
                                              string latLonField,
-                                             bool iconByTipo = false)
+                                             bool iconByTipo = false,
+                                             string? customIcon = null)
         {
             var baseHtml = GetHtml();
             var json = JsonConvert.SerializeObject(data);
             string call;
-            if(iconByTipo)
+            if(customIcon != null)
+                call = $"addMarkersCustomIcon(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{customIcon}','{latLonField}');";
+            else if(iconByTipo)
                 call = $"addMarkersByTipoServicoIcon(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{latLonField}');";
             else
                 call = $"addMarkersSelective(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorOpen}','{colorClosed}','{colorPrev}','{colorCorr}','{colorServ}',{colorPrevOn.ToString().ToLower()},{colorCorrOn.ToString().ToLower()},{colorServOn.ToString().ToLower()},'{latLonField}');";
