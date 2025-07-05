@@ -104,6 +104,8 @@ namespace ManutMap
             ColorTipoCorrCombo.SelectionChanged += FiltersChanged;
             ColorTipoServCombo.SelectionChanged += FiltersChanged;
             MarkerStyleCombo.SelectionChanged += FiltersChanged;
+            ChbCluster.Checked += FiltersChanged;
+            ChbCluster.Unchecked += FiltersChanged;
         }
 
         private void LoadLocalAndPopulate()
@@ -249,7 +251,8 @@ namespace ManutMap
                 ColorServicoOutros = (ColorTipoServCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#008080",
                 LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON",
                 MarkerStyle = (MarkerStyleCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "circle",
-                OnlyDatalog = ChbOnlyDatalog.IsChecked == true
+                OnlyDatalog = ChbOnlyDatalog.IsChecked == true,
+                UseClusters = ChbCluster.IsChecked != false
             };
         }
 
@@ -272,6 +275,8 @@ namespace ManutMap
             if (_manutList == null) return;
 
             var criteria = GetCurrentCriteria();
+
+            _mapService.SetClustering(criteria.UseClusters);
 
             var filteredResult = _filterSvc.Apply(_manutList, criteria);
 
@@ -449,7 +454,8 @@ namespace ManutMap
                                                                 criteria.ColorServOn,
                                                                 criteria.LatLonField,
                                                                 false,
-                                                                icon);
+                                                                icon,
+                                                                criteria.UseClusters);
 
                 var dialog = new SaveFileDialog
                 {
