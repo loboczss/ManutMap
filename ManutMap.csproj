@@ -17,6 +17,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Azure.Identity" Version="1.14.1" />
+		<PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Graph" Version="5.83.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1343.22" />
