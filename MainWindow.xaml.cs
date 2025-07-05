@@ -530,5 +530,13 @@ namespace ManutMap
             win.Owner = this;
             win.Show();
         }
+
+        private void PrazoButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_manutList == null) return;
+            var win = new PrazoWindow(_manutList);
+            win.Owner = this;
+            win.Show();
+        }
     }
 }
