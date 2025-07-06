@@ -84,6 +84,26 @@ namespace ManutMap.Services
                         else return false;
                     }
 
+                    if (c.PrazoDias > 0 && c.TipoPrazo != "Todos")
+                    {
+                        bool has = false;
+                        bool ok = false;
+
+                        if (item["CORR_DIAS"] != null && int.TryParse(item["CORR_DIAS"].ToString(), out var corr))
+                        {
+                            has = true;
+                            ok |= CheckPrazo(corr, c);
+                        }
+                        if (item["PREV_DIAS"] != null && int.TryParse(item["PREV_DIAS"].ToString(), out var prev))
+                        {
+                            has = true;
+                            ok |= CheckPrazo(prev, c);
+                        }
+
+                        if (!has || !ok)
+                            return false;
+                    }
+
                     return true;
                 })
                 .ToList();
@@ -93,6 +113,17 @@ namespace ManutMap.Services
                          StringComparer.OrdinalIgnoreCase)
                 .Select(g => g.First())
                 .ToList();
+        }
+
+        private static bool CheckPrazo(int dias, FilterCriteria c)
+        {
+            return c.TipoPrazo switch
+            {
+                "Restantes" => dias >= 0 && dias <= c.PrazoDias,
+                "Vencidos" => dias < 0 && -dias <= c.PrazoDias,
+                "Exato" => Math.Abs(dias) == c.PrazoDias,
+                _ => true
+            };
         }
     }
 }

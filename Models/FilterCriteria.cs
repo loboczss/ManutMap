@@ -40,6 +40,10 @@ namespace ManutMap.Models
 
         // Novo: habilitar agrupamento de marcadores
         public bool UseClusters { get; set; } = true;
+
+        // Filtro de prazos
+        public int PrazoDias { get; set; }
+        public string TipoPrazo { get; set; } = "Todos";
     }
 }
 

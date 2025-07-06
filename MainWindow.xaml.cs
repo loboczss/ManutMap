@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Input;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using Microsoft.Win32;
@@ -107,6 +108,10 @@ namespace ManutMap
             MarkerStyleCombo.SelectionChanged += FiltersChanged;
             ChbCluster.Checked += FiltersChanged;
             ChbCluster.Unchecked += FiltersChanged;
+
+            PrazoDiasTextBox.TextChanged += FiltersChanged;
+            PrazoDiasTextBox.PreviewTextInput += PrazoDiasTextBox_PreviewTextInput;
+            TipoPrazoCombo.SelectionChanged += FiltersChanged;
         }
 
         private void LoadLocalAndPopulate()
@@ -256,7 +261,9 @@ namespace ManutMap
                 LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON",
                 MarkerStyle = (MarkerStyleCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "circle",
                 OnlyDatalog = ChbOnlyDatalog.IsChecked == true,
-                UseClusters = ChbCluster.IsChecked != false
+                UseClusters = ChbCluster.IsChecked != false,
+                PrazoDias = int.TryParse(PrazoDiasTextBox.Text, out var pd) ? pd : 0,
+                TipoPrazo = (TipoPrazoCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos"
             };
         }
 
@@ -590,6 +597,9 @@ namespace ManutMap
             MarkerStyleCombo.SelectedIndex = 0;
             LatLonFieldCombo.SelectedIndex = 0;
 
+            PrazoDiasTextBox.Text = string.Empty;
+            TipoPrazoCombo.SelectedIndex = 0;
+
             ApplyFilters();
         }
 
@@ -613,6 +623,11 @@ namespace ManutMap
             var win = new PrazoWindow(_manutList);
             win.Owner = this;
             win.Show();
+        }
+
+        private void PrazoDiasTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !e.Text.All(char.IsDigit);
         }
 
         public void ShowClientOnMap(string idSigfi)

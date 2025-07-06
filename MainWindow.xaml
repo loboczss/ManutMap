@@ -443,6 +443,30 @@
                                 </StackPanel>
                             </Expander>
                         </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <Expander Header="Prazos" IsExpanded="False">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                        <TextBlock Text="Dias" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox x:Name="PrazoDiasTextBox" PreviewTextInput="PrazoDiasTextBox_PreviewTextInput" TextChanged="FiltersChanged"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Tipo de Prazo" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="TipoPrazoCombo" SelectionChanged="FiltersChanged" SelectedIndex="0">
+                                            <ComboBoxItem Content="Todos"/>
+                                            <ComboBoxItem Content="Restantes"/>
+                                            <ComboBoxItem Content="Vencidos"/>
+                                            <ComboBoxItem Content="Exato"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Grid>
+                            </Expander>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </DockPanel>
