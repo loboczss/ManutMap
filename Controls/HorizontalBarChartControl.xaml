@@ -6,16 +6,16 @@
         <ItemsControl.ItemTemplate>
             <DataTemplate>
                 <StackPanel Orientation="Horizontal" Margin="0,5" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Label}" Width="120"/>
+                    <TextBlock Text="{Binding Route}" Width="120"/>
                     <Border Background="SteelBlue" Height="20" CornerRadius="4">
                         <Border.Width>
                             <MultiBinding Converter="{StaticResource BarWidthConverter}">
-                                <Binding Path="Value"/>
+                                <Binding Path="Count"/>
                                 <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="Tag"/>
                             </MultiBinding>
                         </Border.Width>
                     </Border>
-                    <TextBlock Text="{Binding Value}" Margin="5,0,0,0"/>
+                    <TextBlock Text="{Binding Count}" Margin="5,0,0,0"/>
                 </StackPanel>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
