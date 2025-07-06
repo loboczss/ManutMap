@@ -91,13 +91,33 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <TextBlock x:Name="text" Text="{TemplateBinding Content}" ToolTip="Mostrar no mapa"/>
+                        <StackPanel x:Name="container" Orientation="Horizontal" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                            <Path x:Name="icon" 
+                                  Width="12" Height="12" Margin="0,0,5,0"
+                                  Fill="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}" 
+                                  Stretch="Uniform"
+                                  Data="M12,2C8.13,2 5,5.13 5,9c0,5.25 7,13 7,13s7,-7.75 7,-13c0,-3.87 -3.13,-7 -7,-7z M12,11.5c-1.38,0 -2.5,-1.12 -2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5z" />
+
+                            <TextBlock x:Name="presenter"
+                                       VerticalAlignment="Center"
+                                       Text="{TemplateBinding Content}"
+                                       ToolTip="{TemplateBinding ToolTip}" />
+                        </StackPanel>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="text" Property="TextDecorations" Value="Underline"/>
+                                <Setter TargetName="presenter" Property="TextDecorations" Value="Underline"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Opacity" Value="0.7"/>
+                                <Setter TargetName="container" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <TranslateTransform X="1" Y="1" />
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
