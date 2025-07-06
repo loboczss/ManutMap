@@ -6,10 +6,14 @@
 		<ApplicationIcon>ChatGPT-Image-3-de-jul.-de-2025_-09_07_24.ico</ApplicationIcon>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<Compile Include="Services/FileService.cs" />
-		<Compile Include="Services/DatalogService.cs" />
-	</ItemGroup>
+        <ItemGroup>
+                <Compile Include="Services/FileService.cs" />
+                <Compile Include="Services/DatalogService.cs" />
+                <Compile Include="Services/FilterService.cs" />
+                <Compile Include="Services/MapService.cs" />
+                <Compile Include="Services/JsonFileConstants.cs" />
+                <Compile Include="Services/SharePointService.cs" />
+        </ItemGroup>
 
 	<ItemGroup>
 	  <Content Include="ChatGPT-Image-3-de-jul.-de-2025_-09_07_24.ico" />
