@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
-        xmlns:controls="clr-namespace:ManutMap.Controls;assembly=ManutMap"
+        xmlns:controls="clr-namespace:ManutMap.Controls"
         mc:Ignorable="d"
         Title="ManutMap – Mapa de Manutenções"
         Height="768" Width="1366"
@@ -473,8 +473,7 @@
                 </ScrollViewer>
             </DockPanel>
         </Border>
-        <Button Grid.Column="1" x:Name="ToggleSidebarButton" Click="ToggleSidebarButton_Click" Style="{StaticResource SidebarToggle}" ToolTip="Recolher/Expandir Painel" Content="&lt;"/>
-
+        
         <TabControl Grid.Column="2">
             <TabItem Header="Mapa">
                 <Grid>
