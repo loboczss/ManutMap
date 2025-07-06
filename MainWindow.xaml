@@ -14,8 +14,9 @@
     <Window.Resources>
         <SolidColorBrush x:Key="BrandBlue" Color="#0078D4"/>
         <SolidColorBrush x:Key="BrandBlue.Hover" Color="#005A9E"/>
-        <SolidColorBrush x:Key="Text.Primary" Color="White"/>
+        <SolidColorBrush x:Key="Text.Primary" Color="Black"/>
         <SolidColorBrush x:Key="Text.Secondary" Color="#605E5C"/>
+        <SolidColorBrush x:Key="Text.Third" Color="White"/>
         <SolidColorBrush x:Key="Border.Default" Color="#D1D1D1"/>
         <SolidColorBrush x:Key="Background.Panel" Color="White"/>
         <SolidColorBrush x:Key="Background.Hover" Color="#F3F2F1"/>
