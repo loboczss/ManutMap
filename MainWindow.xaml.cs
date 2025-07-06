@@ -24,6 +24,9 @@ namespace ManutMap
         private MapService _mapService;
         private JArray _manutList;
         private Dictionary<string, string> _datalogMap;
+        private List<RouteCount> _routeStats = new();
+        public int MaxRouteCount { get; private set; }
+        private readonly List<OsSimpleInfo> _osSemDatalog = new();
         private readonly Dictionary<string, List<string>> _regionalRotas = new()
         {
             {"Cruzeiro do Sul", new List<string>{"01","02","03","04","05","14","15","16","17","30","32","34","36","39","40","42","06"}},
@@ -408,6 +411,8 @@ namespace ManutMap
                     obj["FOLDERURL"] = null;
                 }
             }
+
+            UpdateStatsTab();
         }
 
         private void AnnotatePrazoInfo()
@@ -502,6 +507,8 @@ namespace ManutMap
                     }
                 }
             }
+
+            UpdateStatsTab();
         }
 
         private void ShareButton_Click(object sender, RoutedEventArgs e)
@@ -641,6 +648,50 @@ namespace ManutMap
             var win = new PrazoWindow(_manutList);
             win.Owner = this;
             win.Show();
+        }
+
+        private void UpdateStatsTab()
+        {
+            if (_manutList == null) return;
+
+            var all = _manutList.OfType<JObject>().ToList();
+            var withDatalog = all.Where(o => o["TEMDATALOG"]?.ToObject<bool>() == true).ToList();
+            var withoutDatalog = all.Where(o => o["TEMDATALOG"]?.ToObject<bool>() != true).ToList();
+
+            _routeStats = withDatalog
+                .GroupBy(o => (o["ROTA"]?.ToString() ?? "-").Trim())
+                .Select(g => new RouteCount(g.Key, g.Count()))
+                .OrderByDescending(g => g.Count)
+                .ToList();
+
+            MaxRouteCount = _routeStats.Count > 0 ? _routeStats.Max(r => r.Count) : 0;
+            RouteStatsList.Tag = MaxRouteCount;
+            RouteStatsList.ItemsSource = _routeStats;
+
+            int prevCom = withDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase));
+            int prevSem = withoutDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase));
+            int corrCom = withDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase));
+            int corrSem = withoutDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase));
+
+            int maxVal = new[] { prevCom, prevSem, corrCom, corrSem }.Max();
+            PrevComBar.Maximum = PrevSemBar.Maximum = CorrComBar.Maximum = CorrSemBar.Maximum = maxVal;
+            PrevComBar.Value = prevCom; PrevComText.Text = prevCom.ToString();
+            PrevSemBar.Value = prevSem; PrevSemText.Text = prevSem.ToString();
+            CorrComBar.Value = corrCom; CorrComText.Text = corrCom.ToString();
+            CorrSemBar.Value = corrSem; CorrSemText.Text = corrSem.ToString();
+
+            _osSemDatalog.Clear();
+            foreach (var o in withoutDatalog)
+            {
+                _osSemDatalog.Add(new OsSimpleInfo
+                {
+                    NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
+                    IdSigfi = (o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
+                    Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim()
+                });
+            }
+            DatalogMissingGrid.ItemsSource = null;
+            DatalogMissingGrid.ItemsSource = _osSemDatalog;
         }
 
         private void PrazoDiasTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
