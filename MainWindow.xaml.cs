@@ -382,13 +382,19 @@ namespace ManutMap
 
             int datalogCount = dadosFiltrados.Count(item =>
                 item["TEMDATALOG"]?.ToObject<bool>() == true);
+            int totalCount = dadosFiltrados.Count();
+            int missingCount = totalCount - datalogCount;
+            double rate = totalCount > 0 ? datalogCount * 100.0 / totalCount : 0.0;
 
             // Atualiza cada TextBlock individualmente
             PreventivasStatsText.Text = $"{prevAbertas} abertas, {prevConcluidas} concluídas";
             CorretivasStatsText.Text = $"{corrAbertas} abertas, {corrConcluidas} concluídas";
             ServicosStatsText.Text = $"{servAbertos} abertos, {servConcluidos} concluídos";
             DatalogStatsText.Text = datalogCount.ToString();
-            TotalStatsText.Text = dadosFiltrados.Count().ToString();
+            TotalStatsText.Text = totalCount.ToString();
+
+            DatalogSummaryText.Text = $"{datalogCount} OS com Datalog (" + rate.ToString("0.#") + "%)";
+            MissingCountText.Text = missingCount.ToString();
         }
 
         private void AnnotateDatalogInfo()

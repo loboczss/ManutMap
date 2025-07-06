@@ -6,5 +6,6 @@
              StartupUri="LoginWindow.xaml">
     <Application.Resources>
         <helpers:ProportionalHeightConverter x:Key="BarHeightConverter"/>
+        <helpers:ProportionalWidthConverter x:Key="BarWidthConverter"/>
     </Application.Resources>
 </Application>
