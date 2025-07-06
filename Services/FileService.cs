@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 namespace ManutMap.Services
@@ -15,6 +16,14 @@ namespace ManutMap.Services
             var json = File.ReadAllText(filename);
             var root = JObject.Parse(json);
             return (JArray)root["manutencoes"];
+        }
+
+        public async Task<JArray?> LoadLocalJsonAsync(string filename)
+        {
+            if (!File.Exists(filename)) return null;
+            var json = await File.ReadAllTextAsync(filename);
+            var root = JObject.Parse(json);
+            return (JArray?)root["manutencoes"];
         }
 
         public void SaveCsv(IEnumerable<JObject> data, string path, string latLonField = "LATLON")
