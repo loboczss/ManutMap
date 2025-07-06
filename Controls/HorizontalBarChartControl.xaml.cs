@@ -42,7 +42,9 @@ namespace ManutMap.Controls
             double max = 0;
             foreach (var item in _items)
             {
-                var prop = item?.GetType().GetProperty("Value");
+                if (item == null) continue;
+                var type = item.GetType();
+                var prop = type.GetProperty("Value") ?? type.GetProperty("Count");
                 if (prop != null)
                 {
                     var valObj = prop.GetValue(item);
