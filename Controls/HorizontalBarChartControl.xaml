@@ -24,7 +24,7 @@
         <DataTemplate DataType="{x:Type models:LabelValue}">
             <StackPanel Orientation="Horizontal" Margin="0,5" VerticalAlignment="Center">
                 <TextBlock Text="{Binding Label}" Width="120"/>
-                <Border Background="SteelBlue" Height="20" CornerRadius="4">
+                <Border x:Name="Bar" Background="SteelBlue" Height="20" CornerRadius="4">
                     <Border.Width>
                         <MultiBinding Converter="{StaticResource BarWidthConverter}">
                             <Binding Path="Value"/>
@@ -34,6 +34,14 @@
                 </Border>
                 <TextBlock Text="{Binding Value}" Margin="5,0,0,0"/>
             </StackPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Label}" Value="Prev. sem">
+                    <Setter TargetName="Bar" Property="Background" Value="Red"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Label}" Value="Corr. sem">
+                    <Setter TargetName="Bar" Property="Background" Value="Red"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
     </UserControl.Resources>
 

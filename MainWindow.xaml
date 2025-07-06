@@ -531,25 +531,28 @@
 
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
-                                <TextBlock Text="Coletas de Datalog por Rota" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                                <controls:HorizontalBarChartControl x:Name="RouteChart" />
+                                <TextBlock Text="Coletas de Datalog por Rota" FontWeight="Bold" FontSize="16" Margin="0,0,0,4"/>
+                                <TextBlock Text="Mostra a quantidade de coletas em cada rota." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
+                                <controls:LineChartControl x:Name="RouteChart" Height="200" />
                             </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
-                                <TextBlock Text="Datalog por Tipo de Serviço" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                                <TextBlock Text="Datalog por Tipo de Serviço" FontWeight="Bold" FontSize="16" Margin="0,0,0,4"/>
+                                <TextBlock Text="Compara ordens preventivas e corretivas com coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
                                 <controls:HorizontalBarChartControl x:Name="TipoServicoChart" />
                             </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
-                                <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,5">
+                                <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4">
                                     <Run Text="Ordens de Serviço sem Datalog ("/>
                                     <Run x:Name="MissingCountText"/>
                                     <Run Text=")"/>
                                 </TextBlock>
+                                <TextBlock Text="Lista as ordens que ainda não possuem coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
                                 <DataGrid x:Name="DatalogMissingGrid" AutoGenerateColumns="False" Height="200">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>
