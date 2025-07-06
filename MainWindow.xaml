@@ -284,35 +284,36 @@
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <StackPanel Grid.Row="0" Margin="0,0,0,10">
-                                        <TextBlock Text="Tipo SIGFI" Style="{StaticResource LabelStyle}"/>
-                                        <ComboBox x:Name="SigfiFilterCombo" SelectionChanged="FiltersChanged"/>
-                                    </StackPanel>
-
                                     <StackPanel Grid.Row="1" Margin="0,0,0,10">
-                                        <TextBlock Text="Tipo Serviço" Style="{StaticResource LabelStyle}"/>
-                                        <ComboBox x:Name="TipoFilterCombo" SelectionChanged="FiltersChanged"/>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Row="2" Margin="0,0,0,10">
                                         <TextBlock Text="Número da OS" Style="{StaticResource LabelStyle}"/>
                                         <TextBox x:Name="NumOsFilterBox" TextChanged="FiltersChanged"/>
                                     </StackPanel>
 
-                                    <StackPanel Grid.Row="3" Margin="0,0,0,10">
+                                    <StackPanel Grid.Row="2" Margin="0,0,0,10">
                                         <TextBlock Text="ID SIGFI" Style="{StaticResource LabelStyle}"/>
                                         <TextBox x:Name="IdSigfiFilterBox" TextChanged="FiltersChanged"/>
                                     </StackPanel>
 
-                                    <StackPanel Grid.Row="4" Margin="0,0,0,10">
+                                    <StackPanel Grid.Row="3" Margin="0,0,0,10">
                                         <TextBlock Text="Regional" Style="{StaticResource LabelStyle}"/>
                                         <ComboBox x:Name="RegionalFilterCombo" SelectionChanged="RegionalChanged"/>
                                     </StackPanel>
 
-                                    <StackPanel Grid.Row="5">
+                                    <StackPanel Grid.Row="4" Margin="0,0,0,10">
                                         <TextBlock Text="Rota" Style="{StaticResource LabelStyle}"/>
                                         <ComboBox x:Name="RotaFilterCombo" SelectionChanged="FiltersChanged"/>
                                     </StackPanel>
+
+                                    <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                                        <TextBlock Text="Tipo Serviço" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="TipoFilterCombo" SelectionChanged="FiltersChanged"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="5" Margin="0,0,0,10">
+                                        <TextBlock Text="Tipo SIGFI" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="SigfiFilterCombo" SelectionChanged="FiltersChanged"/>
+                                    </StackPanel>
+
                                 </Grid>
                             </Expander>
                         </Border>
