@@ -90,6 +90,7 @@ namespace ManutMap.Controls
         {
             ChartCanvas.Children.Clear();
             if (_items == null || MaxValue <= 0) return;
+
             var list = _items.Cast<object>().ToList();
             int n = list.Count;
             if (n == 0) return;
@@ -97,6 +98,34 @@ namespace ManutMap.Controls
             double width = ChartCanvas.ActualWidth;
             double height = ChartCanvas.ActualHeight;
             if (width == 0 || height == 0) return;
+
+            // draw grid lines for better readability
+            int grids = 4;
+            for (int i = 0; i <= grids; i++)
+            {
+                double y = height - i * height / grids;
+                var line = new Line
+                {
+                    X1 = 0,
+                    X2 = width,
+                    Y1 = y,
+                    Y2 = y,
+                    Stroke = Brushes.LightGray,
+                    StrokeThickness = 0.5,
+                    StrokeDashArray = new DoubleCollection { 2, 2 }
+                };
+                ChartCanvas.Children.Add(line);
+
+                var label = new TextBlock
+                {
+                    Text = ((int)(MaxValue * i / grids)).ToString(),
+                    FontSize = 10,
+                    Foreground = Brushes.Gray
+                };
+                Canvas.SetLeft(label, 0);
+                Canvas.SetTop(label, y - 10);
+                ChartCanvas.Children.Add(label);
+            }
 
             var poly = new Polyline
             {
@@ -127,6 +156,16 @@ namespace ManutMap.Controls
                 Canvas.SetLeft(ell, x - 4);
                 Canvas.SetTop(ell, y - 4);
                 ChartCanvas.Children.Add(ell);
+
+                var valueLabel = new TextBlock
+                {
+                    Text = val.ToString(),
+                    FontSize = 11,
+                    Foreground = Brushes.Black
+                };
+                Canvas.SetLeft(valueLabel, x - 10);
+                Canvas.SetTop(valueLabel, y - 20);
+                ChartCanvas.Children.Add(valueLabel);
             }
 
             ChartCanvas.Children.Insert(0, poly);
