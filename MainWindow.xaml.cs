@@ -352,6 +352,7 @@ namespace ManutMap
             }
 
             AtualizarPainelEstatisticas(filteredResult);
+            UpdateStatsTab(filteredResult);
         }
 
         // MÉTODO DE ESTATÍSTICAS ATUALIZADO para a nova barra
@@ -639,11 +640,11 @@ namespace ManutMap
             win.Show();
         }
 
-        private void UpdateStatsTab()
+        private void UpdateStatsTab(IEnumerable<JObject>? source = null)
         {
-            if (_manutList == null) return;
+            if (source == null && _manutList == null) return;
 
-            var all = _manutList.OfType<JObject>().ToList();
+            var all = source?.ToList() ?? _manutList!.OfType<JObject>().ToList();
             var withDatalog = all.Where(o => o["TEMDATALOG"]?.ToObject<bool>() == true).ToList();
             var withoutDatalog = all.Where(o => o["TEMDATALOG"]?.ToObject<bool>() != true).ToList();
 
