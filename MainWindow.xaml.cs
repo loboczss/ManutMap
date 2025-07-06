@@ -665,20 +665,22 @@ namespace ManutMap
                 .ToList();
 
             MaxRouteCount = _routeStats.Count > 0 ? _routeStats.Max(r => r.Count) : 0;
-            RouteStatsList.Tag = MaxRouteCount;
-            RouteStatsList.ItemsSource = _routeStats;
+            RouteChart.Tag = MaxRouteCount;
+            RouteChart.Items = _routeStats;
 
             int prevCom = withDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase));
             int prevSem = withoutDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase));
             int corrCom = withDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase));
             int corrSem = withoutDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase));
 
-            int maxVal = new[] { prevCom, prevSem, corrCom, corrSem }.Max();
-            PrevComBar.Maximum = PrevSemBar.Maximum = CorrComBar.Maximum = CorrSemBar.Maximum = maxVal;
-            PrevComBar.Value = prevCom; PrevComText.Text = prevCom.ToString();
-            PrevSemBar.Value = prevSem; PrevSemText.Text = prevSem.ToString();
-            CorrComBar.Value = corrCom; CorrComText.Text = corrCom.ToString();
-            CorrSemBar.Value = corrSem; CorrSemText.Text = corrSem.ToString();
+            var tipoData = new List<LabelValue>
+            {
+                new LabelValue("Prev. com", prevCom),
+                new LabelValue("Prev. sem", prevSem),
+                new LabelValue("Corr. com", corrCom),
+                new LabelValue("Corr. sem", corrSem)
+            };
+            TipoServicoChart.Items = tipoData;
 
             _osSemDatalog.Clear();
             foreach (var o in withoutDatalog)
