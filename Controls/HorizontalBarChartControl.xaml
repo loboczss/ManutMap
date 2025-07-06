@@ -1,23 +1,41 @@
 <UserControl x:Class="ManutMap.Controls.HorizontalBarChartControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:ManutMap.Controls">
-    <ItemsControl x:Name="ItemsHost" ItemsSource="{Binding Items}">
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <StackPanel Orientation="Horizontal" Margin="0,5" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Route}" Width="120"/>
-                    <Border Background="SteelBlue" Height="20" CornerRadius="4">
-                        <Border.Width>
-                            <MultiBinding Converter="{StaticResource BarWidthConverter}">
-                                <Binding Path="Count"/>
-                                <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="Tag"/>
-                            </MultiBinding>
-                        </Border.Width>
-                    </Border>
-                    <TextBlock Text="{Binding Count}" Margin="5,0,0,0"/>
-                </StackPanel>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+             xmlns:local="clr-namespace:ManutMap.Controls"
+             xmlns:models="clr-namespace:ManutMap.Models">
+    <UserControl.Resources>
+        <!-- Template for RouteCount items -->
+        <DataTemplate DataType="{x:Type models:RouteCount}">
+            <StackPanel Orientation="Horizontal" Margin="0,5" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Route}" Width="120"/>
+                <Border Background="SteelBlue" Height="20" CornerRadius="4">
+                    <Border.Width>
+                        <MultiBinding Converter="{StaticResource BarWidthConverter}">
+                            <Binding Path="Count"/>
+                            <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="Tag"/>
+                        </MultiBinding>
+                    </Border.Width>
+                </Border>
+                <TextBlock Text="{Binding Count}" Margin="5,0,0,0"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Template for LabelValue items -->
+        <DataTemplate DataType="{x:Type models:LabelValue}">
+            <StackPanel Orientation="Horizontal" Margin="0,5" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Label}" Width="120"/>
+                <Border Background="SteelBlue" Height="20" CornerRadius="4">
+                    <Border.Width>
+                        <MultiBinding Converter="{StaticResource BarWidthConverter}">
+                            <Binding Path="Value"/>
+                            <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="Tag"/>
+                        </MultiBinding>
+                    </Border.Width>
+                </Border>
+                <TextBlock Text="{Binding Value}" Margin="5,0,0,0"/>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <ItemsControl x:Name="ItemsHost" ItemsSource="{Binding Items}"/>
 </UserControl>
