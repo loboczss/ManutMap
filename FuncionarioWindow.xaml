@@ -60,11 +60,6 @@
             <ComboBox x:Name="FieldCombo" Height="35" SelectedIndex="0">
                 <ComboBoxItem>Matrícula</ComboBoxItem>
                 <ComboBoxItem>Nome</ComboBoxItem>
-                <ComboBoxItem>Função</ComboBoxItem>
-                <ComboBoxItem>Escala</ComboBoxItem>
-                <ComboBoxItem>Departamento</ComboBoxItem>
-                <ComboBoxItem>Cidade</ComboBoxItem>
-                <ComboBoxItem>Contratação</ComboBoxItem>
             </ComboBox>
 
             <TextBox x:Name="SearchBox"
