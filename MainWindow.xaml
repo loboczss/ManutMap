@@ -474,51 +474,106 @@
         </Border>
         <Button Grid.Column="1" x:Name="ToggleSidebarButton" Click="ToggleSidebarButton_Click" Style="{StaticResource SidebarToggle}" ToolTip="Recolher/Expandir Painel" Content="&lt;"/>
 
-        <Grid Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <TabControl Grid.Column="2">
+            <TabItem Header="Mapa">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-            <wv2:WebView2 Grid.Row="0" x:Name="MapView"/>
+                    <wv2:WebView2 Grid.Row="0" x:Name="MapView"/>
 
-            <Border Grid.Row="1" Background="Gray" BorderThickness="0,1,0,0" BorderBrush="{StaticResource Border.Default}" Padding="15,10">
-                <StackPanel>
-                    <WrapPanel Orientation="Horizontal" ItemHeight="20">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                            <TextBlock Text="Preventivas:" FontWeight="Bold" Margin="0,0,8,0"/>
-                            <TextBlock x:Name="PreventivasStatsText" Text="0 abertas, 0 concluídas"/>
+                    <Border Grid.Row="1" Background="Gray" BorderThickness="0,1,0,0" BorderBrush="{StaticResource Border.Default}" Padding="15,10">
+                        <StackPanel>
+                            <WrapPanel Orientation="Horizontal" ItemHeight="20">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                                    <TextBlock Text="Preventivas:" FontWeight="Bold" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="PreventivasStatsText" Text="0 abertas, 0 concluídas"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                                    <TextBlock Text="Corretivas:" FontWeight="Bold" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="CorretivasStatsText" Text="0 abertas, 0 concluídas"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                                    <TextBlock Text="Serviços:" FontWeight="Bold" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="ServicosStatsText" Text="0 abertos, 0 concluídos"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                                    <TextBlock Text="Datalogs:" FontWeight="Bold" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="DatalogStatsText" Text="0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                                    <TextBlock Text="Total Exibido:" FontWeight="Bold" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="TotalStatsText" Text="0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Atualizado:" FontWeight="Bold" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="LastUpdatedText" Text="--"/>
+                                </StackPanel>
+                            </WrapPanel>
+
+                            <ProgressBar x:Name="SyncProgressBar"
+                                         Style="{StaticResource ModernProgressBar}"
+                                         Visibility="Collapsed"
+                                         Margin="0,5,0,0"/>
+
+                            <TextBlock x:Name="SyncProgressText" FontStyle="Italic" Visibility="Collapsed" Margin="0,5,0,0"/>
                         </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                        <TextBlock Text="Corretivas:" FontWeight="Bold" Margin="0,0,8,0"/>
-                        <TextBlock x:Name="CorretivasStatsText" Text="0 abertas, 0 concluídas"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                        <TextBlock Text="Serviços:" FontWeight="Bold" Margin="0,0,8,0"/>
-                        <TextBlock x:Name="ServicosStatsText" Text="0 abertos, 0 concluídos"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                        <TextBlock Text="Datalogs:" FontWeight="Bold" Margin="0,0,8,0"/>
-                        <TextBlock x:Name="DatalogStatsText" Text="0"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                        <TextBlock Text="Total Exibido:" FontWeight="Bold" Margin="0,0,8,0"/>
-                        <TextBlock x:Name="TotalStatsText" Text="0"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Atualizado:" FontWeight="Bold" Margin="0,0,8,0"/>
-                        <TextBlock x:Name="LastUpdatedText" Text="--"/>
-                    </StackPanel>
-                    </WrapPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Estatísticas">
+                <ScrollViewer>
+                    <StackPanel Margin="15" x:Name="StatsPanel">
+                        <TextBlock Text="Coletas de Datalog por Rota" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                        <ItemsControl x:Name="RouteStatsList" Margin="0,0,0,15" DataContext="{Binding RelativeSource={RelativeSource AncestorType=TabItem}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                        <TextBlock Text="{Binding Route}" Width="80"/>
+                                        <ProgressBar Value="{Binding Count}" Maximum="{Binding ElementName=RouteStatsList, Path=Tag}" Width="200" Height="16" Margin="5,0"/>
+                                        <TextBlock Text="{Binding Count}" Margin="5,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
-                    <ProgressBar x:Name="SyncProgressBar" 
-                                 Style="{StaticResource ModernProgressBar}"
-                                 Visibility="Collapsed" 
-                                 Margin="0,5,0,0"/>
+                        <TextBlock Text="Datalog por Tipo de Serviço" FontWeight="Bold" FontSize="16" Margin="0,10,0,10"/>
+                        <StackPanel Margin="0,0,0,15">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Prev. com datalog" Width="150"/>
+                                <ProgressBar x:Name="PrevComBar" Width="200" Height="16"/>
+                                <TextBlock x:Name="PrevComText" Margin="5,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Prev. sem datalog" Width="150"/>
+                                <ProgressBar x:Name="PrevSemBar" Width="200" Height="16"/>
+                                <TextBlock x:Name="PrevSemText" Margin="5,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Corr. com datalog" Width="150"/>
+                                <ProgressBar x:Name="CorrComBar" Width="200" Height="16"/>
+                                <TextBlock x:Name="CorrComText" Margin="5,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Corr. sem datalog" Width="150"/>
+                                <ProgressBar x:Name="CorrSemBar" Width="200" Height="16"/>
+                                <TextBlock x:Name="CorrSemText" Margin="5,0"/>
+                            </StackPanel>
+                        </StackPanel>
 
-                    <TextBlock x:Name="SyncProgressText" FontStyle="Italic" Visibility="Collapsed" Margin="0,5,0,0"/>
-                </StackPanel>
-            </Border>
-        </Grid>
+                        <TextBlock Text="Ordens de Serviço sem Datalog" FontWeight="Bold" FontSize="16" Margin="0,10,0,5"/>
+                        <DataGrid x:Name="DatalogMissingGrid" AutoGenerateColumns="False" Height="200">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>
+                                <DataGridTextColumn Header="IDSIGFI" Binding="{Binding IdSigfi}" Width="*"/>
+                                <DataGridTextColumn Header="ROTA" Binding="{Binding Rota}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
