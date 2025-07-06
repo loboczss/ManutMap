@@ -532,7 +532,7 @@
                             <StackPanel>
                                 <TextBlock Text="Coletas de Datalog por Rota" FontWeight="Bold" FontSize="16" Margin="0,0,0,4"/>
                                 <TextBlock Text="Mostra a quantidade de coletas em cada rota." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
-                                <controls:HorizontalBarChartControl x:Name="RouteChart" />
+                                <controls:LineChartControl x:Name="RouteChart" Height="200" />
                             </StackPanel>
                         </Border>
 
