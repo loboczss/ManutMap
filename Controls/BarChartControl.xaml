@@ -1,0 +1,29 @@
+<UserControl x:Class="ManutMap.Controls.BarChartControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ManutMap.Controls">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+        <ItemsControl x:Name="ItemsHost" ItemsSource="{Binding Items}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical" Margin="5" VerticalAlignment="Bottom">
+                        <Border Background="SteelBlue" Width="25">
+                            <Border.Height>
+                                <MultiBinding Converter="{StaticResource BarHeightConverter}">
+                                    <Binding Path="Value"/>
+                                    <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="Tag"/>
+                                </MultiBinding>
+                            </Border.Height>
+                        </Border>
+                        <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+</UserControl>
