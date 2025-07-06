@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Threading.Tasks;
 using ManutMap.Services;
 using ManutMap.Models;
 
@@ -34,7 +35,7 @@ namespace ManutMap
             SearchButton.IsEnabled = true;
         }
 
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        private async void SearchButton_Click(object sender, RoutedEventArgs e)
         {
             var input = SearchBox.Text?.Trim() ?? string.Empty;
             if (string.IsNullOrWhiteSpace(input))
@@ -43,38 +44,46 @@ namespace ManutMap
                 return;
             }
 
-            FuncionarioInfo? info = null;
-            switch (FieldCombo.SelectedIndex)
+            SearchButton.IsEnabled = false;
+            ResultText.Text = "Buscando...";
+
+            var info = await Task.Run(() =>
             {
-                case 0: // Matricula
-                    var key = input.TrimStart('0');
-                    _funcionarios.TryGetValue(key, out info);
-                    break;
-                case 1: // Nome
-                    info = _funcionarios.Values.FirstOrDefault(f =>
-                        f.Nome.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
-                    break;
-                case 2: // Funcao
-                    info = _funcionarios.Values.FirstOrDefault(f =>
-                        f.Funcao.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
-                    break;
-                case 3: // Escala
-                    info = _funcionarios.Values.FirstOrDefault(f =>
-                        f.Escala.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
-                    break;
-                case 4: // Departamento
-                    info = _funcionarios.Values.FirstOrDefault(f =>
-                        f.Departamento.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
-                    break;
-                case 5: // Cidade
-                    info = _funcionarios.Values.FirstOrDefault(f =>
-                        f.Cidade.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
-                    break;
-                case 6: // Contratacao
-                    info = _funcionarios.Values.FirstOrDefault(f =>
-                        f.Contratacao.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
-                    break;
-            }
+                FuncionarioInfo? local = null;
+                switch (FieldCombo.SelectedIndex)
+                {
+                    case 0: // Matricula
+                        var key = input.TrimStart('0');
+                        _funcionarios.TryGetValue(key, out local);
+                        break;
+                    case 1: // Nome
+                        local = _funcionarios.Values.FirstOrDefault(f =>
+                            f.Nome.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                        break;
+                    case 2: // Funcao
+                        local = _funcionarios.Values.FirstOrDefault(f =>
+                            f.Funcao.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                        break;
+                    case 3: // Escala
+                        local = _funcionarios.Values.FirstOrDefault(f =>
+                            f.Escala.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                        break;
+                    case 4: // Departamento
+                        local = _funcionarios.Values.FirstOrDefault(f =>
+                            f.Departamento.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                        break;
+                    case 5: // Cidade
+                        local = _funcionarios.Values.FirstOrDefault(f =>
+                            f.Cidade.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                        break;
+                    case 6: // Contratacao
+                        local = _funcionarios.Values.FirstOrDefault(f =>
+                            f.Contratacao.IndexOf(input, StringComparison.OrdinalIgnoreCase) >= 0);
+                        break;
+                }
+
+                return local;
+            });
 
             if (info != null)
             {
@@ -90,9 +99,11 @@ namespace ManutMap
             {
                 ResultText.Text = "Funcionário não encontrado";
             }
+
+            SearchButton.IsEnabled = true;
         }
 
-        private void SearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private async void SearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             if (FieldCombo.SelectedIndex != 1)
             {
@@ -107,12 +118,12 @@ namespace ManutMap
                 return;
             }
 
-            var suggestions = _funcionarios.Values
+            var suggestions = await Task.Run(() => _funcionarios.Values
                 .Where(f => f.Nome.StartsWith(text, StringComparison.OrdinalIgnoreCase))
                 .Select(f => f.Nome)
                 .Distinct()
                 .Take(5)
-                .ToList();
+                .ToList());
 
             SuggestionsList.ItemsSource = suggestions;
             SuggestionsList.Visibility = suggestions.Any() ? Visibility.Visible : Visibility.Collapsed;
