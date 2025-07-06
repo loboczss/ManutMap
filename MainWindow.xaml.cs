@@ -64,12 +64,12 @@ namespace ManutMap
             };
             _updateTimer.Tick += async (_, __) => await SyncAndRefresh();
 
-            _mapService = new MapService(MapView);
-            _mapService.InitializeAsync();
-
-            this.Loaded += (_, __) =>
+            this.Loaded += async (_, __) =>
             {
-                LoadLocalAndPopulate();
+                _mapService = new MapService(MapView);
+                await _mapService.InitializeAsync();
+
+                await LoadLocalAndPopulateAsync();
                 _datalogMap = _datalogService.GetCachedDatalogFolders();
                 AnnotateDatalogInfo();
                 AnnotatePrazoInfo();
@@ -118,6 +118,24 @@ namespace ManutMap
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manutencoes_latest.json");
             _manutList = _fileService.LoadLocalJson(path) ?? new JArray();
+
+            if (File.Exists(path))
+                LastUpdatedText.Text = File.GetLastWriteTime(path).ToString("dd/MM/yyyy HH:mm");
+
+            PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
+            PopulateComboBox(TipoFilterCombo, "TIPO");
+            PopulateComboBox(RotaFilterCombo, "ROTA");
+            PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
+
+            AnnotatePrazoInfo();
+
+            ApplyFilters();
+        }
+
+        private async Task LoadLocalAndPopulateAsync()
+        {
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manutencoes_latest.json");
+            _manutList = await _fileService.LoadLocalJsonAsync(path) ?? new JArray();
 
             if (File.Exists(path))
                 LastUpdatedText.Text = File.GetLastWriteTime(path).ToString("dd/MM/yyyy HH:mm");
