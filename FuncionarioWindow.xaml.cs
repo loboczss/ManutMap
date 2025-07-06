@@ -47,10 +47,11 @@ namespace ManutMap
             SearchButton.IsEnabled = false;
             ResultText.Text = "Buscando...";
 
+            var selectedIndex = FieldCombo.SelectedIndex;
             var info = await Task.Run(() =>
             {
                 FuncionarioInfo? local = null;
-                switch (FieldCombo.SelectedIndex)
+                switch (selectedIndex)
                 {
                     case 0: // Matricula
                         var key = input.TrimStart('0');
