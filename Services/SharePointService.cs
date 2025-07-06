@@ -40,6 +40,9 @@ namespace ManutMap.Services
 
         private string? _driveId;
 
+        private static Dictionary<string, string>? _funcCache;
+        private static Dictionary<string, FuncionarioInfo>? _funcInfoCache;
+
         public DateTime LastUpdate { get; private set; }
 
         public SharePointService()
@@ -87,6 +90,9 @@ namespace ManutMap.Services
 
         public async Task<Dictionary<string, string>> DownloadFuncionariosAsync()
         {
+            if (_funcCache != null)
+                return _funcCache;
+
             bool fromInternet = false;
             string csv = string.Empty;
 
@@ -112,11 +118,15 @@ namespace ManutMap.Services
                 csv = File.ReadAllText(FuncCsvPath, Encoding.UTF8);
             }
 
-            return ParseFuncionariosCsv(csv);
+            _funcCache = ParseFuncionariosCsv(csv);
+            return _funcCache;
         }
 
         public async Task<Dictionary<string, FuncionarioInfo>> DownloadFuncionariosInfoAsync()
         {
+            if (_funcInfoCache != null)
+                return _funcInfoCache;
+
             bool fromInternet = false;
             string csv = string.Empty;
 
@@ -142,7 +152,8 @@ namespace ManutMap.Services
                 csv = File.ReadAllText(FuncCsvPath, Encoding.UTF8);
             }
 
-            return ParseFuncionariosInfoCsv(csv);
+            _funcInfoCache = ParseFuncionariosInfoCsv(csv);
+            return _funcInfoCache;
         }
 
         private static Dictionary<string, FuncionarioInfo> ParseFuncionariosInfoCsv(string csv)
