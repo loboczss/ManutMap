@@ -145,7 +145,6 @@
             <Setter Property="Background" Value="{StaticResource Background.Panel}"/>
             <Setter Property="BorderBrush" Value="{StaticResource Border.Default}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="ToolTip" Value="{Binding Tooltip}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="DataGridRow">
@@ -611,6 +610,10 @@
                                    RowHeight="32" ColumnHeaderHeight="32"
                                    RowHeaderWidth="0"
                                    ColumnHeaderStyle="{StaticResource AlertGridColumnHeader}"
+                                   VirtualizingPanel.IsVirtualizing="True"
+                                   VirtualizingPanel.VirtualizationMode="Recycling"
+                                   EnableRowVirtualization="True"
+                                   EnableColumnVirtualization="True"
                                    Style="{StaticResource ModernDataGrid}">
                             <DataGrid.RowStyle>
                                 <StaticResource ResourceKey="OsAlertRowStyle"/>

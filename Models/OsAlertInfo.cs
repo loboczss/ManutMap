@@ -12,7 +12,6 @@ namespace ManutMap.Models
         public string Tipo { get; set; } = string.Empty;
         public DateTime Conclusao { get; set; }
         public int DiasSemDatalog { get; set; }
-        public string Tooltip { get; set; } = string.Empty;
         public JObject? Raw { get; set; }
     }
 }
