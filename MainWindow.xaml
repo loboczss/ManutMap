@@ -558,13 +558,15 @@
                         <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4"
                                    Text="OS concluídas há mais de 2 dias sem Datalog (últimos 15 dias)"/>
                         <TextBlock Text="Alertas de ordens concluídas há mais de 2 dias nos últimos 15 dias que ainda não possuem coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
-                        <DataGrid x:Name="DatalogAlertGrid" AutoGenerateColumns="False" Height="200" LoadingRow="DatalogAlertGrid_LoadingRow">
+                        <DataGrid x:Name="DatalogAlertGrid" AutoGenerateColumns="False" Height="200" LoadingRow="DatalogAlertGrid_LoadingRow"
+                                  AlternatingRowBackground="#FAFAFA" RowHeight="34" ColumnHeaderHeight="36" HeadersVisibility="Column" IsReadOnly="True">
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="ToolTip" Value="{Binding Tooltip}"/>
+                                </Style>
+                            </DataGrid.RowStyle>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>
-                                <DataGridTextColumn Header="IDSIGFI" Binding="{Binding IdSigfi}" Width="*"/>
-                                <DataGridTextColumn Header="CLIENTE" Binding="{Binding Cliente}" Width="*"/>
-                                <DataGridTextColumn Header="ROTA" Binding="{Binding Rota}" Width="*"/>
-                                <DataGridTextColumn Header="SERVIÇO" Binding="{Binding Tipo}" Width="*"/>
                                 <DataGridTextColumn Header="CONCLUSÃO" Binding="{Binding Conclusao, StringFormat=d}" Width="*"/>
                                 <DataGridTextColumn Header="DIAS" Binding="{Binding DiasSemDatalog}" Width="*"/>
                             </DataGrid.Columns>
