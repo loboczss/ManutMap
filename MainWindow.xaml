@@ -614,12 +614,14 @@
                                    VirtualizingPanel.VirtualizationMode="Recycling"
                                    EnableRowVirtualization="True"
                                    EnableColumnVirtualization="True"
+                                   ColumnWidth="Auto"
                                    Style="{StaticResource ModernDataGrid}">
                             <DataGrid.RowStyle>
                                 <StaticResource ResourceKey="OsAlertRowStyle"/>
                             </DataGrid.RowStyle>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>
+                                <DataGridTextColumn Header="ROTA" Binding="{Binding Rota}" Width="*"/>
                                 <DataGridTextColumn Header="CONCLUSÃO" Binding="{Binding Conclusao, StringFormat='dd/MM/yyyy'}" Width="*"/>
                                 <DataGridTextColumn Header="DIAS" Binding="{Binding DiasSemDatalog}" Width="*"/>
                             </DataGrid.Columns>
