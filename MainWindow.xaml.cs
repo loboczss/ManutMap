@@ -768,10 +768,10 @@ namespace ManutMap
 
             var tipoData = new List<LabelValue>
             {
-                new LabelValue("Prev. com", prevCom),
-                new LabelValue("Prev. sem", prevSem),
-                new LabelValue("Corr. com", corrCom),
-                new LabelValue("Corr. sem", corrSem)
+                new LabelValue("Preventiva com dtlg", prevCom),
+                new LabelValue("Preventiva sem dtlg", prevSem),
+                new LabelValue("Corretiva com dtlg", corrCom),
+                new LabelValue("Corretiva sem dtlg", corrSem)
             };
             TipoServicoChart.Items = tipoData;
 
