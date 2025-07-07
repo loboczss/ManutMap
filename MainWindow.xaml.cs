@@ -25,7 +25,9 @@ namespace ManutMap
         private JArray _manutList;
         private Dictionary<string, string> _datalogMap;
         private List<RouteCount> _routeStats = new();
+        private List<RouteCount> _recentRouteStats = new();
         public int MaxRouteCount { get; private set; }
+        public int MaxRecentRouteCount { get; private set; }
         private readonly List<OsSimpleInfo> _osSemDatalog = new();
         private readonly Dictionary<string, List<string>> _regionalRotas = new()
         {
@@ -640,7 +642,7 @@ namespace ManutMap
             win.Show();
         }
 
-        private void UpdateStatsTab(IEnumerable<JObject>? source = null)
+        private async void UpdateStatsTab(IEnumerable<JObject>? source = null)
         {
             if (source == null && _manutList == null) return;
 
@@ -657,6 +659,31 @@ namespace ManutMap
             MaxRouteCount = _routeStats.Count > 0 ? _routeStats.Max(r => r.Count) : 0;
             RouteChart.Tag = MaxRouteCount;
             RouteChart.Items = _routeStats;
+
+            try
+            {
+                var recent = await _datalogService.GetDatalogFoldersPeriodAsync(DateTime.UtcNow.AddDays(-10), DateTime.UtcNow);
+                var rotaMap = all
+                    .Where(o => o["NUMOS"] != null && o["ROTA"] != null)
+                    .ToDictionary(o => (o["NUMOS"]!.ToString() ?? string.Empty).Trim(),
+                                  o => (o["ROTA"]!.ToString() ?? string.Empty).Trim(),
+                                  StringComparer.OrdinalIgnoreCase);
+
+                _recentRouteStats = recent.Keys
+                    .Where(k => rotaMap.ContainsKey(k))
+                    .GroupBy(k => rotaMap[k])
+                    .Select(g => new RouteCount(g.Key, g.Count()))
+                    .OrderByDescending(g => g.Count)
+                    .ToList();
+            }
+            catch
+            {
+                _recentRouteStats = new List<RouteCount>();
+            }
+
+            MaxRecentRouteCount = _recentRouteStats.Count > 0 ? _recentRouteStats.Max(r => r.Count) : 0;
+            RecentRouteChart.Tag = MaxRecentRouteCount;
+            RecentRouteChart.Items = _recentRouteStats;
 
             int prevCom = withDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase));
             int prevSem = withoutDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase));
