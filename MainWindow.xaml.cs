@@ -798,6 +798,7 @@ namespace ManutMap
 
             DatalogAlertGrid.ItemsSource = null;
             DatalogAlertGrid.ItemsSource = _osAlertaDatalog;
+            FilterAlertGrid();
             RecentRouteChart.Tag = MaxRecentRouteCount;
             RecentRouteChart.Items = _recentRouteStats;
 
@@ -852,6 +853,40 @@ namespace ManutMap
                 };
                 win.ShowDialog();
             }
+        }
+
+        private void AlertSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            FilterAlertGrid();
+        }
+
+        private void AlertFieldCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            FilterAlertGrid();
+        }
+
+        private void FilterAlertGrid()
+        {
+            if (_osAlertaDatalog == null) return;
+
+            var text = AlertSearchBox?.Text?.Trim() ?? string.Empty;
+            int field = AlertFieldCombo?.SelectedIndex ?? 0;
+
+            IEnumerable<OsAlertInfo> list = _osAlertaDatalog;
+
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                list = field switch
+                {
+                    0 => list.Where(o => o.NumOS != null && o.NumOS.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0),
+                    1 => list.Where(o => o.IdSigfi != null && o.IdSigfi.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0),
+                    2 => list.Where(o => o.Cliente != null && o.Cliente.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0),
+                    3 => list.Where(o => o.Rota != null && o.Rota.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0),
+                    _ => list
+                };
+            }
+
+            DatalogAlertGrid.ItemsSource = list.ToList();
         }
 
         private async Task AnnotateFuncionariosInfoAsync()

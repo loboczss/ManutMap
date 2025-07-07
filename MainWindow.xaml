@@ -607,6 +607,15 @@
                         <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4"
                                    Text="OS concluídas há mais de 2 dias sem Datalog (últimos 15 dias)"/>
                         <TextBlock Text="Alertas de ordens concluídas há mais de 2 dias nos últimos 15 dias que ainda não possuem coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <ComboBox x:Name="AlertFieldCombo" Width="120" SelectedIndex="0" SelectionChanged="AlertFieldCombo_SelectionChanged">
+                                <ComboBoxItem>OS</ComboBoxItem>
+                                <ComboBoxItem>ID SIGFI</ComboBoxItem>
+                                <ComboBoxItem>Cliente</ComboBoxItem>
+                                <ComboBoxItem>Rota</ComboBoxItem>
+                            </ComboBox>
+                            <TextBox x:Name="AlertSearchBox" Width="150" Margin="10,0,0,0" TextChanged="AlertSearchBox_TextChanged"/>
+                        </StackPanel>
                         <DataGrid x:Name="DatalogAlertGrid" AutoGenerateColumns="False"
                                    MouseDoubleClick="DatalogAlertGrid_RowDoubleClick"
                                    RowHeight="32" ColumnHeaderHeight="32"
