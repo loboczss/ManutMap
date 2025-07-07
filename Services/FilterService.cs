@@ -92,15 +92,17 @@ namespace ManutMap.Services
                         if (item["CORR_DIAS"] != null && int.TryParse(item["CORR_DIAS"].ToString(), out var corr))
                         {
                             has = true;
-                            ok |= CheckPrazo(corr, c);
+                            if (CheckPrazo(corr, c))
+                                ok = true;
                         }
                         if (item["PREV_DIAS"] != null && int.TryParse(item["PREV_DIAS"].ToString(), out var prev))
                         {
                             has = true;
-                            ok |= CheckPrazo(prev, c);
+                            if (CheckPrazo(prev, c))
+                                ok = true;
                         }
 
-                        if (!has || !ok)
+                        if (has && !ok)
                             return false;
                     }
 
