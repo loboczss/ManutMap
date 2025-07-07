@@ -574,8 +574,8 @@
                 <Border Style="{StaticResource Card}">
                     <StackPanel>
                         <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4"
-                                   Text="OS concluídas há mais de 2 dias sem Datalog"/>
-                        <TextBlock Text="Alertas de ordens concluídas há mais de 2 dias que ainda não possuem coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
+                                   Text="OS concluídas há mais de 2 dias sem Datalog (últimos 15 dias)"/>
+                        <TextBlock Text="Alertas de ordens concluídas há mais de 2 dias nos últimos 15 dias que ainda não possuem coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
                         <DataGrid x:Name="DatalogAlertGrid" AutoGenerateColumns="False" Height="200" LoadingRow="DatalogAlertGrid_LoadingRow">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>

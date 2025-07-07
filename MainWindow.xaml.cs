@@ -735,7 +735,7 @@ namespace ManutMap
                     DateTime.TryParse(dtStr, pt, System.Globalization.DateTimeStyles.None, out var dt))
                 {
                     int dias = (int)(DateTime.Today - dt.Date).TotalDays;
-                    if (dias > 2)
+                    if (dias > 2 && dias <= 15)
                     {
                         _osAlertaDatalog.Add(new OsAlertInfo
                         {
