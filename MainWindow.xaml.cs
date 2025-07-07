@@ -776,5 +776,17 @@ namespace ManutMap
             }
         }
 
+        private void DatalogAlertGrid_RowDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DatalogAlertGrid.SelectedItem is OsAlertInfo info && info.Raw != null)
+            {
+                var win = new OsDetailWindow(info.Raw)
+                {
+                    Owner = this
+                };
+                win.ShowDialog();
+            }
+        }
+
     }
 }
