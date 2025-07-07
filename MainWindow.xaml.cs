@@ -771,8 +771,8 @@ namespace ManutMap
         {
             if (e.Row.Item is OsAlertInfo)
             {
-                e.Row.Background = Brushes.IndianRed;
-                e.Row.Foreground = Brushes.White;
+                e.Row.Background = new SolidColorBrush(Color.FromRgb(255, 235, 235));
+                e.Row.Foreground = Brushes.Black;
             }
         }
 
