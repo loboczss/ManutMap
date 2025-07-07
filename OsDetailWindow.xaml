@@ -10,15 +10,51 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,10">
-            <TextBlock x:Name="DescExecText" FontWeight="Bold" TextWrapping="Wrap"/>
-        </StackPanel>
+        <TextBlock x:Name="DescExecText" Grid.Row="0" FontWeight="Bold" TextWrapping="Wrap" Margin="0,0,0,10"/>
 
-        <DataGrid x:Name="DetailsGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FAFAFA">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Campo" Binding="{Binding Name}" Width="*"/>
-                <DataGridTextColumn Header="Valor" Binding="{Binding Value}" Width="2*"/>
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Número OS:" FontWeight="Bold"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="NumOsText"/>
+
+            <TextBlock Grid.Row="1" Text="IDSIGFI:" FontWeight="Bold"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="IdSigfiText"/>
+
+            <TextBlock Grid.Row="2" Text="Rota:" FontWeight="Bold"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="RotaText"/>
+
+            <TextBlock Grid.Row="3" Text="Tipo:" FontWeight="Bold"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TipoText"/>
+
+            <TextBlock Grid.Row="4" Text="Tipo SIGFI:" FontWeight="Bold"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" x:Name="TipoSigfiText"/>
+
+            <TextBlock Grid.Row="5" Text="Nome:" FontWeight="Bold"/>
+            <TextBlock Grid.Row="5" Grid.Column="1" x:Name="NomeText"/>
+
+            <TextBlock Grid.Row="6" Text="Reclamante:" FontWeight="Bold"/>
+            <TextBlock Grid.Row="6" Grid.Column="1" x:Name="ReclamanteText"/>
+
+            <TextBlock Grid.Row="7" Text="Abertura:" FontWeight="Bold"/>
+            <TextBlock Grid.Row="7" Grid.Column="1" x:Name="AberturaText"/>
+
+            <TextBlock Grid.Row="8" Text="Conclusão:" FontWeight="Bold"/>
+            <TextBlock Grid.Row="8" Grid.Column="1" x:Name="ConclusaoText"/>
+        </Grid>
     </Grid>
 </Window>

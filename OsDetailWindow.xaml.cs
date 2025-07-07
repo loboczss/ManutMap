@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Windows;
 using Newtonsoft.Json.Linq;
 
@@ -11,19 +10,31 @@ namespace ManutMap
         {
             InitializeComponent();
 
-            if (data.TryGetValue("DESCADICIONALEXEC", out var desc))
-            {
-                DescExecText.Text = $"DESCADICIONALEXEC: {desc}";
-            }
-            else
-            {
-                DescExecText.Text = "DESCADICIONALEXEC: -";
-            }
+            var culture = new CultureInfo("pt-BR");
 
-            var items = data.Properties()
-                .Select(p => new KeyValuePair<string, string>(p.Name, p.Value.ToString()))
-                .ToList();
-            DetailsGrid.ItemsSource = items;
+            DescExecText.Text = $"DESCADICIONALEXEC: {data["DESCADICIONALEXEC"]?.ToString() ?? "-"}";
+
+            NumOsText.Text = data["NUMOS"]?.ToString() ?? "-";
+            IdSigfiText.Text = data["IDSIGFI"]?.ToString() ?? "-";
+            RotaText.Text = data["ROTA"]?.ToString() ?? "-";
+            TipoText.Text = data["TIPO"]?.ToString() ?? "-";
+            TipoSigfiText.Text = data["TIPODESIGFI"]?.ToString() ?? "-";
+            NomeText.Text = data["NOMECLIENTE"]?.ToString() ?? "-";
+            ReclamanteText.Text = data["RECLAMANTE"]?.ToString() ?? "-";
+
+            AberturaText.Text = FormatDate(data["DTAHORARECLAMACAO"]?.ToString(), culture);
+            ConclusaoText.Text = FormatDate(data["DTCONCLUSAO"]?.ToString(), culture);
+        }
+
+        private static string FormatDate(string? value, CultureInfo culture)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return "-";
+            if (DateTime.TryParse(value, culture, DateTimeStyles.None, out var dt) ||
+                DateTime.TryParse(value, out dt))
+            {
+                return dt.ToString("dd/MM/yyyy", culture);
+            }
+            return value;
         }
     }
 }
