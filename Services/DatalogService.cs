@@ -24,7 +24,13 @@ namespace ManutMap.Services
         private const string SitePath = "OneEngenharia";
         private const string DriveDatalog = "DatalogGERAL";
         private const string DriveDatalog2 = "DataLog";
-        private static readonly string[] DriveDatalogAll = { DriveDatalog, DriveDatalog2 };
+        private const string DriveDatalog3 = "DataLogsAC";
+        private static readonly string[] DriveDatalogAll =
+        {
+            DriveDatalog,
+            DriveDatalog2,
+            DriveDatalog3
+        };
         private const string DriveJson = "ArquivosJSON";
 
         private static readonly string CachePath = Path.Combine(
@@ -82,10 +88,19 @@ namespace ManutMap.Services
                 new[] { "https://graph.microsoft.com/.default" });
         }
 
-        private async Task<List<DriveItem>> GetNewRootFoldersAsync(string driveId)
+        private async Task<List<DriveItem>> GetNewRootFoldersAsync(string driveId,
+                                                                   string driveName)
         {
             if (_cacheDate == DateTime.MinValue)
-                return await GetAllRootFoldersAsync(driveId);
+                return await GetAllRootFoldersAsync(driveId, driveName);
+
+            if (driveName.Equals(DriveDatalog3, StringComparison.OrdinalIgnoreCase))
+            {
+                var todas = await GetAllFoldersRecursiveAsync(driveId, "root", 2);
+                return todas.Where(i => i.CreatedDateTime.HasValue &&
+                                        i.CreatedDateTime.Value.UtcDateTime >= _cacheDate)
+                             .ToList();
+            }
 
             // Graph API does not always allow filtering by createdDateTime.
             // If the request fails, fallback to fetching all folders and filter
@@ -116,7 +131,7 @@ namespace ManutMap.Services
             }
             catch
             {
-                var all = await GetAllRootFoldersAsync(driveId);
+                var all = await GetAllRootFoldersAsync(driveId, driveName);
                 return all.Where(i =>
                         i.Folder != null &&
                         i.CreatedDateTime.HasValue &&
@@ -156,7 +171,7 @@ namespace ManutMap.Services
             foreach (var driveName in DriveDatalogAll)
             {
                 string driveId = await GetDriveId(site.Id, driveName);
-                var novos = await GetNewRootFoldersAsync(driveId);
+                var novos = await GetNewRootFoldersAsync(driveId, driveName);
                 if (novos.Count > 0)
                 {
                     MergeFolders(novos, driveName);
@@ -250,8 +265,12 @@ namespace ManutMap.Services
             return drives.Value.First(d => d.Name == driveName).Id!;
         }
 
-        private async Task<List<DriveItem>> GetAllRootFoldersAsync(string driveId)
+        private async Task<List<DriveItem>> GetAllRootFoldersAsync(string driveId,
+                                                                   string driveName)
         {
+            if (driveName.Equals(DriveDatalog3, StringComparison.OrdinalIgnoreCase))
+                return await GetAllFoldersRecursiveAsync(driveId, "root", 2);
+
             var lista = new List<DriveItem>();
 
             var page = await _graph.Drives[driveId].Items["root"].Children.GetAsync();
@@ -272,6 +291,42 @@ namespace ManutMap.Services
                 lista.AddRange(page!.Value.Where(i => i.Folder != null));
             }
             return lista;
+        }
+
+        private async Task<List<DriveItem>> GetAllFoldersRecursiveAsync(string driveId,
+                                                                       string itemId,
+                                                                       int depth)
+        {
+            var result = new List<DriveItem>();
+            var page = await _graph.Drives[driveId].Items[itemId].Children.GetAsync();
+            result.AddRange(page.Value.Where(i => i.Folder != null && i.Name!.Contains("_")));
+            var folders = page.Value.Where(i => i.Folder != null && !i.Name!.Contains("_"))
+                                   .ToList();
+
+            while (page.OdataNextLink is string next)
+            {
+                var req = new RequestInformation
+                {
+                    HttpMethod = Method.GET,
+                    UrlTemplate = next,
+                    PathParameters = new Dictionary<string, object>()
+                };
+                page = await _graph.RequestAdapter.SendAsync(
+                           req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
+
+                result.AddRange(page!.Value.Where(i => i.Folder != null && i.Name!.Contains("_")));
+                folders.AddRange(page.Value.Where(i => i.Folder != null && !i.Name!.Contains("_")));
+            }
+
+            if (depth > 0)
+            {
+                foreach (var f in folders)
+                {
+                    result.AddRange(await GetAllFoldersRecursiveAsync(driveId, f.Id!, depth - 1));
+                }
+            }
+
+            return result;
         }
 
         private async Task<List<DriveItem>> GetLatestJsonsAsync(string driveId)
@@ -385,7 +440,7 @@ namespace ManutMap.Services
                                                                              int tipoFiltro,
                                                                              string? regionalSel)
         {
-            var all = await GetAllRootFoldersAsync(driveId);
+            var all = await GetAllRootFoldersAsync(driveId, driveName);
             var q = all.AsEnumerable();
 
             if (!buscaUnica)
@@ -425,7 +480,7 @@ namespace ManutMap.Services
                                              string? idSigfi,
                                              string? regional)
         {
-            var all = await GetAllRootFoldersAsync(driveId);
+            var all = await GetAllRootFoldersAsync(driveId, driveName);
 
             var q = all.Where(i => i.Name!.EndsWith("_instalacao",
                                        StringComparison.OrdinalIgnoreCase));
