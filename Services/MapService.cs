@@ -5,6 +5,8 @@ using Microsoft.Web.WebView2.Wpf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ManutMap.Helpers;
+using System.Windows;
+using Microsoft.Web.WebView2.Core;
 
 namespace ManutMap.Services
 {

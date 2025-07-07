@@ -1,3 +1,5 @@
+using System;
+
 namespace ManutMap.Models
 {
     public class OsAlertInfo

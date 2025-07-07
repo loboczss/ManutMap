@@ -554,24 +554,6 @@
                         </Border>
 
                         <Border Style="{StaticResource Card}">
-                            <StackPanel>
-                                <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4">
-                                    <Run Text="Ordens de Serviço sem Datalog ("/>
-                                    <Run x:Name="MissingCountText"/>
-                                    <Run Text=")"/>
-                                </TextBlock>
-                                <TextBlock Text="Lista as ordens que ainda não possuem coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
-                        <DataGrid x:Name="DatalogMissingGrid" AutoGenerateColumns="False" Height="200">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>
-                                <DataGridTextColumn Header="IDSIGFI" Binding="{Binding IdSigfi}" Width="*"/>
-                                <DataGridTextColumn Header="ROTA" Binding="{Binding Rota}" Width="*"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
-                </Border>
-
-                <Border Style="{StaticResource Card}">
                     <StackPanel>
                         <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4"
                                    Text="OS concluídas há mais de 2 dias sem Datalog"/>
