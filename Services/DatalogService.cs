@@ -6,7 +6,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Net.Http;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -149,28 +148,20 @@ namespace ManutMap.Services
 
         private async Task EnsureCacheUpdatedAsync()
         {
-            try
-            {
-                var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
-                string driveId = await GetDriveId(site.Id, DriveDatalog);
+            var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
+            string driveId = await GetDriveId(site.Id, DriveDatalog);
 
-                var novos = await GetNewRootFoldersAsync(driveId);
-                if (novos.Count > 0)
-                {
-                    MergeFolders(novos);
-                    _cacheDate = DateTime.UtcNow;
-                    SaveCache();
-                }
-                else if (_folderCache == null)
-                {
-                    // no cache existed and no folders found
-                    _folderCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                }
-            }
-            catch (HttpRequestException ex)
+            var novos = aSystemwait GetNewRootFoldersAsync(driveId);
+            if (novos.Count > 0)
             {
-                // In case the Graph API cannot be reached (e.g. no internet)
-                Console.Error.WriteLine($"Erro ao acessar o Graph API: {ex.Message}");
+                MergeFolders(novos);
+                _cacheDate = DateTime.UtcNow;
+                SaveCache();
+            }
+            else if (_folderCache == null)
+            {
+                // no cache existed and no folders found
+                _folderCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             }
         }
 
