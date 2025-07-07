@@ -131,9 +131,17 @@
             <Setter Property="IsReadOnly" Value="True"/>
         </Style>
 
+        <Style x:Key="AlertGridColumnHeader" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#F3F2F1"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Border.Default}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        </Style>
+
         <Style x:Key="OsAlertRowStyle" TargetType="DataGridRow">
-            <Setter Property="Margin" Value="0,0,0,6"/>
-            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="Padding" Value="6"/>
             <Setter Property="Background" Value="{StaticResource Background.Panel}"/>
             <Setter Property="BorderBrush" Value="{StaticResource Border.Default}"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -598,9 +606,12 @@
                         <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4"
                                    Text="OS concluídas há mais de 2 dias sem Datalog (últimos 15 dias)"/>
                         <TextBlock Text="Alertas de ordens concluídas há mais de 2 dias nos últimos 15 dias que ainda não possuem coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
-                        <DataGrid x:Name="DatalogAlertGrid" AutoGenerateColumns="False" Height="280"
+                        <DataGrid x:Name="DatalogAlertGrid" AutoGenerateColumns="False"
                                    MouseDoubleClick="DatalogAlertGrid_RowDoubleClick"
-                                  RowHeight="34" ColumnHeaderHeight="36" Style="{StaticResource ModernDataGrid}">
+                                   RowHeight="32" ColumnHeaderHeight="32"
+                                   RowHeaderWidth="0"
+                                   ColumnHeaderStyle="{StaticResource AlertGridColumnHeader}"
+                                   Style="{StaticResource ModernDataGrid}">
                             <DataGrid.RowStyle>
                                 <StaticResource ResourceKey="OsAlertRowStyle"/>
                             </DataGrid.RowStyle>
