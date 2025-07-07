@@ -121,6 +121,7 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    (item.FUNCIONARIOS?'<b>Funcionários:</b> '+item.FUNCIONARIOS+'<br>':'')+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
@@ -190,6 +191,7 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    (item.FUNCIONARIOS?'<b>Funcionários:</b> '+item.FUNCIONARIOS+'<br>':'')+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
@@ -257,6 +259,7 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    (item.FUNCIONARIOS?'<b>Funcionários:</b> '+item.FUNCIONARIOS+'<br>':'')+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
@@ -324,6 +327,7 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    (item.FUNCIONARIOS?'<b>Funcionários:</b> '+item.FUNCIONARIOS+'<br>':'')+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
@@ -413,6 +417,7 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    (item.FUNCIONARIOS?'<b>Funcionários:</b> '+item.FUNCIONARIOS+'<br>':'')+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+
@@ -482,6 +487,7 @@ namespace ManutMap.Helpers
                     '<b>Tipo SIGFI:</b> '+item.TIPODESIGFI+'<br>'+
                     '<b>IDSIGFI:</b> '+item.IDSIGFI+'<br>'+
                     '<b>Serviço:</b> '+item.TIPO+'<br>'+
+                    (item.FUNCIONARIOS?'<b>Funcionários:</b> '+item.FUNCIONARIOS+'<br>':'')+
                     '<b>Datalog:</b> '+(temDat?'Sim':'Não')+'<br>'+
                     (datUrl?'<a href="'+datUrl+'" target="_blank">Abrir Datalog</a><br>':'')+
                     (prevUlt?'<b>Última Prev.:</b> '+prevUlt+'<br>':'')+

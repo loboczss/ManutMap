@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace ManutMap
         private MapService _mapService;
         private JArray _manutList;
         private Dictionary<string, string> _datalogMap;
+        private Dictionary<string, string>? _funcMap;
         private List<RouteCount> _routeStats = new();
         private List<RouteCount> _recentRouteStats = new();
         public int MaxRouteCount { get; private set; }
@@ -82,6 +84,7 @@ namespace ManutMap
                     _datalogMap = _datalogService.GetCachedDatalogFolders();
                     AnnotateDatalogInfo();
                     AnnotatePrazoInfo();
+                    await AnnotateFuncionariosInfoAsync();
                     ApplyFilters();
 
                     _ = SyncAndRefresh();
@@ -147,6 +150,7 @@ namespace ManutMap
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
             AnnotatePrazoInfo();
+            _ = AnnotateFuncionariosInfoAsync();
 
             ApplyFilters();
         }
@@ -165,6 +169,7 @@ namespace ManutMap
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
             AnnotatePrazoInfo();
+            await AnnotateFuncionariosInfoAsync();
 
             ApplyFilters();
         }
@@ -247,6 +252,7 @@ namespace ManutMap
             _datalogMap = await _datalogService.GetAllDatalogFoldersAsync();
             AnnotateDatalogInfo();
             AnnotatePrazoInfo();
+            await AnnotateFuncionariosInfoAsync();
 
             progress?.Report((70, "Atualizando filtros..."));
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
@@ -796,6 +802,27 @@ namespace ManutMap
                     Owner = this
                 };
                 win.ShowDialog();
+            }
+        }
+
+        private async Task AnnotateFuncionariosInfoAsync()
+        {
+            if (_manutList == null)
+                return;
+
+            _funcMap ??= await _spService.DownloadFuncionariosAsync();
+
+            foreach (var obj in _manutList.OfType<JObject>())
+            {
+                var desc = obj["DESCADICIONALEXEC"]?.ToString() ?? string.Empty;
+                var nomes = new List<string>();
+                foreach (Match m in Regex.Matches(desc, "#(\\d+)"))
+                {
+                    var mat = m.Groups[1].Value.TrimStart('0');
+                    if (_funcMap.TryGetValue(mat, out var nome) && !nomes.Contains(nome))
+                        nomes.Add(nome);
+                }
+                obj["FUNCIONARIOS"] = nomes.Count > 0 ? string.Join(", ", nomes) : null;
             }
         }
 
