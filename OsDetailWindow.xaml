@@ -13,13 +13,15 @@
         </Border.Effect>
 
         <StackPanel Margin="25">
-            <TextBlock x:Name="DescExecText"
-                       FontSize="18"
-                       FontWeight="SemiBold"
-                       Foreground="#333333"
-                       TextWrapping="Wrap"
-                       IsTextSelectionEnabled="True"
-                       Margin="0,0,0,20" />
+            <TextBox x:Name="DescExecText"
+                     FontSize="18"
+                     FontWeight="SemiBold"
+                     Foreground="#333333"
+                     TextWrapping="Wrap"
+                     IsReadOnly="True"
+                     BorderThickness="0"
+                     Background="Transparent"
+                     Margin="0,0,0,20" />
 
             <Separator Margin="0,0,0,15"/>
 
@@ -35,14 +37,15 @@
                         <Setter Property="Foreground" Value="#555555"/>
                         <Setter Property="VerticalAlignment" Value="Top"/>
                         <Setter Property="Margin" Value="0,8,20,8"/>
-                        <Setter Property="IsTextSelectionEnabled" Value="True"/>
                     </Style>
-                    <Style TargetType="TextBlock" x:Key="ValueStyle">
+                    <Style TargetType="TextBox" x:Key="ValueStyle">
                         <Setter Property="VerticalAlignment" Value="Top"/>
                         <Setter Property="Foreground" Value="#222222"/>
                         <Setter Property="Margin" Value="0,8,0,8"/>
                         <Setter Property="TextWrapping" Value="Wrap"/>
-                        <Setter Property="IsTextSelectionEnabled" Value="True"/>
+                        <Setter Property="IsReadOnly" Value="True"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Background" Value="Transparent"/>
                     </Style>
                 </Grid.Resources>
 
@@ -60,34 +63,34 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Número OS:" Style="{StaticResource LabelStyle}"/>
-                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="NumOsText" Style="{StaticResource ValueStyle}"/>
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="NumOsText" Style="{StaticResource ValueStyle}"/>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="ID SIGFI:" Style="{StaticResource LabelStyle}"/>
-                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="IdSigfiText" Style="{StaticResource ValueStyle}"/>
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="IdSigfiText" Style="{StaticResource ValueStyle}"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Rota:" Style="{StaticResource LabelStyle}"/>
-                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="RotaText" Style="{StaticResource ValueStyle}"/>
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="RotaText" Style="{StaticResource ValueStyle}"/>
 
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Tipo:" Style="{StaticResource LabelStyle}"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TipoText" Style="{StaticResource ValueStyle}"/>
+                <TextBox Grid.Row="3" Grid.Column="1" x:Name="TipoText" Style="{StaticResource ValueStyle}"/>
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Tipo SIGFI:" Style="{StaticResource LabelStyle}"/>
-                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="TipoSigfiText" Style="{StaticResource ValueStyle}"/>
+                <TextBox Grid.Row="4" Grid.Column="1" x:Name="TipoSigfiText" Style="{StaticResource ValueStyle}"/>
 
                 <TextBlock Grid.Row="5" Grid.Column="0" Text="Nome:" Style="{StaticResource LabelStyle}"/>
-                <TextBlock Grid.Row="5" Grid.Column="1" x:Name="NomeText" Style="{StaticResource ValueStyle}"/>
+                <TextBox Grid.Row="5" Grid.Column="1" x:Name="NomeText" Style="{StaticResource ValueStyle}"/>
 
                 <TextBlock Grid.Row="6" Grid.Column="0" Text="Reclamante:" Style="{StaticResource LabelStyle}"/>
-                <TextBlock Grid.Row="6" Grid.Column="1" x:Name="ReclamanteText" Style="{StaticResource ValueStyle}"/>
+                <TextBox Grid.Row="6" Grid.Column="1" x:Name="ReclamanteText" Style="{StaticResource ValueStyle}"/>
 
                 <TextBlock Grid.Row="7" Grid.Column="0" Text="Abertura:" Style="{StaticResource LabelStyle}"/>
-                <TextBlock Grid.Row="7" Grid.Column="1" x:Name="AberturaText" Style="{StaticResource ValueStyle}"/>
+                <TextBox Grid.Row="7" Grid.Column="1" x:Name="AberturaText" Style="{StaticResource ValueStyle}"/>
 
                 <TextBlock Grid.Row="8" Grid.Column="0" Text="Conclusão:" Style="{StaticResource LabelStyle}"/>
-                <TextBlock Grid.Row="8" Grid.Column="1" x:Name="ConclusaoText" Style="{StaticResource ValueStyle}"/>
+                <TextBox Grid.Row="8" Grid.Column="1" x:Name="ConclusaoText" Style="{StaticResource ValueStyle}"/>
 
                 <TextBlock Grid.Row="9" Grid.Column="0" Text="Funcionários:" Style="{StaticResource LabelStyle}"/>
-                <TextBlock Grid.Row="9" Grid.Column="1" x:Name="FuncionariosText" Style="{StaticResource ValueStyle}"/>
+                <TextBox Grid.Row="9" Grid.Column="1" x:Name="FuncionariosText" Style="{StaticResource ValueStyle}"/>
             </Grid>
         </StackPanel>
     </Border>

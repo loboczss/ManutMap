@@ -25,6 +25,8 @@ namespace ManutMap.Services
         private const string DriveDatalog = "DatalogGERAL";
         private const string DriveDatalog2 = "DataLog";
         private const string DriveDatalog3 = "DataLogsAC";
+        private const string DriveDatalog2Id = "5b66bbc3-23d2-42d9-827a-e6b77765e8e0";
+        private const string DriveDatalog3Id = "f5904f07-a47e-4955-8a9d-5807ef6e2179";
         private static readonly string[] DriveDatalogAll =
         {
             DriveDatalog,
@@ -261,6 +263,11 @@ namespace ManutMap.Services
 
         private async Task<string> GetDriveId(string siteId, string driveName)
         {
+            if (driveName.Equals(DriveDatalog2, StringComparison.OrdinalIgnoreCase))
+                return DriveDatalog2Id;
+            if (driveName.Equals(DriveDatalog3, StringComparison.OrdinalIgnoreCase))
+                return DriveDatalog3Id;
+
             var drives = await _graph.Sites[siteId].Drives.GetAsync();
             var drive = drives.Value.FirstOrDefault(d => d.Name.Equals(driveName,
                 StringComparison.OrdinalIgnoreCase));
