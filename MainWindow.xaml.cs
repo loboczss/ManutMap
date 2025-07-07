@@ -73,17 +73,29 @@ namespace ManutMap
 
             this.Loaded += async (_, __) =>
             {
-                _mapService = new MapService(MapView);
-                await _mapService.InitializeAsync();
+                try
+                {
+                    _mapService = new MapService(MapView);
+                    await _mapService.InitializeAsync();
 
-                await LoadLocalAndPopulateAsync();
-                _datalogMap = _datalogService.GetCachedDatalogFolders();
-                AnnotateDatalogInfo();
-                AnnotatePrazoInfo();
-                ApplyFilters();
+                    await LoadLocalAndPopulateAsync();
+                    _datalogMap = _datalogService.GetCachedDatalogFolders();
+                    AnnotateDatalogInfo();
+                    AnnotatePrazoInfo();
+                    ApplyFilters();
 
-                _ = SyncAndRefresh();
-                _updateTimer.Start();
+                    _ = SyncAndRefresh();
+                    _updateTimer.Start();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        "Erro ao inicializar os componentes:\n" + ex.Message,
+                        "Erro",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                    Application.Current.Shutdown();
+                }
             };
 
             // Associa todos os eventos de filtro a um único handler
