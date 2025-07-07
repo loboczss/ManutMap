@@ -794,6 +794,13 @@ namespace ManutMap
             RouteChart.Tag = MaxRouteCount;
             RouteChart.Items = _routeStats;
 
+            TipoServicoChart.Items = stats.tipoData;
+
+            DatalogAlertGrid.ItemsSource = null;
+            DatalogAlertGrid.ItemsSource = _osAlertaDatalog;
+            RecentRouteChart.Tag = MaxRecentRouteCount;
+            RecentRouteChart.Items = _recentRouteStats;
+
             try
             {
                 var recent = await _datalogService.GetDatalogFoldersPeriodAsync(DateTime.UtcNow.AddDays(-10), DateTime.UtcNow);
@@ -816,13 +823,9 @@ namespace ManutMap
             }
 
             MaxRecentRouteCount = _recentRouteStats.Count > 0 ? _recentRouteStats.Max(r => r.Count) : 0;
-            RecentRouteChart.Tag = MaxRecentRouteCount;
-            RecentRouteChart.Items = _recentRouteStats;
 
-            TipoServicoChart.Items = stats.tipoData;
 
-            DatalogAlertGrid.ItemsSource = null;
-            DatalogAlertGrid.ItemsSource = _osAlertaDatalog;
+
         }
 
         private void PrazoDiasTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
