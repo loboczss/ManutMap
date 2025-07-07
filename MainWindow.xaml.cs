@@ -411,7 +411,7 @@ namespace ManutMap
             TotalStatsText.Text = totalCount.ToString();
 
             DatalogSummaryText.Text = $"{datalogCount} OS com Datalog (" + rate.ToString("0.#") + "%)";
-            MissingCountText.Text = missingCount.ToString();
+     
         }
 
         private void AnnotateDatalogInfo()
@@ -723,8 +723,6 @@ namespace ManutMap
                     Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim()
                 });
             }
-            DatalogMissingGrid.ItemsSource = null;
-            DatalogMissingGrid.ItemsSource = _osSemDatalog;
 
             _osAlertaDatalog.Clear();
             var pt = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
