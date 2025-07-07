@@ -102,14 +102,6 @@ namespace ManutMap.Helpers
         var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : '';
         var prevDias = item.PREV_DIAS;
         var corrDias = item.CORR_DIAS;
-        var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : '';
-        var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : '';
-        var prevDias = item.PREV_DIAS;
-        var corrDias = item.CORR_DIAS;
-        var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : '';
-        var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : '';
-        var prevDias = item.PREV_DIAS;
-        var corrDias = item.CORR_DIAS;
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
