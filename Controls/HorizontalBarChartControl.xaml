@@ -35,11 +35,17 @@
                 <TextBlock Text="{Binding Value}" Margin="5,0,0,0"/>
             </StackPanel>
             <DataTemplate.Triggers>
-                <DataTrigger Binding="{Binding Label}" Value="Prev. sem">
+                <DataTrigger Binding="{Binding Label}" Value="Preventiva sem dtlg">
                     <Setter TargetName="Bar" Property="Background" Value="Red"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Label}" Value="Corr. sem">
+                <DataTrigger Binding="{Binding Label}" Value="Corretiva sem dtlg">
                     <Setter TargetName="Bar" Property="Background" Value="Red"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Label}" Value="Preventiva com dtlg">
+                    <Setter TargetName="Bar" Property="Background" Value="Green"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Label}" Value="Corretiva com dtlg">
+                    <Setter TargetName="Bar" Property="Background" Value="Green"/>
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
