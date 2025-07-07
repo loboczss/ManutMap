@@ -23,6 +23,8 @@ namespace ManutMap.Services
         private const string Domain = "oneengenharia.sharepoint.com";
         private const string SitePath = "OneEngenharia";
         private const string DriveDatalog = "DatalogGERAL";
+        private const string DriveDatalog2 = "DataLog";
+        private static readonly string[] DriveDatalogAll = { DriveDatalog, DriveDatalog2 };
         private const string DriveJson = "ArquivosJSON";
 
         private static readonly string CachePath = Path.Combine(
@@ -123,14 +125,14 @@ namespace ManutMap.Services
             }
         }
 
-        private void MergeFolders(IEnumerable<DriveItem> items)
+        private void MergeFolders(IEnumerable<DriveItem> items, string driveName)
         {
             LoadCache();
             foreach (var it in items)
             {
                 string name = it.Name!.Trim();
                 string url = it.WebUrl ??
-                              $"https://{Domain}/sites/{SitePath}/{DriveDatalog}/{name}";
+                              $"https://{Domain}/sites/{SitePath}/{driveName}/{name}";
 
                 _folderCache![name] = url;
 
@@ -149,12 +151,21 @@ namespace ManutMap.Services
         private async Task EnsureCacheUpdatedAsync()
         {
             var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
-            string driveId = await GetDriveId(site.Id, DriveDatalog);
+            bool updated = false;
 
-            var novos = await GetNewRootFoldersAsync(driveId);
-            if (novos.Count > 0)
+            foreach (var driveName in DriveDatalogAll)
             {
-                MergeFolders(novos);
+                string driveId = await GetDriveId(site.Id, driveName);
+                var novos = await GetNewRootFoldersAsync(driveId);
+                if (novos.Count > 0)
+                {
+                    MergeFolders(novos, driveName);
+                    updated = true;
+                }
+            }
+
+            if (updated)
+            {
                 _cacheDate = DateTime.UtcNow;
                 SaveCache();
             }
@@ -176,17 +187,24 @@ namespace ManutMap.Services
             // When searching for installation folders (combo index 0)
             if (tipoFiltro == 0)
             {
-                string dataDrive = await GetDriveId(site.Id, DriveDatalog);
-                var inst = await GetPastasInstalacaoAsync(dataDrive, termo, regional);
-                return inst.OrderBy(i => i.Name)
-                           .Select(i => new OsInfo
+                var dict = new Dictionary<string, (string Url, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
+                foreach (var driveName in DriveDatalogAll)
+                {
+                    string dataDrive = await GetDriveId(site.Id, driveName);
+                    var inst = await GetPastasInstalacaoAsync(dataDrive, driveName, termo, regional);
+                    foreach (var item in inst)
+                        dict[item.Name] = (item.Url, item.Date);
+                }
+
+                return dict.OrderBy(k => k.Key)
+                           .Select(kvp => new OsInfo
                            {
-                               NumOS = i.Name,
-                               IdSigfi = i.Name,
+                               NumOS = kvp.Key,
+                               IdSigfi = kvp.Key,
                                Rota = "-",
-                               Data = i.Date,
+                               Data = kvp.Value.Date,
                                TemDatalog = true,
-                               FolderUrl = i.Url
+                               FolderUrl = kvp.Value.Url
                            })
                            .ToList();
             }
@@ -359,6 +377,7 @@ namespace ManutMap.Services
         }
 
         private async Task<Dictionary<string, string>> GetPastasPeriodoAsync(string driveId,
+                                                                             string driveName,
                                                                              DateTime ini,
                                                                              DateTime fim,
                                                                              bool buscaUnica,
@@ -384,7 +403,7 @@ namespace ManutMap.Services
             {
                 string name = it.Name!.Trim();
                 string url = it.WebUrl ??
-                              $"https://{Domain}/sites/{SitePath}/{DriveDatalog}/{name}";
+                              $"https://{Domain}/sites/{SitePath}/{driveName}/{name}";
 
                 dict[name] = url;
 
@@ -402,6 +421,7 @@ namespace ManutMap.Services
         }
 
         public async Task<List<(string Name, string Url, DateTime Date)>> GetPastasInstalacaoAsync(string driveId,
+                                             string driveName,
                                              string? idSigfi,
                                              string? regional)
         {
@@ -419,7 +439,7 @@ namespace ManutMap.Services
             return q.Select(i => (
                         i.Name!.Trim(),
                         i.WebUrl ??
-                        $"https://{Domain}/sites/{SitePath}/{DriveDatalog}/{i.Name!.Trim()}",
+                        $"https://{Domain}/sites/{SitePath}/{driveName}/{i.Name!.Trim()}",
                         (i.LastModifiedDateTime ?? i.CreatedDateTime ?? DateTimeOffset.MinValue)
                             .UtcDateTime))
                     .ToList();
@@ -435,8 +455,17 @@ namespace ManutMap.Services
         public async Task<Dictionary<string, string>> GetDatalogFoldersPeriodAsync(DateTime ini, DateTime fim)
         {
             var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
-            string driveId = await GetDriveId(site.Id, DriveDatalog);
-            return await GetPastasPeriodoAsync(driveId, ini, fim, false, null, -1, null);
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var driveName in DriveDatalogAll)
+            {
+                string driveId = await GetDriveId(site.Id, driveName);
+                var partial = await GetPastasPeriodoAsync(driveId, driveName, ini, fim, false, null, -1, null);
+                foreach (var kv in partial)
+                    dict[kv.Key] = kv.Value;
+            }
+
+            return dict;
         }
     }
 }
