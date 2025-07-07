@@ -431,5 +431,12 @@ namespace ManutMap.Services
             LoadCache();
             return _folderCache!;
         }
+
+        public async Task<Dictionary<string, string>> GetDatalogFoldersPeriodAsync(DateTime ini, DateTime fim)
+        {
+            var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
+            string driveId = await GetDriveId(site.Id, DriveDatalog);
+            return await GetPastasPeriodoAsync(driveId, ini, fim, false, null, -1, null);
+        }
     }
 }
