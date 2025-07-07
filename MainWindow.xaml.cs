@@ -376,31 +376,39 @@ namespace ManutMap
         {
             if (dadosFiltrados == null) return;
 
-            int prevAbertas = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase) &&
-                string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
-            int prevConcluidas = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase) &&
-                !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            int prevAbertas = 0;
+            int prevConcluidas = 0;
+            int corrAbertas = 0;
+            int corrConcluidas = 0;
+            int servAbertos = 0;
+            int servConcluidos = 0;
+            int datalogCount = 0;
+            int totalCount = 0;
 
-            int corrAbertas = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase) &&
-                string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
-            int corrConcluidas = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase) &&
-                !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+            foreach (var item in dadosFiltrados)
+            {
+                totalCount++;
 
-            int servAbertos = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "SERVICOS", StringComparison.OrdinalIgnoreCase) &&
-                string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
-            int servConcluidos = dadosFiltrados.Count(item =>
-                string.Equals(item["TIPO"]?.ToString().Trim(), "SERVICOS", StringComparison.OrdinalIgnoreCase) &&
-                !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString()));
+                bool isConcluida = !string.IsNullOrWhiteSpace(item["DTCONCLUSAO"]?.ToString());
+                string tipo = item["TIPO"]?.ToString().Trim() ?? string.Empty;
 
-            int datalogCount = dadosFiltrados.Count(item =>
-                item["TEMDATALOG"]?.ToObject<bool>() == true);
-            int totalCount = dadosFiltrados.Count();
-            int missingCount = totalCount - datalogCount;
+                if (string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (isConcluida) prevConcluidas++; else prevAbertas++;
+                }
+                else if (string.Equals(tipo, "CORRETIVA", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (isConcluida) corrConcluidas++; else corrAbertas++;
+                }
+                else if (string.Equals(tipo, "SERVICOS", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (isConcluida) servConcluidos++; else servAbertos++;
+                }
+
+                if (item["TEMDATALOG"]?.ToObject<bool>() == true)
+                    datalogCount++;
+            }
+
             double rate = totalCount > 0 ? datalogCount * 100.0 / totalCount : 0.0;
 
             // Atualiza cada TextBlock individualmente
@@ -661,8 +669,68 @@ namespace ManutMap
             if (source == null && _manutList == null) return;
 
             var all = source?.ToList() ?? _manutList!.OfType<JObject>().ToList();
-            var withDatalog = all.Where(o => o["TEMDATALOG"]?.ToObject<bool>() == true).ToList();
-            var withoutDatalog = all.Where(o => o["TEMDATALOG"]?.ToObject<bool>() != true).ToList();
+            var withDatalog = new List<JObject>();
+            var withoutDatalog = new List<JObject>();
+
+            int prevCom = 0, prevSem = 0, corrCom = 0, corrSem = 0;
+            var pt = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
+
+            _osSemDatalog.Clear();
+            _osAlertaDatalog.Clear();
+
+            foreach (var o in all)
+            {
+                bool hasData = o["TEMDATALOG"]?.ToObject<bool>() == true;
+                string tipo = o["TIPO"]?.ToString()?.Trim() ?? string.Empty;
+
+                if (hasData)
+                {
+                    withDatalog.Add(o);
+                    if (string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase)) prevCom++;
+                    else if (string.Equals(tipo, "CORRETIVA", StringComparison.OrdinalIgnoreCase)) corrCom++;
+                }
+                else
+                {
+                    withoutDatalog.Add(o);
+                    if (string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase)) prevSem++;
+                    else if (string.Equals(tipo, "CORRETIVA", StringComparison.OrdinalIgnoreCase)) corrSem++;
+
+                    _osSemDatalog.Add(new OsSimpleInfo
+                    {
+                        NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
+                        IdSigfi = (o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
+                        Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim()
+                    });
+
+                    var dtStr = o["DTCONCLUSAO"]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(dtStr) && DateTime.TryParse(dtStr, pt, System.Globalization.DateTimeStyles.None, out var dt))
+                    {
+                        int dias = (int)(DateTime.Today - dt.Date).TotalDays;
+                        if (dias > 2 && dias <= 15)
+                        {
+                            var jobj = (JObject)o;
+                            string tooltip = string.Empty;
+                            if (jobj.TryGetValue("DESCADICIONALEXEC", out var desc))
+                            {
+                                tooltip = $"DESCADICIONALEXEC: {desc}\n";
+                            }
+                            tooltip += string.Join("\n", jobj.Properties().Select(p => $"{p.Name}: {p.Value}"));
+                            _osAlertaDatalog.Add(new OsAlertInfo
+                            {
+                                NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
+                                IdSigfi = (o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
+                                Cliente = (o["NOMECLIENTE"]?.ToString() ?? string.Empty).Trim(),
+                                Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim(),
+                                Tipo = tipo,
+                                Conclusao = dt,
+                                DiasSemDatalog = dias,
+                                Tooltip = tooltip,
+                                Raw = jobj
+                            });
+                        }
+                    }
+                }
+            }
 
             _routeStats = withDatalog
                 .GroupBy(o => (o["ROTA"]?.ToString() ?? "-").Trim())
@@ -699,11 +767,6 @@ namespace ManutMap
             RecentRouteChart.Tag = MaxRecentRouteCount;
             RecentRouteChart.Items = _recentRouteStats;
 
-            int prevCom = withDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase));
-            int prevSem = withoutDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase));
-            int corrCom = withDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase));
-            int corrSem = withoutDatalog.Count(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "CORRETIVA", StringComparison.OrdinalIgnoreCase));
-
             var tipoData = new List<LabelValue>
             {
                 new LabelValue("Prev. com", prevCom),
@@ -713,51 +776,6 @@ namespace ManutMap
             };
             TipoServicoChart.Items = tipoData;
 
-            _osSemDatalog.Clear();
-            foreach (var o in withoutDatalog)
-            {
-                _osSemDatalog.Add(new OsSimpleInfo
-                {
-                    NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
-                    IdSigfi = (o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
-                    Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim()
-                });
-            }
-
-            _osAlertaDatalog.Clear();
-            var pt = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
-            foreach (var o in withoutDatalog)
-            {
-                var dtStr = o["DTCONCLUSAO"]?.ToString();
-                if (!string.IsNullOrWhiteSpace(dtStr) &&
-                    DateTime.TryParse(dtStr, pt, System.Globalization.DateTimeStyles.None, out var dt))
-                {
-                    int dias = (int)(DateTime.Today - dt.Date).TotalDays;
-                    if (dias > 2 && dias <= 15)
-                    {
-                        var jobj = (JObject)o;
-                        string tooltip = string.Empty;
-                        if (jobj.TryGetValue("DESCADICIONALEXEC", out var desc))
-                        {
-                            tooltip = $"DESCADICIONALEXEC: {desc}\n";
-                        }
-                        tooltip += string.Join("\n", jobj.Properties()
-                            .Select(p => $"{p.Name}: {p.Value}"));
-                        _osAlertaDatalog.Add(new OsAlertInfo
-                        {
-                            NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
-                            IdSigfi = (o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
-                            Cliente = (o["NOMECLIENTE"]?.ToString() ?? string.Empty).Trim(),
-                            Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim(),
-                            Tipo = (o["TIPO"]?.ToString() ?? string.Empty).Trim(),
-                            Conclusao = dt,
-                            DiasSemDatalog = dias,
-                            Tooltip = tooltip,
-                            Raw = (JObject)o
-                        });
-                    }
-                }
-            }
             DatalogAlertGrid.ItemsSource = null;
             DatalogAlertGrid.ItemsSource = _osAlertaDatalog;
         }
