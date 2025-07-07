@@ -147,11 +147,36 @@ namespace ManutMap.Controls
                 ChartCanvas.Children.Add(label);
             }
 
-            var poly = new Polyline
+            // vertical grid lines when not too many points
+            if (n <= 12)
             {
-                Stroke = Brushes.SteelBlue,
-                StrokeThickness = 2
-            };
+                for (int i = 0; i < n; i++)
+                {
+                    double x = n == 1 ? width / 2 : i * width / (n - 1);
+                    var vline = new Line
+                    {
+                        X1 = x,
+                        X2 = x,
+                        Y1 = 0,
+                        Y2 = height,
+                        Stroke = Brushes.LightGray,
+                        StrokeThickness = 0.5,
+                        StrokeDashArray = new DoubleCollection { 2, 2 }
+                    };
+                    ChartCanvas.Children.Add(vline);
+                }
+            }
+
+            // axis lines
+            var axisBrush = Brushes.Gray;
+            ChartCanvas.Children.Add(new Line { X1 = 0, Y1 = height, X2 = width, Y2 = height, Stroke = axisBrush, StrokeThickness = 1 });
+            ChartCanvas.Children.Add(new Line { X1 = 0, Y1 = 0, X2 = 0, Y2 = height, Stroke = axisBrush, StrokeThickness = 1 });
+
+            Color brandColor = Color.FromRgb(0x00, 0x78, 0xD4);
+            var lineBrush = new SolidColorBrush(brandColor);
+            var fillBrush = new SolidColorBrush(Color.FromArgb(60, brandColor.R, brandColor.G, brandColor.B));
+
+            var points = new List<System.Windows.Point>();
 
             bool showLabels = n <= 20;
             for (int i = 0; i < n; i++)
@@ -164,13 +189,13 @@ namespace ManutMap.Controls
 
                 double x = n == 1 ? width / 2 : i * width / (n - 1);
                 double y = height - (val / MaxValue * height);
-                poly.Points.Add(new System.Windows.Point(x, y));
+                points.Add(new System.Windows.Point(x, y));
 
                 var ell = new Ellipse
                 {
                     Width = 8,
                     Height = 8,
-                    Fill = Brushes.SteelBlue,
+                    Fill = lineBrush,
                     Stroke = Brushes.White,
                     StrokeThickness = 2
                 };
@@ -192,7 +217,25 @@ namespace ManutMap.Controls
                 }
             }
 
-            ChartCanvas.Children.Insert(0, poly);
+            var areaGeometry = new StreamGeometry();
+            using (var ctx = areaGeometry.Open())
+            {
+                ctx.BeginFigure(new System.Windows.Point(0, height), true, true);
+                foreach (var p in points)
+                    ctx.LineTo(p, true, false);
+                ctx.LineTo(new System.Windows.Point(width, height), true, false);
+            }
+            areaGeometry.Freeze();
+            var areaPath = new Path { Data = areaGeometry, Fill = fillBrush };
+            ChartCanvas.Children.Add(areaPath);
+
+            var poly = new Polyline
+            {
+                Stroke = lineBrush,
+                StrokeThickness = 2,
+                Points = new PointCollection(points)
+            };
+            ChartCanvas.Children.Add(poly);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
