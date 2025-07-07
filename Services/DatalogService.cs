@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net.Http;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -148,20 +149,28 @@ namespace ManutMap.Services
 
         private async Task EnsureCacheUpdatedAsync()
         {
-            var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
-            string driveId = await GetDriveId(site.Id, DriveDatalog);
+            try
+            {
+                var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
+                string driveId = await GetDriveId(site.Id, DriveDatalog);
 
-            var novos = await GetNewRootFoldersAsync(driveId);
-            if (novos.Count > 0)
-            {
-                MergeFolders(novos);
-                _cacheDate = DateTime.UtcNow;
-                SaveCache();
+                var novos = await GetNewRootFoldersAsync(driveId);
+                if (novos.Count > 0)
+                {
+                    MergeFolders(novos);
+                    _cacheDate = DateTime.UtcNow;
+                    SaveCache();
+                }
+                else if (_folderCache == null)
+                {
+                    // no cache existed and no folders found
+                    _folderCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                }
             }
-            else if (_folderCache == null)
+            catch (HttpRequestException ex)
             {
-                // no cache existed and no folders found
-                _folderCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                // In case the Graph API cannot be reached (e.g. no internet)
+                Console.Error.WriteLine($"Erro ao acessar o Graph API: {ex.Message}");
             }
         }
 
