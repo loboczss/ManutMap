@@ -14,8 +14,8 @@ namespace ManutMap.Controls
         {
             InitializeComponent();
             DataContext = this;
-            Loaded += (_, _) => DrawChart();
-            SizeChanged += (_, _) => DrawChart();
+            Loaded += (_, _) => { UpdateChartWidth(); DrawChart(); };
+            SizeChanged += (_, _) => { UpdateChartWidth(); DrawChart(); };
         }
 
         private IEnumerable? _items;
@@ -28,6 +28,7 @@ namespace ManutMap.Controls
                 OnPropertyChanged(nameof(Items));
                 UpdateMax();
                 UpdateLabels();
+                UpdateChartWidth();
                 DrawChart();
             }
         }
@@ -52,6 +53,17 @@ namespace ManutMap.Controls
             {
                 _labels = value;
                 OnPropertyChanged(nameof(Labels));
+            }
+        }
+
+        private double _chartWidth;
+        public double ChartWidth
+        {
+            get => _chartWidth;
+            set
+            {
+                _chartWidth = value;
+                OnPropertyChanged(nameof(ChartWidth));
             }
         }
 
@@ -84,6 +96,14 @@ namespace ManutMap.Controls
                     max = v;
             }
             MaxValue = max;
+        }
+
+        private void UpdateChartWidth()
+        {
+            int count = _items?.Cast<object>().Count() ?? 0;
+            double minWidth = ActualWidth > 0 ? ActualWidth : 200;
+            double width = count > 0 ? System.Math.Max(minWidth, count * 40) : minWidth;
+            ChartWidth = width;
         }
 
         private void DrawChart()
@@ -133,6 +153,7 @@ namespace ManutMap.Controls
                 StrokeThickness = 2
             };
 
+            bool showLabels = n <= 20;
             for (int i = 0; i < n; i++)
             {
                 var item = list[i];
@@ -157,15 +178,18 @@ namespace ManutMap.Controls
                 Canvas.SetTop(ell, y - 4);
                 ChartCanvas.Children.Add(ell);
 
-                var valueLabel = new TextBlock
+                if (showLabels)
                 {
-                    Text = val.ToString(),
-                    FontSize = 11,
-                    Foreground = Brushes.Black
-                };
-                Canvas.SetLeft(valueLabel, x - 10);
-                Canvas.SetTop(valueLabel, y - 20);
-                ChartCanvas.Children.Add(valueLabel);
+                    var valueLabel = new TextBlock
+                    {
+                        Text = val.ToString(),
+                        FontSize = 11,
+                        Foreground = Brushes.Black
+                    };
+                    Canvas.SetLeft(valueLabel, x - 10);
+                    Canvas.SetTop(valueLabel, y - 20);
+                    ChartCanvas.Children.Add(valueLabel);
+                }
             }
 
             ChartCanvas.Children.Insert(0, poly);
