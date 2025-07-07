@@ -525,7 +525,7 @@
 
                     <wv2:WebView2 Grid.Row="0" x:Name="MapView"/>
 
-                    <Border Grid.Row="1" Background="Gray" BorderThickness="0,1,0,0" BorderBrush="{StaticResource Border.Default}" Padding="15,10">
+                    <Border Grid.Row="1" Background="White" BorderThickness="0,1,0,0" BorderBrush="{StaticResource Border.Default}" Padding="15,10">
                         <StackPanel>
                             <WrapPanel Orientation="Horizontal" ItemHeight="20">
                                 <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
@@ -598,8 +598,8 @@
                         <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4"
                                    Text="OS concluídas há mais de 2 dias sem Datalog (últimos 15 dias)"/>
                         <TextBlock Text="Alertas de ordens concluídas há mais de 2 dias nos últimos 15 dias que ainda não possuem coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
-                        <DataGrid x:Name="DatalogAlertGrid" AutoGenerateColumns="False" Height="200"
-                                  LoadingRow="DatalogAlertGrid_LoadingRow" MouseDoubleClick="DatalogAlertGrid_RowDoubleClick"
+                        <DataGrid x:Name="DatalogAlertGrid" AutoGenerateColumns="False" Height="280"
+                                   MouseDoubleClick="DatalogAlertGrid_RowDoubleClick"
                                   RowHeight="34" ColumnHeaderHeight="36" Style="{StaticResource ModernDataGrid}">
                             <DataGrid.RowStyle>
                                 <StaticResource ResourceKey="OsAlertRowStyle"/>

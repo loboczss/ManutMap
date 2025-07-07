@@ -151,7 +151,7 @@ namespace ManutMap.Services
             var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
             string driveId = await GetDriveId(site.Id, DriveDatalog);
 
-            var novos = aSystemwait GetNewRootFoldersAsync(driveId);
+            var novos = await GetNewRootFoldersAsync(driveId);
             if (novos.Count > 0)
             {
                 MergeFolders(novos);
