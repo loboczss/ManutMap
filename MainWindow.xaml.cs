@@ -31,6 +31,8 @@ namespace ManutMap
         private List<RouteCount> _recentRouteStats = new();
         public int MaxRouteCount { get; private set; }
         public int MaxRecentRouteCount { get; private set; }
+        private bool _statsDirty = true;
+        private List<JObject>? _filteredCache;
         private readonly List<OsSimpleInfo> _osSemDatalog = new();
         private readonly List<OsAlertInfo> _osAlertaDatalog = new();
         private readonly Dictionary<string, List<string>> _regionalRotas = new()
@@ -373,8 +375,14 @@ namespace ManutMap
                                                 criteria.LatLonField);
             }
 
-            AtualizarPainelEstatisticas(filteredResult);
-            UpdateStatsTab(filteredResult);
+            _filteredCache = filteredResult.ToList();
+            AtualizarPainelEstatisticas(_filteredCache);
+            _statsDirty = true;
+            if (MainTabControl.SelectedIndex == 1)
+            {
+                _statsDirty = false;
+                UpdateStatsTab(_filteredCache);
+            }
         }
 
         // MÉTODO DE ESTATÍSTICAS ATUALIZADO para a nova barra
@@ -449,7 +457,7 @@ namespace ManutMap
                 }
             }
 
-            UpdateStatsTab();
+            _statsDirty = true;
         }
 
         private void AnnotatePrazoInfo()
@@ -545,7 +553,7 @@ namespace ManutMap
                 }
             }
 
-            UpdateStatsTab();
+            _statsDirty = true;
         }
 
         private void ShareButton_Click(object sender, RoutedEventArgs e)
@@ -670,74 +678,102 @@ namespace ManutMap
             win.Show();
         }
 
+        private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (MainTabControl.SelectedIndex == 1 && _statsDirty)
+            {
+                _statsDirty = false;
+                UpdateStatsTab(_filteredCache);
+            }
+        }
+
         private async void UpdateStatsTab(IEnumerable<JObject>? source = null)
         {
             if (source == null && _manutList == null) return;
 
             var all = source?.ToList() ?? _manutList!.OfType<JObject>().ToList();
-            var withDatalog = new List<JObject>();
-            var withoutDatalog = new List<JObject>();
 
-            int prevCom = 0, prevSem = 0, corrCom = 0, corrSem = 0;
-            var pt = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
-
-            _osSemDatalog.Clear();
-            _osAlertaDatalog.Clear();
-
-            foreach (var o in all)
+            var stats = await Task.Run(() =>
             {
-                bool hasData = o["TEMDATALOG"]?.ToObject<bool>() == true;
-                string tipo = o["TIPO"]?.ToString()?.Trim() ?? string.Empty;
+                var withDatalog = new List<JObject>();
+                var osSem = new List<OsSimpleInfo>();
+                var osAlert = new List<OsAlertInfo>();
 
-                if (hasData)
+                int prevCom = 0, prevSem = 0, corrCom = 0, corrSem = 0;
+                var pt = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
+
+                foreach (var o in all)
                 {
-                    withDatalog.Add(o);
-                    if (string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase)) prevCom++;
-                    else if (string.Equals(tipo, "CORRETIVA", StringComparison.OrdinalIgnoreCase)) corrCom++;
-                }
-                else
-                {
-                    withoutDatalog.Add(o);
-                    if (string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase)) prevSem++;
-                    else if (string.Equals(tipo, "CORRETIVA", StringComparison.OrdinalIgnoreCase)) corrSem++;
+                    bool hasData = o["TEMDATALOG"]?.ToObject<bool>() == true;
+                    string tipo = o["TIPO"]?.ToString()?.Trim() ?? string.Empty;
 
-                    _osSemDatalog.Add(new OsSimpleInfo
+                    if (hasData)
                     {
-                        NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
-                        IdSigfi = (o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
-                        Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim()
-                    });
+                        withDatalog.Add(o);
+                        if (string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase)) prevCom++;
+                        else if (string.Equals(tipo, "CORRETIVA", StringComparison.OrdinalIgnoreCase)) corrCom++;
+                    }
+                    else
+                    {
+                        if (string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase)) prevSem++;
+                        else if (string.Equals(tipo, "CORRETIVA", StringComparison.OrdinalIgnoreCase)) corrSem++;
 
-                    var dtStr = o["DTCONCLUSAO"]?.ToString();
-                    if (!string.IsNullOrWhiteSpace(dtStr) && DateTime.TryParse(dtStr, pt, System.Globalization.DateTimeStyles.None, out var dt))
-                    {
-                        int dias = (int)(DateTime.Today - dt.Date).TotalDays;
-                        if (dias > 2 && dias <= 15)
+                        osSem.Add(new OsSimpleInfo
                         {
-                            var jobj = (JObject)o;
-                            _osAlertaDatalog.Add(new OsAlertInfo
+                            NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
+                            IdSigfi = (o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
+                            Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim()
+                        });
+
+                        var dtStr = o["DTCONCLUSAO"]?.ToString();
+                        if (!string.IsNullOrWhiteSpace(dtStr) && DateTime.TryParse(dtStr, pt, System.Globalization.DateTimeStyles.None, out var dt))
+                        {
+                            int dias = (int)(DateTime.Today - dt.Date).TotalDays;
+                            if (dias > 2 && dias <= 15)
                             {
-                                NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
-                                IdSigfi = (o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
-                                Cliente = (o["NOMECLIENTE"]?.ToString() ?? string.Empty).Trim(),
-                                Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim(),
-                                Tipo = tipo,
-                                Conclusao = dt,
-                                DiasSemDatalog = dias,
-                                Raw = jobj
-                            });
+                                var jobj = (JObject)o;
+                                osAlert.Add(new OsAlertInfo
+                                {
+                                    NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
+                                    IdSigfi = (o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
+                                    Cliente = (o["NOMECLIENTE"]?.ToString() ?? string.Empty).Trim(),
+                                    Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim(),
+                                    Tipo = tipo,
+                                    Conclusao = dt,
+                                    DiasSemDatalog = dias,
+                                    Raw = jobj
+                                });
+                            }
                         }
                     }
                 }
-            }
 
-            _routeStats = withDatalog
-                .GroupBy(o => (o["ROTA"]?.ToString() ?? "-").Trim())
-                .Select(g => new RouteCount(g.Key, g.Count()))
-                .OrderByDescending(g => g.Count)
-                .ToList();
+                var routeStats = withDatalog
+                    .GroupBy(o => (o["ROTA"]?.ToString() ?? "-").Trim())
+                    .Select(g => new RouteCount(g.Key, g.Count()))
+                    .OrderByDescending(g => g.Count)
+                    .ToList();
 
-            MaxRouteCount = _routeStats.Count > 0 ? _routeStats.Max(r => r.Count) : 0;
+                int maxRoute = routeStats.Count > 0 ? routeStats.Max(r => r.Count) : 0;
+
+                var tipoData = new List<LabelValue>
+                {
+                    new LabelValue("Preventiva com dtlg", prevCom),
+                    new LabelValue("Preventiva sem dtlg", prevSem),
+                    new LabelValue("Corretiva com dtlg", corrCom),
+                    new LabelValue("Corretiva sem dtlg", corrSem)
+                };
+
+                return (routeStats, maxRoute, osSem, osAlert, tipoData);
+            });
+
+            _osSemDatalog.Clear();
+            _osAlertaDatalog.Clear();
+            _osSemDatalog.AddRange(stats.osSem);
+            _osAlertaDatalog.AddRange(stats.osAlert);
+
+            _routeStats = stats.routeStats;
+            MaxRouteCount = stats.maxRoute;
             RouteChart.Tag = MaxRouteCount;
             RouteChart.Items = _routeStats;
 
@@ -766,14 +802,7 @@ namespace ManutMap
             RecentRouteChart.Tag = MaxRecentRouteCount;
             RecentRouteChart.Items = _recentRouteStats;
 
-            var tipoData = new List<LabelValue>
-            {
-                new LabelValue("Preventiva com dtlg", prevCom),
-                new LabelValue("Preventiva sem dtlg", prevSem),
-                new LabelValue("Corretiva com dtlg", corrCom),
-                new LabelValue("Corretiva sem dtlg", corrSem)
-            };
-            TipoServicoChart.Items = tipoData;
+            TipoServicoChart.Items = stats.tipoData;
 
             DatalogAlertGrid.ItemsSource = null;
             DatalogAlertGrid.ItemsSource = _osAlertaDatalog;

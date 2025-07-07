@@ -522,7 +522,7 @@
             </DockPanel>
         </Border>
         
-        <TabControl Grid.Column="2">
+        <TabControl x:Name="MainTabControl" Grid.Column="2" SelectionChanged="MainTabControl_SelectionChanged">
             <TabItem Header="Mapa">
                 <Grid>
                     <Grid.RowDefinitions>
