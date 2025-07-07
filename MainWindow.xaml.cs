@@ -486,7 +486,7 @@ namespace ManutMap
                     var con = obj["DTCONCLUSAO"]?.ToString();
                     if (!string.IsNullOrWhiteSpace(rec) && string.IsNullOrWhiteSpace(con) && DateTime.TryParse(rec, pt, System.Globalization.DateTimeStyles.None, out var dtRec))
                     {
-                        int dias = 5 - (int)(DateTime.Today - dtRec.Date).TotalDays;
+                        int dias = 3 - (int)(DateTime.Today - dtRec.Date).TotalDays;
                         if (!corrDict.ContainsKey(id) || dias < corrDict[id])
                             corrDict[id] = dias;
                     }
@@ -503,7 +503,7 @@ namespace ManutMap
 
                 if (prevDict.TryGetValue(id, out var info))
                 {
-                    var proxima = info.dt.AddMonths(4);
+                    var proxima = info.dt.AddMonths(6);
                     int dias = (int)Math.Ceiling((proxima.Date - DateTime.Today).TotalDays);
                     obj["PREV_ULTIMA"] = info.dt.ToString("yyyy-MM-dd");
                     obj["PREV_PROXIMA"] = proxima.ToString("yyyy-MM-dd");
