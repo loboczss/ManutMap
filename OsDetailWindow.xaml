@@ -1,0 +1,24 @@
+<Window x:Class="ManutMap.OsDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Detalhes da OS" Height="400" Width="500"
+        WindowStartupLocation="CenterOwner"
+        Background="#F5F5F5">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock x:Name="DescExecText" FontWeight="Bold" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <DataGrid x:Name="DetailsGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FAFAFA">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Campo" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Valor" Binding="{Binding Value}" Width="2*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
