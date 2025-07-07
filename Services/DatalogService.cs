@@ -33,6 +33,15 @@ namespace ManutMap.Services
         };
         private const string DriveJson = "ArquivosJSON";
 
+        private const string ListIdDatalog = "5b66bbc3-23d2-42d9-827a-e6b77765e8e0";
+        private const string ListIdDatalogAC = "f5904f07-a47e-4955-8a9d-5807ef6e2179";
+
+        private static readonly Dictionary<string, string> DriveListMap = new(StringComparer.OrdinalIgnoreCase)
+        {
+            [DriveDatalog2] = ListIdDatalog,
+            [DriveDatalog3] = ListIdDatalogAC
+        };
+
         private static readonly string CachePath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
             "datalog_folders_cache.json");
@@ -261,6 +270,13 @@ namespace ManutMap.Services
 
         private async Task<string> GetDriveId(string siteId, string driveName)
         {
+            if (DriveListMap.TryGetValue(driveName, out var listId))
+            {
+                var drv = await _graph.Sites[siteId].Lists[listId].Drive.GetAsync();
+                if (drv != null)
+                    return drv.Id!;
+            }
+
             var drives = await _graph.Sites[siteId].Drives.GetAsync();
             var drive = drives.Value.FirstOrDefault(d => d.Name.Equals(driveName,
                 StringComparison.OrdinalIgnoreCase));
