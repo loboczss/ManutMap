@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Microsoft.Win32;
 using System.Windows.Threading;
+using System.Windows.Media;
 using Newtonsoft.Json.Linq;
 using ManutMap.Models;
 using ManutMap.Services;
@@ -27,6 +28,7 @@ namespace ManutMap
         private List<RouteCount> _routeStats = new();
         public int MaxRouteCount { get; private set; }
         private readonly List<OsSimpleInfo> _osSemDatalog = new();
+        private readonly List<OsAlertInfo> _osAlertaDatalog = new();
         private readonly Dictionary<string, List<string>> _regionalRotas = new()
         {
             {"Cruzeiro do Sul", new List<string>{"01","02","03","04","05","14","15","16","17","30","32","34","36","39","40","42","06"}},
@@ -684,11 +686,47 @@ namespace ManutMap
             }
             DatalogMissingGrid.ItemsSource = null;
             DatalogMissingGrid.ItemsSource = _osSemDatalog;
+
+            _osAlertaDatalog.Clear();
+            var pt = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
+            foreach (var o in withoutDatalog)
+            {
+                var dtStr = o["DTCONCLUSAO"]?.ToString();
+                if (!string.IsNullOrWhiteSpace(dtStr) &&
+                    DateTime.TryParse(dtStr, pt, System.Globalization.DateTimeStyles.None, out var dt))
+                {
+                    int dias = (int)(DateTime.Today - dt.Date).TotalDays;
+                    if (dias > 2)
+                    {
+                        _osAlertaDatalog.Add(new OsAlertInfo
+                        {
+                            NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
+                            IdSigfi = (o["IDSIGFI"]?.ToString() ?? string.Empty).Trim(),
+                            Cliente = (o["NOMECLIENTE"]?.ToString() ?? string.Empty).Trim(),
+                            Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim(),
+                            Tipo = (o["TIPO"]?.ToString() ?? string.Empty).Trim(),
+                            Conclusao = dt,
+                            DiasSemDatalog = dias
+                        });
+                    }
+                }
+            }
+            DatalogAlertGrid.ItemsSource = null;
+            DatalogAlertGrid.ItemsSource = _osAlertaDatalog;
         }
 
         private void PrazoDiasTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !e.Text.All(char.IsDigit);
+        }
+
+        private void DatalogAlertGrid_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            if (e.Row.Item is OsAlertInfo)
+            {
+                e.Row.Background = Brushes.IndianRed;
+                e.Row.Foreground = Brushes.White;
+            }
         }
 
     }
