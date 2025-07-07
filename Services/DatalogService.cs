@@ -262,7 +262,12 @@ namespace ManutMap.Services
         private async Task<string> GetDriveId(string siteId, string driveName)
         {
             var drives = await _graph.Sites[siteId].Drives.GetAsync();
-            return drives.Value.First(d => d.Name == driveName).Id!;
+            var drive = drives.Value.FirstOrDefault(d => d.Name.Equals(driveName,
+                StringComparison.OrdinalIgnoreCase));
+            if (drive == null)
+                throw new InvalidOperationException($"Drive '{driveName}' n\u00e3o encontrado.");
+
+            return drive.Id!;
         }
 
         private async Task<List<DriveItem>> GetAllRootFoldersAsync(string driveId,
