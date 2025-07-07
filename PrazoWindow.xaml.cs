@@ -68,7 +68,7 @@ namespace ManutMap
                 var dtStr = obj["DTAHORARECLAMACAO"]?.ToString();
                 if (DateTime.TryParse(dtStr, pt, DateTimeStyles.None, out var dt))
                 {
-                    int diasRest = 5 - (int)(DateTime.Today - dt.Date).TotalDays;
+                    int diasRest = 3 - (int)(DateTime.Today - dt.Date).TotalDays;
                     list.Add(new CorretivaInfo
                     {
                         NumOS = obj["NUMOS"]?.ToString() ?? string.Empty,
@@ -112,7 +112,7 @@ namespace ManutMap
             var list = new List<PreventivaInfo>();
             foreach (var kv in dict)
             {
-                var proxima = kv.Value.dt.AddMonths(4);
+                var proxima = kv.Value.dt.AddMonths(6);
                 int dias = (int)Math.Ceiling((proxima.Date - DateTime.Today).TotalDays);
                 list.Add(new PreventivaInfo
                 {
