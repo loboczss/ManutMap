@@ -18,6 +18,7 @@
                        FontWeight="SemiBold"
                        Foreground="#333333"
                        TextWrapping="Wrap"
+                       IsTextSelectionEnabled="True"
                        Margin="0,0,0,20" />
 
             <Separator Margin="0,0,0,15"/>
@@ -34,12 +35,14 @@
                         <Setter Property="Foreground" Value="#555555"/>
                         <Setter Property="VerticalAlignment" Value="Top"/>
                         <Setter Property="Margin" Value="0,8,20,8"/>
+                        <Setter Property="IsTextSelectionEnabled" Value="True"/>
                     </Style>
                     <Style TargetType="TextBlock" x:Key="ValueStyle">
                         <Setter Property="VerticalAlignment" Value="Top"/>
                         <Setter Property="Foreground" Value="#222222"/>
                         <Setter Property="Margin" Value="0,8,0,8"/>
                         <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="IsTextSelectionEnabled" Value="True"/>
                     </Style>
                 </Grid.Resources>
 
