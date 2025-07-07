@@ -503,13 +503,26 @@ namespace ManutMap
 
             foreach (var obj in _manutList.OfType<JObject>())
             {
+                string tipo = obj["TIPO"]?.ToString()?.Trim() ?? string.Empty;
                 string id = obj["IDSIGFI"]?.ToString()?.Trim();
                 if (string.IsNullOrEmpty(id))
                     id = obj["NOMECLIENTE"]?.ToString()?.Trim() ?? string.Empty;
                 if (string.IsNullOrEmpty(id))
                     continue;
 
-                if (prevDict.TryGetValue(id, out var info))
+                var dtStr = obj["DTCONCLUSAO"]?.ToString();
+                if (string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase) &&
+                    !string.IsNullOrWhiteSpace(dtStr) &&
+                    DateTime.TryParse(dtStr, pt, System.Globalization.DateTimeStyles.None, out var dtCon))
+                {
+                    var proxima = dtCon.AddMonths(6);
+                    int dias = (int)Math.Ceiling((proxima.Date - DateTime.Today).TotalDays);
+                    obj["PREV_ULTIMA"] = dtCon.ToString("yyyy-MM-dd");
+                    obj["PREV_PROXIMA"] = proxima.ToString("yyyy-MM-dd");
+                    obj["PREV_DIAS"] = dias;
+                    obj["ROTA_LAST"] = obj["ROTA"]?.ToString() ?? string.Empty;
+                }
+                else if (prevDict.TryGetValue(id, out var info))
                 {
                     var proxima = info.dt.AddMonths(6);
                     int dias = (int)Math.Ceiling((proxima.Date - DateTime.Today).TotalDays);
