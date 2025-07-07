@@ -132,17 +132,17 @@
         </Style>
 
         <Style x:Key="OsAlertRowStyle" TargetType="DataGridRow">
-            <Setter Property="Margin" Value="0,0,0,6"/>
-            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="6,4"/>
             <Setter Property="Background" Value="{StaticResource Background.Panel}"/>
             <Setter Property="BorderBrush" Value="{StaticResource Border.Default}"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
             <Setter Property="ToolTip" Value="{Binding Tooltip}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="DataGridRow">
                         <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0"
                                 Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
                             <DataGridCellsPresenter/>
                         </Border>
@@ -158,6 +158,14 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <Style x:Key="AlertGridHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="{StaticResource BrandBlue}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="6"/>
         </Style>
 
         <Style TargetType="Expander">
@@ -598,12 +606,11 @@
                         <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4"
                                    Text="OS concluídas há mais de 2 dias sem Datalog (últimos 15 dias)"/>
                         <TextBlock Text="Alertas de ordens concluídas há mais de 2 dias nos últimos 15 dias que ainda não possuem coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
-                        <DataGrid x:Name="DatalogAlertGrid" AutoGenerateColumns="False" Height="280"
+                        <DataGrid x:Name="DatalogAlertGrid" AutoGenerateColumns="False"
                                    MouseDoubleClick="DatalogAlertGrid_RowDoubleClick"
-                                  RowHeight="34" ColumnHeaderHeight="36" Style="{StaticResource ModernDataGrid}">
-                            <DataGrid.RowStyle>
-                                <StaticResource ResourceKey="OsAlertRowStyle"/>
-                            </DataGrid.RowStyle>
+                                   ColumnHeaderHeight="32" RowHeight="30" Style="{StaticResource ModernDataGrid}"
+                                   ColumnHeaderStyle="{StaticResource AlertGridHeaderStyle}"
+                                   RowStyle="{StaticResource OsAlertRowStyle}" MaxHeight="240">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>
                                 <DataGridTextColumn Header="CONCLUSÃO" Binding="{Binding Conclusao, StringFormat='dd/MM/yyyy'}" Width="*"/>
