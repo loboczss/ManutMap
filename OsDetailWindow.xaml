@@ -53,6 +53,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Número OS:" Style="{StaticResource LabelStyle}"/>
@@ -81,6 +82,9 @@
 
                 <TextBlock Grid.Row="8" Grid.Column="0" Text="Conclusão:" Style="{StaticResource LabelStyle}"/>
                 <TextBlock Grid.Row="8" Grid.Column="1" x:Name="ConclusaoText" Style="{StaticResource ValueStyle}"/>
+
+                <TextBlock Grid.Row="9" Grid.Column="0" Text="Funcionários:" Style="{StaticResource LabelStyle}"/>
+                <TextBlock Grid.Row="9" Grid.Column="1" x:Name="FuncionariosText" Style="{StaticResource ValueStyle}"/>
             </Grid>
         </StackPanel>
     </Border>
