@@ -131,6 +131,35 @@
             <Setter Property="IsReadOnly" Value="True"/>
         </Style>
 
+        <Style x:Key="OsAlertRowStyle" TargetType="DataGridRow">
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Background" Value="{StaticResource Background.Panel}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Border.Default}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="ToolTip" Value="{Binding Tooltip}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridRow">
+                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4"
+                                Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <DataGridCellsPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource Background.Hover}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource BrandBlue}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="Expander">
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Template">
@@ -573,13 +602,11 @@
                                   LoadingRow="DatalogAlertGrid_LoadingRow" MouseDoubleClick="DatalogAlertGrid_RowDoubleClick"
                                   RowHeight="34" ColumnHeaderHeight="36" Style="{StaticResource ModernDataGrid}">
                             <DataGrid.RowStyle>
-                                <Style TargetType="DataGridRow">
-                                    <Setter Property="ToolTip" Value="{Binding Tooltip}"/>
-                                </Style>
+                                <StaticResource ResourceKey="OsAlertRowStyle"/>
                             </DataGrid.RowStyle>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="OS" Binding="{Binding NumOS}" Width="*"/>
-                                <DataGridTextColumn Header="CONCLUSÃO" Binding="{Binding Conclusao, StringFormat=d}" Width="*"/>
+                                <DataGridTextColumn Header="CONCLUSÃO" Binding="{Binding Conclusao, StringFormat='dd/MM/yyyy'}" Width="*"/>
                                 <DataGridTextColumn Header="DIAS" Binding="{Binding DiasSemDatalog}" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
