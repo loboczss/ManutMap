@@ -120,6 +120,16 @@
             </Setter>
         </Style>
 
+        <!-- Lighter card style used on the statistics screen -->
+        <Style x:Key="StatsCard" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="Background" Value="#FCFCFC"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect ShadowDepth="0" Color="#BBBBBB" Opacity="0.4" BlurRadius="3"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="ModernDataGrid" TargetType="DataGrid">
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Background" Value="White"/>
@@ -140,11 +150,11 @@
         </Style>
 
         <Style x:Key="OsAlertRowStyle" TargetType="DataGridRow">
-            <Setter Property="Margin" Value="0,0,0,4"/>
-            <Setter Property="Padding" Value="6"/>
-            <Setter Property="Background" Value="{StaticResource Background.Panel}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource Border.Default}"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="DataGridRow">
@@ -576,7 +586,7 @@
                     <StackPanel Margin="15" x:Name="StatsPanel">
                         <TextBlock x:Name="DatalogSummaryText" FontWeight="Bold" FontSize="14" Margin="0,0,0,15"/>
 
-                        <Border Style="{StaticResource Card}">
+                        <Border Style="{StaticResource StatsCard}">
                             <StackPanel>
                                 <TextBlock Text="Coletas de Datalog por Rota" FontWeight="Bold" FontSize="16" Margin="0,0,0,4"/>
                                 <TextBlock Text="Mostra a quantidade de coletas em cada rota." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
@@ -584,7 +594,7 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource Card}">
+                        <Border Style="{StaticResource StatsCard}">
                             <StackPanel>
                                 <TextBlock Text="Coletas (últimos 10 dias)" FontWeight="Bold" FontSize="16" Margin="0,0,0,4"/>
                                 <TextBlock Text="Rotas com mais coletas de datalog nos últimos 10 dias." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
@@ -592,7 +602,7 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource Card}">
+                        <Border Style="{StaticResource StatsCard}">
                             <StackPanel>
                                 <TextBlock Text="Datalog por Tipo de Serviço" FontWeight="Bold" FontSize="16" Margin="0,0,0,4"/>
                                 <TextBlock Text="Compara ordens preventivas e corretivas com coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
@@ -600,7 +610,7 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource Card}">
+                        <Border Style="{StaticResource StatsCard}">
                     <StackPanel>
                         <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4"
                                    Text="OS concluídas há mais de 2 dias sem Datalog (últimos 15 dias)"/>
