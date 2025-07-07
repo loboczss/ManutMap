@@ -284,7 +284,7 @@ namespace ManutMap.Services
         {
             string driveId = await GetDriveIdAsync();
 
-            var page = await _client.Drives[driveId].Items["root"].Children.GetAsync();
+            var page = await _client.Drives[driveId].Root.Children.GetAsync();
             var items = page.Value.ToList();
 
             while (page.OdataNextLink is string next)
