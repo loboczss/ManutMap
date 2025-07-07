@@ -250,8 +250,12 @@ namespace ManutMap
             progress?.Report((10, "Baixando dados..."));
             _manutList = await _spService.DownloadLatestJsonAsync();
 
-            progress?.Report((40, "Sincronizando datalog..."));
-            _datalogMap = await _datalogService.GetAllDatalogFoldersAsync();
+            var subProgress = new Progress<(int Percent, string Message)>(p =>
+            {
+                int percent = 40 + p.Percent * 30 / 100;
+                progress?.Report((percent, $"Sincronizando datalog... {p.Message}"));
+            });
+            _datalogMap = await _datalogService.GetAllDatalogFoldersAsync(subProgress);
             AnnotateDatalogInfo();
             AnnotatePrazoInfo();
             await AnnotateFuncionariosInfoAsync();

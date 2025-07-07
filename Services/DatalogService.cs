@@ -172,20 +172,37 @@ namespace ManutMap.Services
             }
         }
 
-        private async Task EnsureCacheUpdatedAsync()
+        private static int CalcPercent(int completed, int total)
+        {
+            if (total <= 0) return 100;
+            return (int)(completed * 100.0 / total);
+        }
+
+        private async Task EnsureCacheUpdatedAsync(IProgress<(int Percent, string Message)>? progress = null)
         {
             var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
             bool updated = false;
+            int total = DriveDatalogAll.Length;
+            int completed = 0;
 
-            foreach (var driveName in DriveDatalogAll)
+            var tasks = DriveDatalogAll.Select(async driveName =>
             {
+                progress?.Report((CalcPercent(completed, total), $"{driveName}: buscando"));
                 string driveId = await GetDriveId(site.Id, driveName);
                 var novos = await GetNewRootFoldersAsync(driveId, driveName);
+                return (driveName, novos);
+            }).ToArray();
+
+            foreach (var task in tasks)
+            {
+                var (driveName, novos) = await task;
+                completed++;
                 if (novos.Count > 0)
                 {
                     MergeFolders(novos, driveName);
                     updated = true;
                 }
+                progress?.Report((CalcPercent(completed, total), $"{driveName}: processado"));
             }
 
             if (updated)
@@ -521,10 +538,12 @@ namespace ManutMap.Services
                     .ToList();
         }
 
-        public async Task<Dictionary<string, string>> GetAllDatalogFoldersAsync()
+        public async Task<Dictionary<string, string>> GetAllDatalogFoldersAsync(IProgress<(int Percent, string Message)>? progress = null)
         {
-            await EnsureCacheUpdatedAsync();
+            progress?.Report((0, "atualizando cache"));
+            await EnsureCacheUpdatedAsync(progress);
             LoadCache();
+            progress?.Report((100, "concluído"));
             return _folderCache!;
         }
 
