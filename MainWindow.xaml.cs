@@ -735,6 +735,14 @@ namespace ManutMap
                     int dias = (int)(DateTime.Today - dt.Date).TotalDays;
                     if (dias > 2 && dias <= 15)
                     {
+                        var jobj = (JObject)o;
+                        string tooltip = string.Empty;
+                        if (jobj.TryGetValue("DESCADICIONALEXEC", out var desc))
+                        {
+                            tooltip = $"DESCADICIONALEXEC: {desc}\n";
+                        }
+                        tooltip += string.Join("\n", jobj.Properties()
+                            .Select(p => $"{p.Name}: {p.Value}"));
                         _osAlertaDatalog.Add(new OsAlertInfo
                         {
                             NumOS = (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
@@ -743,7 +751,9 @@ namespace ManutMap
                             Rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim(),
                             Tipo = (o["TIPO"]?.ToString() ?? string.Empty).Trim(),
                             Conclusao = dt,
-                            DiasSemDatalog = dias
+                            DiasSemDatalog = dias,
+                            Tooltip = tooltip,
+                            Raw = (JObject)o
                         });
                     }
                 }
