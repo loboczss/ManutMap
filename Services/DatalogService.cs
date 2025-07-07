@@ -108,7 +108,7 @@ namespace ManutMap.Services
             try
             {
                 var list = new List<DriveItem>();
-                var page = await _graph.Drives[driveId].Items["root"].Children.GetAsync(rc =>
+                var page = await _graph.Drives[driveId].Root.Children.GetAsync(rc =>
                 {
                     rc.QueryParameters.Filter = $"createdDateTime ge {_cacheDate:yyyy-MM-ddTHH:mm:ssZ}";
                 });
@@ -278,7 +278,7 @@ namespace ManutMap.Services
 
             var lista = new List<DriveItem>();
 
-            var page = await _graph.Drives[driveId].Items["root"].Children.GetAsync();
+            var page = await _graph.Drives[driveId].Root.Children.GetAsync();
             lista.AddRange(page.Value.Where(i => i.Folder != null));
 
             while (page.OdataNextLink is string next)
@@ -336,7 +336,7 @@ namespace ManutMap.Services
 
         private async Task<List<DriveItem>> GetLatestJsonsAsync(string driveId)
         {
-            var pg = await _graph.Drives[driveId].Items["root"].Children.GetAsync();
+            var pg = await _graph.Drives[driveId].Root.Children.GetAsync();
             var list = new List<DriveItem>();
 
             foreach (var suf in JsonFileConstants.JsonSuffixes)
