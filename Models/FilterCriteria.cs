@@ -44,6 +44,10 @@ namespace ManutMap.Models
         // Filtro de prazos
         public int PrazoDias { get; set; }
         public string TipoPrazo { get; set; } = "Todos";
+
+        // Quantidade de preventivas por rota para filtrar
+        // 0 significa todas
+        public int PrevPorRota { get; set; }
     }
 }
 

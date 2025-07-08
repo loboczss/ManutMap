@@ -113,6 +113,22 @@ namespace ManutMap.Services
                 })
                 .ToList();
 
+            if (c.PrevPorRota > 0)
+            {
+                var map = filtered
+                    .Where(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase))
+                    .GroupBy(o => (o["ROTA"]?.ToString() ?? string.Empty).Trim(), StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+
+                filtered = filtered
+                    .Where(o =>
+                    {
+                        var rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim();
+                        return map.TryGetValue(rota, out var cnt) && cnt == c.PrevPorRota;
+                    })
+                    .ToList();
+            }
+
             return filtered
                 .GroupBy(o => (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
                          StringComparer.OrdinalIgnoreCase)
