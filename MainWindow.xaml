@@ -533,6 +533,9 @@
                                         <ComboBoxItem Content="LATLON"/>
                                         <ComboBoxItem Content="LATLONCON"/>
                                     </ComboBox>
+                                    <CheckBox x:Name="ChbSingleClient" Content="Marcador único por cliente"
+                                              Margin="0,10,0,0"
+                                              Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                     <CheckBox x:Name="ChbCluster" Content="Agrupar Marcadores" IsChecked="True"
                                               Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                 </StackPanel>
@@ -575,6 +578,10 @@
                                     <TextBlock x:Name="DatalogStatsText" Text="0"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                                    <TextBlock Text="Clientes:" FontWeight="Bold" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="ClientesStatsText" Text="0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
                                     <TextBlock Text="Total Exibido:" FontWeight="Bold" Margin="0,0,8,0"/>
                                     <TextBlock x:Name="TotalStatsText" Text="0"/>
                                 </StackPanel>
@@ -613,6 +620,14 @@
                                 <TextBlock Text="Datalog por Tipo de Serviço" FontWeight="Bold" FontSize="16" Margin="0,0,0,4"/>
                                 <TextBlock Text="Compara ordens preventivas e corretivas com coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
                                 <controls:HorizontalBarChartControl x:Name="TipoServicoChart" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource StatsCard}">
+                            <StackPanel>
+                                <TextBlock Text="Clientes por Rota" FontWeight="Bold" FontSize="16" Margin="0,0,0,4"/>
+                                <TextBlock Text="Quantidade de clientes distintos em cada rota." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
+                                <controls:HorizontalBarChartControl x:Name="ClientesRotaChart" />
                             </StackPanel>
                         </Border>
 

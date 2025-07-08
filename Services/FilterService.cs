@@ -156,6 +156,22 @@ namespace ManutMap.Services
                     .ToList();
             }
 
+            if (c.SingleClientMarker)
+            {
+                filtered = filtered
+                    .GroupBy(GetClientId, StringComparer.OrdinalIgnoreCase)
+                    .Select(g =>
+                    {
+                        var first = (JObject)g.First().DeepClone();
+                        var list = g.Select(o => (o["NUMOS"]?.ToString() ?? string.Empty).Trim())
+                                     .Where(s => !string.IsNullOrWhiteSpace(s))
+                                     .Distinct(StringComparer.OrdinalIgnoreCase);
+                        first["NUMOS_LIST"] = string.Join(", ", list);
+                        return first;
+                    })
+                    .ToList();
+            }
+
             return filtered;
         }
 

@@ -29,8 +29,10 @@ namespace ManutMap
         private Dictionary<string, string>? _funcMap;
         private List<RouteCount> _routeStats = new();
         private List<RouteCount> _recentRouteStats = new();
+        private List<RouteCount> _clientRouteStats = new();
         public int MaxRouteCount { get; private set; }
         public int MaxRecentRouteCount { get; private set; }
+        public int MaxClientRouteCount { get; private set; }
         private bool _statsDirty = true;
         private List<JObject>? _filteredCache;
         private readonly List<OsSimpleInfo> _osSemDatalog = new();
@@ -132,6 +134,8 @@ namespace ManutMap
             ColorTipoCorrCombo.SelectionChanged += FiltersChanged;
             ColorTipoServCombo.SelectionChanged += FiltersChanged;
             MarkerStyleCombo.SelectionChanged += FiltersChanged;
+            ChbSingleClient.Checked += FiltersChanged;
+            ChbSingleClient.Unchecked += FiltersChanged;
             ChbCluster.Checked += FiltersChanged;
             ChbCluster.Unchecked += FiltersChanged;
 
@@ -335,6 +339,7 @@ namespace ManutMap
                 MarkerStyle = (MarkerStyleCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "circle",
                 OnlyDatalog = ChbOnlyDatalog.IsChecked == true,
                 UseClusters = ChbCluster.IsChecked != false,
+                SingleClientMarker = ChbSingleClient.IsChecked == true,
                 PrazoDias = int.TryParse(PrazoDiasTextBox.Text, out var pd) ? pd : 0,
                 TipoPrazo = (TipoPrazoCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos"
             };
@@ -426,6 +431,7 @@ namespace ManutMap
             int servConcluidos = 0;
             int datalogCount = 0;
             int totalCount = 0;
+            var clients = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var item in dadosFiltrados)
             {
@@ -447,6 +453,12 @@ namespace ManutMap
                     if (isConcluida) servConcluidos++; else servAbertos++;
                 }
 
+                string cid = item["IDSIGFI"]?.ToString()?.Trim();
+                if (string.IsNullOrEmpty(cid))
+                    cid = item["NOMECLIENTE"]?.ToString()?.Trim() ?? string.Empty;
+                if (!string.IsNullOrEmpty(cid))
+                    clients.Add(cid);
+
                 if (item["TEMDATALOG"]?.ToObject<bool>() == true)
                     datalogCount++;
             }
@@ -458,6 +470,7 @@ namespace ManutMap
             CorretivasStatsText.Text = $"{corrAbertas} abertas, {corrConcluidas} concluídas";
             ServicosStatsText.Text = $"{servAbertos} abertos, {servConcluidos} concluídos";
             DatalogStatsText.Text = datalogCount.ToString();
+            ClientesStatsText.Text = clients.Count.ToString();
             TotalStatsText.Text = totalCount.ToString();
 
             DatalogSummaryText.Text = $"{datalogCount} OS com Datalog (" + rate.ToString("0.#") + "%)";
@@ -835,6 +848,27 @@ namespace ManutMap
 
                 int maxRoute = routeStats.Count > 0 ? routeStats.Max(r => r.Count) : 0;
 
+                var clientDict = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+                foreach (var o in all)
+                {
+                    var rota = (o["ROTA"]?.ToString() ?? "-").Trim();
+                    var id = o["IDSIGFI"]?.ToString()?.Trim();
+                    if (string.IsNullOrEmpty(id))
+                        id = o["NOMECLIENTE"]?.ToString()?.Trim();
+                    if (string.IsNullOrEmpty(id))
+                        continue;
+                    if (!clientDict.TryGetValue(rota, out var set))
+                    {
+                        set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        clientDict[rota] = set;
+                    }
+                    set.Add(id);
+                }
+                var clientRouteStats = clientDict.Select(kvp => new RouteCount(kvp.Key, kvp.Value.Count))
+                                                .OrderByDescending(g => g.Count)
+                                                .ToList();
+                int maxClientRoute = clientRouteStats.Count > 0 ? clientRouteStats.Max(r => r.Count) : 0;
+
                 var tipoData = new List<LabelValue>
                 {
                     new LabelValue("Preventiva com dtlg", prevCom),
@@ -843,7 +877,7 @@ namespace ManutMap
                     new LabelValue("Corretiva sem dtlg", corrSem)
                 };
 
-                return (routeStats, maxRoute, osSem, osAlert, tipoData);
+                return (routeStats, maxRoute, osSem, osAlert, tipoData, clientRouteStats, maxClientRoute);
             });
 
             _osSemDatalog.Clear();
@@ -855,6 +889,11 @@ namespace ManutMap
             MaxRouteCount = stats.maxRoute;
             RouteChart.Tag = MaxRouteCount;
             RouteChart.Items = _routeStats;
+
+            _clientRouteStats = stats.clientRouteStats;
+            MaxClientRouteCount = stats.maxClientRoute;
+            ClientesRotaChart.Tag = MaxClientRouteCount;
+            ClientesRotaChart.Items = _clientRouteStats;
 
             TipoServicoChart.Items = stats.tipoData;
 
