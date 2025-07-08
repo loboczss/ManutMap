@@ -87,6 +87,7 @@ namespace ManutMap
                     _datalogMap = _datalogService.GetCachedDatalogFolders();
                     AnnotateDatalogInfo();
                     AnnotatePrazoInfo();
+                    AnnotatePrevOpenCount();
                     await AnnotateFuncionariosInfoAsync();
                     ApplyFilters();
 
@@ -153,6 +154,7 @@ namespace ManutMap
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
             AnnotatePrazoInfo();
+            AnnotatePrevOpenCount();
             _ = AnnotateFuncionariosInfoAsync();
 
             ApplyFilters();
@@ -172,6 +174,7 @@ namespace ManutMap
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
             AnnotatePrazoInfo();
+            AnnotatePrevOpenCount();
             await AnnotateFuncionariosInfoAsync();
 
             ApplyFilters();
@@ -276,6 +279,7 @@ namespace ManutMap
             _datalogMap = await _datalogService.GetAllDatalogFoldersAsync(subProgress, folderProgress);
             AnnotateDatalogInfo();
             AnnotatePrazoInfo();
+            AnnotatePrevOpenCount();
             await AnnotateFuncionariosInfoAsync();
 
             progress?.Report((70, "Atualizando filtros..."));
@@ -558,6 +562,43 @@ namespace ManutMap
                 {
                     obj["CORR_DIAS"] = cdias;
                 }
+            }
+        }
+
+        private void AnnotatePrevOpenCount()
+        {
+            if (_manutList == null) return;
+
+            var countMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var obj in _manutList.OfType<JObject>())
+            {
+                var tipo = obj["TIPO"]?.ToString()?.Trim() ?? string.Empty;
+                if (!string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var rec = obj["DTAHORARECLAMACAO"]?.ToString();
+                var con = obj["DTCONCLUSAO"]?.ToString();
+                bool isOpen = !string.IsNullOrWhiteSpace(rec) && string.IsNullOrWhiteSpace(con);
+                if (!isOpen) continue;
+
+                string id = obj["IDSIGFI"]?.ToString()?.Trim();
+                if (string.IsNullOrEmpty(id))
+                    id = obj["NOMECLIENTE"]?.ToString()?.Trim() ?? string.Empty;
+                if (string.IsNullOrEmpty(id))
+                    continue;
+
+                if (countMap.ContainsKey(id)) countMap[id]++; else countMap[id] = 1;
+            }
+
+            foreach (var obj in _manutList.OfType<JObject>())
+            {
+                string id = obj["IDSIGFI"]?.ToString()?.Trim();
+                if (string.IsNullOrEmpty(id))
+                    id = obj["NOMECLIENTE"]?.ToString()?.Trim() ?? string.Empty;
+                if (string.IsNullOrEmpty(id))
+                    continue;
+
+                obj["PREV_ABERTAS_CLIENTE"] = countMap.TryGetValue(id, out var c) ? c : 0;
             }
         }
 

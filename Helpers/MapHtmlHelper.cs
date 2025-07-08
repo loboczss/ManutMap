@@ -113,6 +113,7 @@ namespace ManutMap.Helpers
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
+                    '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
                            :'<b>Status:</b> <span style="color:'+color+'">Concluído</span><br>')+
                     (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
@@ -183,6 +184,7 @@ namespace ManutMap.Helpers
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
+                    '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
                            :'<b>Status:</b> <span style="color:'+color+'">Concluído</span><br>')+
                     (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
@@ -251,6 +253,7 @@ namespace ManutMap.Helpers
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
+                    '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
                            :'<b>Status:</b> <span style="color:'+color+'">Concluído</span><br>')+
                     (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
@@ -319,6 +322,7 @@ namespace ManutMap.Helpers
         var corrDias = item.CORR_DIAS;
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
+                    '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
                            :'<b>Status:</b> <span style="color:'+color+'">Concluído</span><br>')+
                     (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
@@ -410,6 +414,7 @@ namespace ManutMap.Helpers
         var corrDias = item.CORR_DIAS;
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
+                    '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> Aberto<br>' : '<b>Status:</b> Concluído<br>')+
                     (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
                     (dtCon?'<b>Conclusão:</b> '+dtCon+'<br>':'')+
@@ -480,6 +485,7 @@ namespace ManutMap.Helpers
 
         var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
+                    '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> Aberto<br>' : '<b>Status:</b> Concluído<br>')+
                     (dtRec?'<b>Abertura:</b> '+dtRec+'<br>':'')+
                     (dtCon?'<b>Conclusão:</b> '+dtCon+'<br>':'')+
