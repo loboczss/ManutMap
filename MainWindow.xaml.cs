@@ -814,8 +814,12 @@ namespace ManutMap
 
             TipoServicoChart.Items = stats.tipoData;
 
-            DatalogAlertGrid.ItemsSource = null;
-            DatalogAlertGrid.ItemsSource = _osAlertaDatalog;
+            if (DatalogAlertGrid != null)
+            {
+                DatalogAlertGrid.ItemsSource = null;
+                DatalogAlertGrid.ItemsSource = _osAlertaDatalog;
+            }
+
 
             try
             {

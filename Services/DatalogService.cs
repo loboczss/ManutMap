@@ -507,12 +507,6 @@ namespace ManutMap.Services
             return _folderCache!;
         }
 
-        public Task<Dictionary<string, string>> GetAllDatalogFoldersAsync(IProgress<(int Percent, string Message)> progress,
-                                                                         IProgress<int> folderProgress)
-        {
-            return GetAllDatalogFoldersAsync((IProgress<(int Percent, string Message)>?)progress,
-                                             (IProgress<int>?)folderProgress);
-        }
 
         public async Task<Dictionary<string, string>> GetDatalogFoldersPeriodAsync(DateTime ini, DateTime fim)
         {
