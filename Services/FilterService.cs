@@ -16,8 +16,22 @@ namespace ManutMap.Services
             {"Mato Grosso", new List<string>{"501","502","503","504","505","506","507","508","509","510","511","513","514"}}
         };
 
+        private static string GetClientId(JObject obj)
+        {
+            string id = obj["IDSIGFI"]?.ToString()?.Trim();
+            if (string.IsNullOrEmpty(id))
+                id = obj["NOMECLIENTE"]?.ToString()?.Trim() ?? string.Empty;
+            return id;
+        }
+
         public List<JObject> Apply(JArray source, FilterCriteria c)
         {
+            var prevCompleted = source.OfType<JObject>()
+                .Where(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase))
+                .Where(o => !string.IsNullOrWhiteSpace(o["DTCONCLUSAO"]?.ToString()))
+                .GroupBy(GetClientId, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+
             var filtered = source.OfType<JObject>()
                 .Where(item =>
                 {
@@ -121,16 +135,22 @@ namespace ManutMap.Services
 
             if (c.PreventivasPorRota > 0)
             {
-                var counts = filtered
-                    .Where(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase))
-                    .GroupBy(o => (o["ROTA"]?.ToString() ?? string.Empty).Trim(), StringComparer.OrdinalIgnoreCase)
-                    .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
-
                 filtered = filtered
                     .Where(o =>
                     {
-                        var rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim();
-                        return counts.TryGetValue(rota, out var cnt) && cnt == c.PreventivasPorRota;
+                        var tipo = (o["TIPO"]?.ToString() ?? string.Empty).Trim();
+                        if (!string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase))
+                            return false;
+
+                        var dtRec = o["DTAHORARECLAMACAO"]?.ToString();
+                        var dtCon = o["DTCONCLUSAO"]?.ToString();
+                        bool isOpen = !string.IsNullOrWhiteSpace(dtRec) && string.IsNullOrWhiteSpace(dtCon);
+                        if (!isOpen)
+                            return false;
+
+                        string id = GetClientId(o);
+                        int done = prevCompleted.TryGetValue(id, out var cnt) ? cnt : 0;
+                        return done + 1 == c.PreventivasPorRota;
                     })
                     .ToList();
             }

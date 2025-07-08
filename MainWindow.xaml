@@ -375,7 +375,7 @@
                                     </StackPanel>
 
                                     <StackPanel Grid.Row="6" Margin="0,0,0,10">
-                                        <TextBlock Text="Preventivas na Rota" Style="{StaticResource LabelStyle}"/>
+                                        <TextBlock Text="Número da Preventiva" Style="{StaticResource LabelStyle}"/>
                                         <ComboBox x:Name="PrevCountRotaCombo" SelectionChanged="FiltersChanged" SelectedIndex="0">
                                             <ComboBoxItem Content="Todas"/>
                                             <ComboBoxItem Content="1"/>
