@@ -102,50 +102,11 @@ namespace ManutMap.Services
             if (_cacheDate == DateTime.MinValue)
                 return await GetAllRootFoldersAsync(driveId, driveName);
 
-            if (driveName.Equals(DriveDatalog3, StringComparison.OrdinalIgnoreCase))
-            {
-                var todas = await GetAllFoldersRecursiveAsync(driveId, "root", 2);
-                return todas.Where(i => i.CreatedDateTime.HasValue &&
-                                        i.CreatedDateTime.Value.UtcDateTime >= _cacheDate)
-                             .ToList();
-            }
-
-            // Graph API does not always allow filtering by createdDateTime.
-            // If the request fails, fallback to fetching all folders and filter
-            // locally.
-            try
-            {
-                var list = new List<DriveItem>();
-                var page = await _graph.Drives[driveId].Items["root"].Children.GetAsync(rc =>
-                {
-                    rc.QueryParameters.Filter = $"createdDateTime ge {_cacheDate:yyyy-MM-ddTHH:mm:ssZ}";
-                });
-
-                list.AddRange(page.Value.Where(i => i.Folder != null));
-
-                while (page.OdataNextLink is string next)
-                {
-                    var req = new RequestInformation
-                    {
-                        HttpMethod = Method.GET,
-                        UrlTemplate = next,
-                        PathParameters = new Dictionary<string, object>()
-                    };
-                    page = await _graph.RequestAdapter.SendAsync(req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
-                    list.AddRange(page!.Value.Where(i => i.Folder != null));
-                }
-
-                return list;
-            }
-            catch
-            {
-                var all = await GetAllRootFoldersAsync(driveId, driveName);
-                return all.Where(i =>
-                        i.Folder != null &&
-                        i.CreatedDateTime.HasValue &&
-                        i.CreatedDateTime.Value.UtcDateTime >= _cacheDate)
-                       .ToList();
-            }
+            var todas = await GetAllFoldersRecursiveAsync(driveId, "root", 2);
+            return todas.Where(i =>
+                                   i.CreatedDateTime.HasValue &&
+                                   i.CreatedDateTime.Value.UtcDateTime >= _cacheDate)
+                         .ToList();
         }
 
         private void MergeFolders(IEnumerable<DriveItem> items, string driveName)
@@ -305,29 +266,12 @@ namespace ManutMap.Services
         private async Task<List<DriveItem>> GetAllRootFoldersAsync(string driveId,
                                                                    string driveName)
         {
-            if (driveName.Equals(DriveDatalog3, StringComparison.OrdinalIgnoreCase))
-                return await GetAllFoldersRecursiveAsync(driveId, "root", 2);
-
-            var lista = new List<DriveItem>();
-
-            var page = await _graph.Drives[driveId].Items["root"].Children.GetAsync();
-            lista.AddRange(page.Value.Where(i => i.Folder != null));
-
-            while (page.OdataNextLink is string next)
-            {
-                var req = new RequestInformation
-                {
-                    HttpMethod = Method.GET,
-                    UrlTemplate = next,
-                    PathParameters = new Dictionary<string, object>()
-                };
-
-                page = await _graph.RequestAdapter.SendAsync(
-                           req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
-
-                lista.AddRange(page!.Value.Where(i => i.Folder != null));
-            }
-            return lista;
+            // Utiliza busca recursiva para garantir que todas as pastas sejam
+            // visitadas independentemente da estrutura do drive. O 
+            // DataLogsAC já dependia dessa busca, mas os outros drives podem
+            // possuir subpastas organizadas por regional. Para evitar pastas
+            // faltantes, sempre percorremos duas camadas de pastas.
+            return await GetAllFoldersRecursiveAsync(driveId, "root", 2);
         }
 
         private async Task<List<DriveItem>> GetAllFoldersRecursiveAsync(string driveId,
