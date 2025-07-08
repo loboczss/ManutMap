@@ -111,7 +111,9 @@ namespace ManutMap.Helpers
         var prevDias = item.PREV_DIAS;
         var corrDias = item.CORR_DIAS;
 
-        var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
+        var osField = item.NUMOS_LIST || item.NUMOS;
+        var osLabel = item.NUMOS_LIST ? 'OSs' : 'OS';
+        var popup = '<b>'+osLabel+':</b> '+osField+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
@@ -182,7 +184,9 @@ namespace ManutMap.Helpers
         var prevDias = item.PREV_DIAS;
         var corrDias = item.CORR_DIAS;
 
-        var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
+        var osField = item.NUMOS_LIST || item.NUMOS;
+        var osLabel = item.NUMOS_LIST ? 'OSs' : 'OS';
+        var popup = '<b>'+osLabel+':</b> '+osField+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
@@ -251,7 +255,9 @@ namespace ManutMap.Helpers
         var prevDias = item.PREV_DIAS;
         var corrDias = item.CORR_DIAS;
 
-        var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
+        var osField = item.NUMOS_LIST || item.NUMOS;
+        var osLabel = item.NUMOS_LIST ? 'OSs' : 'OS';
+        var popup = '<b>'+osLabel+':</b> '+osField+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
@@ -320,7 +326,9 @@ namespace ManutMap.Helpers
         var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : "";
         var prevDias = item.PREV_DIAS;
         var corrDias = item.CORR_DIAS;
-        var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
+        var osField = item.NUMOS_LIST || item.NUMOS;
+        var osLabel = item.NUMOS_LIST ? 'OSs' : 'OS';
+        var popup = '<b>'+osLabel+':</b> '+osField+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> <span style="color:'+color+'">Aberto</span><br>'
@@ -412,7 +420,9 @@ namespace ManutMap.Helpers
         var prevProx = item.PREV_PROXIMA ? fmtDate(item.PREV_PROXIMA) : "";
         var prevDias = item.PREV_DIAS;
         var corrDias = item.CORR_DIAS;
-        var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
+        var osField = item.NUMOS_LIST || item.NUMOS;
+        var osLabel = item.NUMOS_LIST ? 'OSs' : 'OS';
+        var popup = '<b>'+osLabel+':</b> '+osField+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> Aberto<br>' : '<b>Status:</b> Concluído<br>')+
@@ -483,7 +493,9 @@ namespace ManutMap.Helpers
         var prevDias = item.PREV_DIAS;
         var corrDias = item.CORR_DIAS;
 
-        var popup = '<b>OS:</b> '+item.NUMOS+'<br>'+
+        var osField = item.NUMOS_LIST || item.NUMOS;
+        var osLabel = item.NUMOS_LIST ? 'OSs' : 'OS';
+        var popup = '<b>'+osLabel+':</b> '+osField+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
                     (isOpen?'<b>Status:</b> Aberto<br>' : '<b>Status:</b> Concluído<br>')+

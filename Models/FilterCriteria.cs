@@ -44,6 +44,9 @@ namespace ManutMap.Models
         // Novo: habilitar agrupamento de marcadores
         public bool UseClusters { get; set; } = true;
 
+        // Exibir apenas um marcador por cliente
+        public bool SingleClientMarker { get; set; }
+
         // Filtro de prazos
         public int PrazoDias { get; set; }
         public string TipoPrazo { get; set; } = "Todos";
