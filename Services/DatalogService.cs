@@ -97,12 +97,13 @@ namespace ManutMap.Services
         }
 
         private async Task<List<DriveItem>> GetNewRootFoldersAsync(string driveId,
-                                                                   string driveName)
+                                                                   string driveName,
+                                                                   IProgress<int>? folderProgress = null)
         {
             if (_cacheDate == DateTime.MinValue)
-                return await GetAllRootFoldersAsync(driveId, driveName);
+                return await GetAllRootFoldersAsync(driveId, driveName, folderProgress);
 
-            var todas = await GetAllFoldersRecursiveAsync(driveId, "root", 2);
+            var todas = await GetAllFoldersRecursiveAsync(driveId, "root", 2, folderProgress);
             return todas.Where(i =>
                                    i.CreatedDateTime.HasValue &&
                                    i.CreatedDateTime.Value.UtcDateTime >= _cacheDate)
@@ -138,7 +139,8 @@ namespace ManutMap.Services
             return (int)(completed * 100.0 / total);
         }
 
-        private async Task EnsureCacheUpdatedAsync(IProgress<(int Percent, string Message)>? progress = null)
+        private async Task EnsureCacheUpdatedAsync(IProgress<(int Percent, string Message)>? progress = null,
+                                                  IProgress<int>? folderProgress = null)
         {
             var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
             bool updated = false;
@@ -149,7 +151,7 @@ namespace ManutMap.Services
             {
                 progress?.Report((CalcPercent(completed, total), $"{driveName}: buscando"));
                 string driveId = await GetDriveId(site.Id, driveName);
-                var novos = await GetNewRootFoldersAsync(driveId, driveName);
+                var novos = await GetNewRootFoldersAsync(driveId, driveName, folderProgress);
                 return (driveName, novos);
             }).ToArray();
 
@@ -264,25 +266,33 @@ namespace ManutMap.Services
         }
 
         private async Task<List<DriveItem>> GetAllRootFoldersAsync(string driveId,
-                                                                   string driveName)
+                                                                   string driveName,
+                                                                   IProgress<int>? folderProgress = null)
         {
             // Utiliza busca recursiva para garantir que todas as pastas sejam
             // visitadas independentemente da estrutura do drive. O 
             // DataLogsAC já dependia dessa busca, mas os outros drives podem
             // possuir subpastas organizadas por regional. Para evitar pastas
             // faltantes, sempre percorremos duas camadas de pastas.
-            return await GetAllFoldersRecursiveAsync(driveId, "root", 2);
+            return await GetAllFoldersRecursiveAsync(driveId, "root", 2, folderProgress);
         }
 
         private async Task<List<DriveItem>> GetAllFoldersRecursiveAsync(string driveId,
                                                                        string itemId,
-                                                                       int depth)
+                                                                       int depth,
+                                                                       IProgress<int>? folderProgress = null)
         {
             var result = new List<DriveItem>();
             var page = await _graph.Drives[driveId].Items[itemId].Children.GetAsync();
-            result.AddRange(page.Value.Where(i => i.Folder != null && i.Name!.Contains("_")));
-            var folders = page.Value.Where(i => i.Folder != null && !i.Name!.Contains("_"))
-                                   .ToList();
+            var folders = new List<DriveItem>();
+            foreach (var i in page.Value.Where(i => i.Folder != null))
+            {
+                folderProgress?.Report(1);
+                if (i.Name!.Contains("_"))
+                    result.Add(i);
+                else
+                    folders.Add(i);
+            }
 
             while (page.OdataNextLink is string next)
             {
@@ -295,15 +305,21 @@ namespace ManutMap.Services
                 page = await _graph.RequestAdapter.SendAsync(
                            req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
 
-                result.AddRange(page!.Value.Where(i => i.Folder != null && i.Name!.Contains("_")));
-                folders.AddRange(page.Value.Where(i => i.Folder != null && !i.Name!.Contains("_")));
+                foreach (var i in page!.Value.Where(i => i.Folder != null))
+                {
+                    folderProgress?.Report(1);
+                    if (i.Name!.Contains("_"))
+                        result.Add(i);
+                    else
+                        folders.Add(i);
+                }
             }
 
             if (depth > 0)
             {
                 foreach (var f in folders)
                 {
-                    result.AddRange(await GetAllFoldersRecursiveAsync(driveId, f.Id!, depth - 1));
+                    result.AddRange(await GetAllFoldersRecursiveAsync(driveId, f.Id!, depth - 1, folderProgress));
                 }
             }
 
@@ -481,10 +497,11 @@ namespace ManutMap.Services
                     .ToList();
         }
 
-        public async Task<Dictionary<string, string>> GetAllDatalogFoldersAsync(IProgress<(int Percent, string Message)>? progress = null)
+        public async Task<Dictionary<string, string>> GetAllDatalogFoldersAsync(IProgress<(int Percent, string Message)>? progress = null,
+                                                                               IProgress<int>? folderProgress = null)
         {
             progress?.Report((0, "atualizando cache"));
-            await EnsureCacheUpdatedAsync(progress);
+            await EnsureCacheUpdatedAsync(progress, folderProgress);
             LoadCache();
             progress?.Report((100, "concluído"));
             return _folderCache!;

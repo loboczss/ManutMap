@@ -58,6 +58,7 @@ namespace ManutMap
         private readonly DispatcherTimer _debounceTimer;
         private readonly DispatcherTimer _updateTimer;
         private bool _sidebarVisible = true;
+        private int _foldersVisited = 0;
 
         public MainWindow()
         {
@@ -227,6 +228,8 @@ namespace ManutMap
             SyncProgressBar.Value = 0;
             SyncProgressBar.Visibility = Visibility.Visible;
             SyncProgressText.Visibility = Visibility.Visible;
+            FolderProgressText.Text = "0 pastas visitadas";
+            FolderProgressText.Visibility = Visibility.Visible;
         }
 
         private void UpdateProgress(int percent, string message)
@@ -241,6 +244,12 @@ namespace ManutMap
         {
             SyncProgressBar.Visibility = Visibility.Collapsed;
             SyncProgressText.Visibility = Visibility.Collapsed;
+            FolderProgressText.Visibility = Visibility.Collapsed;
+        }
+
+        private void UpdateFolderProgress(int count)
+        {
+            FolderProgressText.Text = $"{count} pastas visitadas";
         }
 
         private async Task SyncAndRefresh(IProgress<(int Percent, string Message)>? progress = null)
@@ -250,12 +259,21 @@ namespace ManutMap
             progress?.Report((10, "Baixando dados..."));
             _manutList = await _spService.DownloadLatestJsonAsync();
 
+            _foldersVisited = 0;
+            var folderProgress = new Progress<int>(n =>
+            {
+                _foldersVisited += n;
+                UpdateFolderProgress(_foldersVisited);
+            });
+
             var subProgress = new Progress<(int Percent, string Message)>(p =>
             {
                 int percent = 40 + p.Percent * 30 / 100;
                 progress?.Report((percent, $"Sincronizando datalog... {p.Message}"));
+                UpdateFolderProgress(_foldersVisited);
             });
-            _datalogMap = await _datalogService.GetAllDatalogFoldersAsync(subProgress);
+
+            _datalogMap = await _datalogService.GetAllDatalogFoldersAsync(subProgress, folderProgress);
             AnnotateDatalogInfo();
             AnnotatePrazoInfo();
             await AnnotateFuncionariosInfoAsync();
