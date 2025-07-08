@@ -886,7 +886,8 @@ namespace ManutMap
 
         private void FilterAlertGrid()
         {
-            if (_osAlertaDatalog == null) return;
+            if (_osAlertaDatalog == null || DatalogAlertGrid == null)
+                return;
 
             var text = AlertSearchBox?.Text?.Trim() ?? string.Empty;
             int field = AlertFieldCombo?.SelectedIndex ?? 0;
