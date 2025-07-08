@@ -111,8 +111,18 @@ namespace ManutMap.Helpers
         var prevDias = item.PREV_DIAS;
         var corrDias = item.CORR_DIAS;
 
-        var osField = item.NUMOS_LIST || item.NUMOS;
-        var osLabel = item.NUMOS_LIST ? 'OSs' : 'OS';
+        var allOs = item.ALL_OS || item.NUMOS_LIST || item.NUMOS;
+        var highlight = item.HIGHLIGHT_OS || '';
+        var osLabel = (item.ALL_OS || item.NUMOS_LIST) ? 'OSs' : 'OS';
+        var osField;
+        if(allOs && highlight){
+          var parts = allOs.split(/\s*,\s*/);
+          osField = parts.map(function(p){
+            return p === highlight ? '<b>'+p+'</b>' : p;
+          }).join(', ');
+        }else{
+          osField = allOs;
+        }
         var popup = '<b>'+osLabel+':</b> '+osField+'<br>'+
                     '<b>Cliente:</b> '+item.NOMECLIENTE+'<br>'+
                     '<b>Prev. abertas:</b> '+item.PREV_ABERTAS_CLIENTE+'<br>'+
