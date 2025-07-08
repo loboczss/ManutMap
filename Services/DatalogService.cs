@@ -112,6 +112,8 @@ namespace ManutMap.Services
         }
 
         private static readonly Regex OsDigitsRegex = new("(?i)[A-Z]{0,2}(\\d{5,})");
+        private static readonly Regex OsFullPrefixRegex = new("(?i)^([A-Z]{2}\\d{5,})");
+        private static readonly Regex OsFullSuffixRegex = new("(?i)^(\\d{5,})_([A-Z]{2})(?:_|$)");
 
         private static bool IsOsFolderName(string name)
         {
@@ -121,6 +123,19 @@ namespace ManutMap.Services
         private static void AddFolderKeys(IDictionary<string, string> dict, string name, string url)
         {
             dict[name] = url;
+
+            string? osKey = null;
+            var m = OsFullPrefixRegex.Match(name);
+            if (m.Success)
+                osKey = m.Groups[1].Value;
+            else
+            {
+                m = OsFullSuffixRegex.Match(name);
+                if (m.Success)
+                    osKey = m.Groups[2].Value + m.Groups[1].Value;
+            }
+            if (!string.IsNullOrEmpty(osKey))
+                dict.TryAdd(osKey, url);
 
             int idx = name.IndexOf('_');
             if (idx > 0)
@@ -132,10 +147,10 @@ namespace ManutMap.Services
                     dict.TryAdd(prefix.TrimEnd('_'), url);
             }
 
-            foreach (Match m in OsDigitsRegex.Matches(name))
+            foreach (Match m2 in OsDigitsRegex.Matches(name))
             {
-                dict.TryAdd(m.Value, url);
-                dict.TryAdd(m.Groups[1].Value, url);
+                dict.TryAdd(m2.Value, url);
+                dict.TryAdd(m2.Groups[1].Value, url);
             }
         }
 
