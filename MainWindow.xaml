@@ -438,12 +438,14 @@
                             <Expander Header="Visualização e Camadas" IsExpanded="True">
                                 <StackPanel>
                                     <CheckBox x:Name="ChbOpen" Content="Exibir OS Abertas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                    <CheckBox x:Name="ChbClosed" Content="Exibir OS Concluídas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged" Margin="0,5,0,0"/>
-                                    <CheckBox x:Name="ChbOnlyDatalog" Content="Apenas OS com Datalog" Checked="FiltersChanged" Unchecked="FiltersChanged" Margin="0,5,0,15"/>
+                                    <CheckBox x:Name="ChbClosed" Content="Exibir OS Concluídas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged" Margin="0,10,0,0"/>
+                                    <CheckBox x:Name="ChbOnlyDatalog" Content="Apenas OS com Datalog" Checked="FiltersChanged" Unchecked="FiltersChanged" Margin="0,10,0,0"/>
+                                    <CheckBox x:Name="ChbSingleClient" Content="Marcador único por cliente" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                    <CheckBox x:Name="ChbCluster" Content="Agrupar Marcadores" IsChecked="True" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
 
                                     <CheckBox x:Name="ChbColorPrev" Content="Colorir por Preventiva" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                    <CheckBox x:Name="ChbColorCorr" Content="Colorir por Corretiva" Margin="0,5,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                    <CheckBox x:Name="ChbColorServ" Content="Colorir por Serviços" Margin="0,5,0,15" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                    <CheckBox x:Name="ChbColorCorr" Content="Colorir por Corretiva" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                    <CheckBox x:Name="ChbColorServ" Content="Colorir por Serviços" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
 
                                     <Separator Margin="0,0,0,15"/>
 
@@ -533,11 +535,7 @@
                                         <ComboBoxItem Content="LATLON"/>
                                         <ComboBoxItem Content="LATLONCON"/>
                                     </ComboBox>
-                                    <CheckBox x:Name="ChbSingleClient" Content="Marcador único por cliente"
-                                              Margin="0,10,0,0"
-                                              Checked="FiltersChanged" Unchecked="FiltersChanged"/>
-                                    <CheckBox x:Name="ChbCluster" Content="Agrupar Marcadores" IsChecked="True"
-                                              Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                   
                                 </StackPanel>
                             </Expander>
                         </Border>
