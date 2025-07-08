@@ -227,7 +227,7 @@
                             <DataGridTemplateColumn Header="Mapa" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="Mapa" Click="MapaCorretiva_Click" Tag="{Binding IdSigfi}" Style="{StaticResource LinkButtonStyle}"/>
+                                        <Button Content="Mapa" Click="MapaCorretiva_Click" Tag="{Binding}" Style="{StaticResource LinkButtonStyle}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -246,7 +246,7 @@
                             <DataGridTemplateColumn Header="Mapa" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="Mapa" Click="MapaPreventiva_Click" Tag="{Binding IdSigfi}" Style="{StaticResource LinkButtonStyle}"/>
+                                        <Button Content="Mapa" Click="MapaPreventiva_Click" Tag="{Binding}" Style="{StaticResource LinkButtonStyle}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

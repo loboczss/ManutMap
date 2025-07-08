@@ -150,18 +150,18 @@ namespace ManutMap
 
         private void MapaCorretiva_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is string id && Owner is MainWindow mw)
+            if (sender is Button btn && btn.Tag is CorretivaInfo info && Owner is MainWindow mw)
             {
-                mw.ShowClientOnMap(id);
+                mw.ShowClientOnMap(info.IdSigfi, info.NumOS);
                 mw.Activate();
             }
         }
 
         private void MapaPreventiva_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is string id && Owner is MainWindow mw)
+            if (sender is Button btn && btn.Tag is PreventivaInfo info && Owner is MainWindow mw)
             {
-                mw.ShowClientOnMap(id);
+                mw.ShowClientOnMap(info.IdSigfi, info.NumOS);
                 mw.Activate();
             }
         }
