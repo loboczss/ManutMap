@@ -342,6 +342,7 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
                                     <StackPanel Grid.Row="1" Margin="0,0,0,10">
@@ -377,6 +378,18 @@
                                     <StackPanel Grid.Row="6" Margin="0,0,0,10">
                                         <TextBlock Text="Número da Preventiva" Style="{StaticResource LabelStyle}"/>
                                         <ComboBox x:Name="PrevCountRotaCombo" SelectionChanged="FiltersChanged" SelectedIndex="0">
+                                            <ComboBoxItem Content="Todas"/>
+                                            <ComboBoxItem Content="1"/>
+                                            <ComboBoxItem Content="2"/>
+                                            <ComboBoxItem Content="3"/>
+                                            <ComboBoxItem Content="4"/>
+                                            <ComboBoxItem Content="5"/>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="7" Margin="0,0,0,10">
+                                        <TextBlock Text="Preventiva Concluída" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="PrevClosedCountCombo" SelectionChanged="FiltersChanged" SelectedIndex="0">
                                             <ComboBoxItem Content="Todas"/>
                                             <ComboBoxItem Content="1"/>
                                             <ComboBoxItem Content="2"/>

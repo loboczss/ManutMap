@@ -156,6 +156,33 @@ namespace ManutMap.Services
                     .ToList();
             }
 
+            if (c.PreventivasConcluidasPorRota > 0)
+            {
+                filtered = filtered
+                    .Where(o =>
+                    {
+                        var tipo = (o["TIPO"]?.ToString() ?? string.Empty).Trim();
+                        if (!string.Equals(tipo, "PREVENTIVA", StringComparison.OrdinalIgnoreCase))
+                            return false;
+
+                        var dtCon = o["DTCONCLUSAO"]?.ToString();
+                        bool isClosed = !string.IsNullOrWhiteSpace(dtCon);
+                        if (!isClosed)
+                            return false;
+
+                        var tipoCausa = o["TIPOCAUSA"]?.ToString() ?? string.Empty;
+                        var m = Regex.Match(tipoCausa, @"(\d+)\s*A$", RegexOptions.IgnoreCase);
+                        if (!m.Success)
+                            return false;
+
+                        if (int.TryParse(m.Groups[1].Value, out var num))
+                            return num == c.PreventivasConcluidasPorRota;
+
+                        return false;
+                    })
+                    .ToList();
+            }
+
             if (c.SingleClientMarker)
             {
                 filtered = filtered
