@@ -798,6 +798,8 @@ namespace ManutMap
 
             DatalogAlertGrid.ItemsSource = null;
             DatalogAlertGrid.ItemsSource = _osAlertaDatalog;
+            RecentRouteChart.Tag = MaxRecentRouteCount;
+            RecentRouteChart.Items = _recentRouteStats;
 
             try
             {
