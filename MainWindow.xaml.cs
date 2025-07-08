@@ -138,6 +138,7 @@ namespace ManutMap
             PrazoDiasTextBox.TextChanged += FiltersChanged;
             PrazoDiasTextBox.PreviewTextInput += PrazoDiasTextBox_PreviewTextInput;
             TipoPrazoCombo.SelectionChanged += FiltersChanged;
+            PrevCountRotaCombo.SelectionChanged += FiltersChanged;
         }
 
         private void LoadLocalAndPopulate()
@@ -317,6 +318,7 @@ namespace ManutMap
                 IdSigfi = IdSigfiFilterBox.Text.Trim(),
                 Regional = (RegionalFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
                 Rota = (RotaFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
+                PreventivasPorRota = int.TryParse((PrevCountRotaCombo.SelectedItem as ComboBoxItem)?.Content.ToString(), out var pc) ? pc : 0,
                 StartDate = StartDatePicker.SelectedDate,
                 EndDate = EndDatePicker.SelectedDate,
                 ShowOpen = ChbOpen.IsChecked == true,
@@ -728,6 +730,7 @@ namespace ManutMap
 
             PrazoDiasTextBox.Text = string.Empty;
             TipoPrazoCombo.SelectedIndex = 0;
+            PrevCountRotaCombo.SelectedIndex = 0;
 
             ApplyFilters();
         }

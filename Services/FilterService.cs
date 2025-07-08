@@ -113,11 +113,29 @@ namespace ManutMap.Services
                 })
                 .ToList();
 
-            return filtered
+            filtered = filtered
                 .GroupBy(o => (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
                          StringComparer.OrdinalIgnoreCase)
                 .Select(g => g.First())
                 .ToList();
+
+            if (c.PreventivasPorRota > 0)
+            {
+                var counts = filtered
+                    .Where(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase))
+                    .GroupBy(o => (o["ROTA"]?.ToString() ?? string.Empty).Trim(), StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+
+                filtered = filtered
+                    .Where(o =>
+                    {
+                        var rota = (o["ROTA"]?.ToString() ?? string.Empty).Trim();
+                        return counts.TryGetValue(rota, out var cnt) && cnt == c.PreventivasPorRota;
+                    })
+                    .ToList();
+            }
+
+            return filtered;
         }
 
         private static bool CheckPrazo(int dias, FilterCriteria c)
