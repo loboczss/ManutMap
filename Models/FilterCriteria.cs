@@ -14,6 +14,9 @@ namespace ManutMap.Models
         // Quantidade de preventivas por rota (0 = todas)
         public int PreventivasPorRota { get; set; }
 
+        // Quantidade de preventivas concluídas por rota (0 = todas)
+        public int PreventivasConcluidasPorRota { get; set; }
+
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
