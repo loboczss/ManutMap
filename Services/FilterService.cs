@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ManutMap.Models;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace ManutMap.Services
 {
@@ -26,12 +27,6 @@ namespace ManutMap.Services
 
         public List<JObject> Apply(JArray source, FilterCriteria c)
         {
-            var prevCompleted = source.OfType<JObject>()
-                .Where(o => string.Equals(o["TIPO"]?.ToString()?.Trim(), "PREVENTIVA", StringComparison.OrdinalIgnoreCase))
-                .Where(o => !string.IsNullOrWhiteSpace(o["DTCONCLUSAO"]?.ToString()))
-                .GroupBy(GetClientId, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
-
             var filtered = source.OfType<JObject>()
                 .Where(item =>
                 {
@@ -148,9 +143,15 @@ namespace ManutMap.Services
                         if (!isOpen)
                             return false;
 
-                        string id = GetClientId(o);
-                        int done = prevCompleted.TryGetValue(id, out var cnt) ? cnt : 0;
-                        return done + 1 == c.PreventivasPorRota;
+                        var tipoCausa = o["TIPOCAUSA"]?.ToString() ?? string.Empty;
+                        var m = Regex.Match(tipoCausa, @"(\d+)\s*A$", RegexOptions.IgnoreCase);
+                        if (!m.Success)
+                            return false;
+
+                        if (int.TryParse(m.Groups[1].Value, out var num))
+                            return num == c.PreventivasPorRota;
+
+                        return false;
                     })
                     .ToList();
             }
