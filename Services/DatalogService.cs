@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ManutMap.Models;
 
@@ -110,6 +111,34 @@ namespace ManutMap.Services
                          .ToList();
         }
 
+        private static readonly Regex OsDigitsRegex = new("(?i)[A-Z]{0,2}(\\d{5,})");
+
+        private static bool IsOsFolderName(string name)
+        {
+            return name.Contains('_') || OsDigitsRegex.IsMatch(name);
+        }
+
+        private static void AddFolderKeys(IDictionary<string, string> dict, string name, string url)
+        {
+            dict[name] = url;
+
+            int idx = name.IndexOf('_');
+            if (idx > 0)
+            {
+                string prefix = name[..idx];
+                dict.TryAdd(prefix, url);
+
+                if (idx == name.Length - 1)
+                    dict.TryAdd(prefix.TrimEnd('_'), url);
+            }
+
+            foreach (Match m in OsDigitsRegex.Matches(name))
+            {
+                dict.TryAdd(m.Value, url);
+                dict.TryAdd(m.Groups[1].Value, url);
+            }
+        }
+
         private void MergeFolders(IEnumerable<DriveItem> items, string driveName)
         {
             LoadCache();
@@ -119,17 +148,7 @@ namespace ManutMap.Services
                 string url = it.WebUrl ??
                               $"https://{Domain}/sites/{SitePath}/{driveName}/{name}";
 
-                _folderCache![name] = url;
-
-                int idx = name.IndexOf('_');
-                if (idx > 0)
-                {
-                    string prefix = name[..idx];
-                    _folderCache.TryAdd(prefix, url);
-
-                    if (idx == name.Length - 1)
-                        _folderCache.TryAdd(prefix.TrimEnd('_'), url);
-                }
+                AddFolderKeys(_folderCache!, name, url);
             }
         }
 
@@ -288,7 +307,7 @@ namespace ManutMap.Services
             foreach (var i in page.Value.Where(i => i.Folder != null))
             {
                 folderProgress?.Report(1);
-                if (i.Name!.Contains("_"))
+                if (IsOsFolderName(i.Name!))
                     result.Add(i);
                 else
                     folders.Add(i);
@@ -308,7 +327,7 @@ namespace ManutMap.Services
                 foreach (var i in page!.Value.Where(i => i.Folder != null))
                 {
                     folderProgress?.Report(1);
-                    if (i.Name!.Contains("_"))
+                    if (IsOsFolderName(i.Name!))
                         result.Add(i);
                     else
                         folders.Add(i);
@@ -457,17 +476,7 @@ namespace ManutMap.Services
                 string url = it.WebUrl ??
                               $"https://{Domain}/sites/{SitePath}/{driveName}/{name}";
 
-                dict[name] = url;
-
-                int idx = name.IndexOf('_');
-                if (idx > 0)
-                {
-                    string prefix = name[..idx];
-                    dict.TryAdd(prefix, url);
-
-                    if (idx == name.Length - 1)
-                        dict.TryAdd(prefix.TrimEnd('_'), url);
-                }
+                AddFolderKeys(dict, name, url);
             }
             return dict;
         }
