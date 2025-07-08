@@ -21,6 +21,9 @@ namespace ManutMap.Services
             var filtered = source.OfType<JObject>()
                 .Where(item =>
                 {
+                    var status = (item["STATUS"]?.ToString() ?? string.Empty).Trim();
+                    if (status.Equals("CANCELADO", StringComparison.OrdinalIgnoreCase))
+                        return false;
                     if (c.Sigfi != "Todos")
                     {
                         var tipoSigfi = (item["TIPODESIGFI"]?.ToString() ?? "").Trim();
