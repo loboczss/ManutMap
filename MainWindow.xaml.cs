@@ -138,6 +138,7 @@ namespace ManutMap
             PrazoDiasTextBox.TextChanged += FiltersChanged;
             PrazoDiasTextBox.PreviewTextInput += PrazoDiasTextBox_PreviewTextInput;
             TipoPrazoCombo.SelectionChanged += FiltersChanged;
+            PrevCountCombo.SelectionChanged += FiltersChanged;
         }
 
         private void LoadLocalAndPopulate()
@@ -334,7 +335,8 @@ namespace ManutMap
                 OnlyDatalog = ChbOnlyDatalog.IsChecked == true,
                 UseClusters = ChbCluster.IsChecked != false,
                 PrazoDias = int.TryParse(PrazoDiasTextBox.Text, out var pd) ? pd : 0,
-                TipoPrazo = (TipoPrazoCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos"
+                TipoPrazo = (TipoPrazoCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
+                PrevPorRota = PrevCountCombo.SelectedIndex
             };
         }
 
@@ -728,6 +730,7 @@ namespace ManutMap
 
             PrazoDiasTextBox.Text = string.Empty;
             TipoPrazoCombo.SelectedIndex = 0;
+            PrevCountCombo.SelectedIndex = 0;
 
             ApplyFilters();
         }
