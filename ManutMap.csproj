@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows</TargetFramework>
-		<UseWPF>true</UseWPF>
-		<ApplicationIcon>ChatGPT-Image-3-de-jul.-de-2025_-09_07_24.ico</ApplicationIcon>
-	</PropertyGroup>
+        <PropertyGroup>
+                <OutputType>WinExe</OutputType>
+                <TargetFramework>net8.0-windows</TargetFramework>
+                <UseWPF>true</UseWPF>
+                <ApplicationIcon>ChatGPT-Image-3-de-jul.-de-2025_-09_07_24.ico</ApplicationIcon>
+                <Version>1.0.0</Version>
+        </PropertyGroup>
 
         <ItemGroup>
                 <Compile Include="Services/FileService.cs" />
