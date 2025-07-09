@@ -18,6 +18,8 @@ namespace ManutMap
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
 
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             var updateWindow = new UpdateWindow();
             updateWindow.ShowDialog();
 
@@ -26,6 +28,8 @@ namespace ManutMap
                 var mainWindow = new MainWindow();
                 MainWindow = mainWindow;
                 mainWindow.Show();
+
+                ShutdownMode = ShutdownMode.OnMainWindowClose;
             }
             else
             {
