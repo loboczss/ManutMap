@@ -895,8 +895,6 @@ namespace ManutMap
 
             _clientRouteStats = stats.clientRouteStats;
             MaxClientRouteCount = stats.maxClientRoute;
-            ClientesRotaChart.Tag = MaxClientRouteCount;
-            ClientesRotaChart.Items = _clientRouteStats;
 
             TipoServicoChart.Items = stats.tipoData;
 
