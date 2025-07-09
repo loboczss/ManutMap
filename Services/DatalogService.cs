@@ -33,6 +33,12 @@ namespace ManutMap.Services
             DriveDatalog3
         };
 
+        // Apenas a unidade DatalogGERAL armazena pastas de instalação.
+        // Utilizamos esse array específico para acelerar buscas por instalações.
+        private static readonly string[] DriveInstalacao =
+        {
+            DriveDatalog
+        };
         private const string DriveJson = "ArquivosJSON";
         private const string ListIdDatalog = "5b66bbc3-23d2-42d9-827a-e6b77765e8e0";
         private const string ListIdDatalogAC = "f5904f07-a47e-4955-8a9d-5807ef6e2179";
@@ -226,7 +232,7 @@ namespace ManutMap.Services
             if (tipoFiltro == 0)
             {
                 var dict = new Dictionary<string, (string Url, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
-                foreach (var driveName in DriveDatalogAll)
+                foreach (var driveName in DriveInstalacao)
                 {
                     string dataDrive = await GetDriveId(site.Id, driveName);
                     var inst = await GetPastasInstalacaoAsync(dataDrive, driveName, termo, regional);
