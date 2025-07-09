@@ -232,7 +232,7 @@ namespace ManutMap.Services
             if (tipoFiltro == 0)
             {
                 var dict = new Dictionary<string, (string Url, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
-                foreach (var driveName in DriveInstalacao)
+                foreach (var driveName in DriveDatalogAll)
                 {
                     string dataDrive = await GetDriveId(site.Id, driveName);
                     var inst = await GetPastasInstalacaoAsync(dataDrive, driveName, termo, regional);
