@@ -773,6 +773,15 @@ namespace ManutMap
             win.Show();
         }
 
+        private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new UpdateWindow
+            {
+                Owner = this
+            };
+            win.ShowDialog();
+        }
+
         private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (MainTabControl.SelectedIndex == 1 && _statsDirty)
