@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Text;
 using Newtonsoft.Json.Linq;
 
 namespace ManutMap.Services
@@ -76,6 +77,29 @@ namespace ManutMap.Services
             var data = await http.GetByteArrayAsync(url);
             await File.WriteAllBytesAsync(dest, data);
             return dest;
+        }
+
+        public string CreateUpdateBatch(string zipPath)
+        {
+            string batchPath = Path.Combine(Path.GetTempPath(), "ManutMapUpdate.bat");
+            string installDir = InstallDir.TrimEnd('\n', '\r', '\\');
+
+            var sb = new StringBuilder();
+            sb.AppendLine("@echo off");
+            sb.AppendLine("set ZIP=\"" + zipPath + "\"");
+            sb.AppendLine("set INSTALL=\"" + installDir + "\"");
+            sb.AppendLine("set TEMP_DIR=%TEMP%\\ManutMapUpdate");
+            sb.AppendLine("if exist \"%TEMP_DIR%\" rmdir /s /q \"%TEMP_DIR%\"");
+            sb.AppendLine("mkdir \"%TEMP_DIR%\"");
+            sb.AppendLine("powershell -NoLogo -NoProfile -Command \"Expand-Archive -Path '%ZIP%' -DestinationPath '%TEMP_DIR%' -Force\"");
+            sb.AppendLine("xcopy \"%TEMP_DIR%\\*\" \"%INSTALL%\\\" /E /Y");
+            sb.AppendLine("set DESKTOP=%USERPROFILE%\\Desktop");
+            sb.AppendLine("powershell -NoLogo -NoProfile -Command \"$s=(New-Object -ComObject WScript.Shell).CreateShortcut('%DESKTOP%\\ManutMap.lnk');$s.TargetPath='%INSTALL%\\ManutMap.exe';$s.Save()\"");
+            sb.AppendLine("rmdir /s /q \"%TEMP_DIR%\"");
+            sb.AppendLine("start \"\" \"%INSTALL%\\ManutMap.exe\"");
+
+            File.WriteAllText(batchPath, sb.ToString(), Encoding.UTF8);
+            return batchPath;
         }
     }
 }

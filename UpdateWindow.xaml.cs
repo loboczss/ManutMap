@@ -54,8 +54,9 @@ namespace ManutMap
                 var file = await _service.DownloadLatestReleaseAsync();
                 if (file != null)
                 {
-                    StatusText.Text = "Executando instalador...";
-                    Process.Start(new ProcessStartInfo(file)
+                    StatusText.Text = "Preparando instalador...";
+                    var batch = _service.CreateUpdateBatch(file);
+                    Process.Start(new ProcessStartInfo(batch)
                     {
                         UseShellExecute = true
                     });
