@@ -33,9 +33,6 @@ namespace ManutMap.Services
             DriveDatalog3
         };
 
-        // Apenas a unidade DatalogGERAL armazena pastas de instalação.
-        // Utilizamos esse array específico para acelerar buscas por instalações.
-
         private const string DriveJson = "ArquivosJSON";
         private const string ListIdDatalog = "5b66bbc3-23d2-42d9-827a-e6b77765e8e0";
         private const string ListIdDatalogAC = "f5904f07-a47e-4955-8a9d-5807ef6e2179";
