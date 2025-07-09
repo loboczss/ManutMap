@@ -17,6 +17,20 @@ namespace ManutMap
             var culture = new CultureInfo("pt-BR");
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
+
+            var updateWindow = new UpdateWindow();
+            updateWindow.ShowDialog();
+
+            if (!updateWindow.UpdateInitiated)
+            {
+                var mainWindow = new MainWindow();
+                MainWindow = mainWindow;
+                mainWindow.Show();
+            }
+            else
+            {
+                Shutdown();
+            }
         }
     }
 
