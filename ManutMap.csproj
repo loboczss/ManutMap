@@ -13,6 +13,7 @@
                 <Compile Include="Services/MapService.cs" />
                 <Compile Include="Services/JsonFileConstants.cs" />
                 <Compile Include="Services/SharePointService.cs" />
+				<Compile Include="Services/AtualizadorService.cs" />
         </ItemGroup>
 
 	<ItemGroup>
