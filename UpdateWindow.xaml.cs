@@ -8,6 +8,7 @@ namespace ManutMap
     public partial class UpdateWindow : Window
     {
         private readonly AtualizadorService _service = new();
+        public bool UpdateInitiated { get; private set; }
 
         public UpdateWindow()
         {
@@ -40,6 +41,7 @@ namespace ManutMap
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateInitiated = false;
             Close();
         }
 
@@ -57,6 +59,7 @@ namespace ManutMap
                     {
                         UseShellExecute = true
                     });
+                    UpdateInitiated = true;
                     Close();
                 }
                 else
