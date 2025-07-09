@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace ManutMap.Services
@@ -47,6 +48,24 @@ namespace ManutMap.Services
             }
 
             return (localVer, remoteVer);
+        }
+
+        public async Task<string?> DownloadLatestReleaseAsync()
+        {
+            using var http = new HttpClient();
+            http.DefaultRequestHeaders.Add("User-Agent", "ManutMap");
+            var json = await http.GetStringAsync(ApiUrl);
+            var obj = JObject.Parse(json);
+            var asset = ((JArray?)obj["assets"])?.FirstOrDefault();
+            var url = (string?)asset?["browser_download_url"];
+            if (string.IsNullOrWhiteSpace(url))
+                return null;
+
+            var fileName = (string?)asset?["name"] ?? Path.GetFileName(url);
+            string dest = Path.Combine(Path.GetTempPath(), fileName);
+            var data = await http.GetByteArrayAsync(url);
+            await File.WriteAllBytesAsync(dest, data);
+            return dest;
         }
     }
 }
