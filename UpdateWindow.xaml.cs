@@ -43,13 +43,34 @@ namespace ManutMap
             Close();
         }
 
-        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        private async void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(new ProcessStartInfo("https://github.com/loboczss/ManutMap/releases/latest")
+            UpdateButton.IsEnabled = false;
+            StatusText.Text = "Baixando atualização...";
+            try
             {
-                UseShellExecute = true
-            });
-            Close();
+                var file = await _service.DownloadLatestReleaseAsync();
+                if (file != null)
+                {
+                    StatusText.Text = "Executando instalador...";
+                    Process.Start(new ProcessStartInfo(file)
+                    {
+                        UseShellExecute = true
+                    });
+                    Close();
+                }
+                else
+                {
+                    StatusText.Text = "Arquivo de atualização não encontrado.";
+                    UpdateButton.IsEnabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                StatusText.Text = "Falha ao baixar atualização.";
+                UpdateButton.IsEnabled = true;
+            }
         }
     }
 }
