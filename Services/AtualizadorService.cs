@@ -17,19 +17,26 @@ namespace ManutMap.Services
         public async Task<(Version LocalVersion, Version RemoteVersion)> GetVersionsAsync()
         {
             Version localVer = new Version(0, 0, 0, 0);
-            var dllPath = Path.Combine(InstallDir, "ManutMap.dll");
-            var exePath = Path.Combine(InstallDir, "ManutMap.exe");
-            string asmPath = File.Exists(dllPath) ? dllPath : exePath;
-
-            if (File.Exists(asmPath))
+            try
             {
-                try
+                localVer = Assembly.GetExecutingAssembly().GetName().Version ?? localVer;
+            }
+            catch
+            {
+                // fallback to file lookup in caso de erro inesperado
+                var dllPath = Path.Combine(InstallDir, "ManutMap.dll");
+                var exePath = Path.Combine(InstallDir, "ManutMap.exe");
+                string asmPath = File.Exists(dllPath) ? dllPath : exePath;
+                if (File.Exists(asmPath))
                 {
-                    localVer = AssemblyName.GetAssemblyName(asmPath).Version;
-                }
-                catch (BadImageFormatException)
-                {
-                    // Executável não possui metadados. Mantém versão padrão.
+                    try
+                    {
+                        localVer = AssemblyName.GetAssemblyName(asmPath).Version;
+                    }
+                    catch (BadImageFormatException)
+                    {
+                        // Executável não possui metadados. Mantém versão padrão.
+                    }
                 }
             }
 
@@ -40,7 +47,10 @@ namespace ManutMap.Services
                 http.DefaultRequestHeaders.Add("User-Agent", "ManutMap");
                 var json = await http.GetStringAsync(ApiUrl);
                 var obj = JObject.Parse(json);
-                remoteVer = new Version(((string)obj["tag_name"]).TrimStart('v'));
+                var tag = ((string?)obj["tag_name"] ?? string.Empty).Trim();
+                tag = new string(tag.TrimStart('v').TakeWhile(c => char.IsDigit(c) || c == '.').ToArray());
+                if (Version.TryParse(tag, out var parsed))
+                    remoteVer = parsed;
             }
             catch
             {
