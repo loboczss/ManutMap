@@ -899,13 +899,9 @@ namespace ManutMap
 
             _routeStats = stats.routeStats;
             MaxRouteCount = stats.maxRoute;
-            RouteChart.Tag = MaxRouteCount;
-            RouteChart.Items = _routeStats;
 
             _clientRouteStats = stats.clientRouteStats;
             MaxClientRouteCount = stats.maxClientRoute;
-
-            TipoServicoChart.Items = stats.tipoData;
 
             if (DatalogAlertGrid != null)
             {

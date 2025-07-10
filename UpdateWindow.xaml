@@ -72,7 +72,7 @@
                     Style="{StaticResource ModernButton}"
                     Visibility="Collapsed"
                     Click="UpdateButton_Click"/>
-            <Button Content="Não Atualizar"
+            <Button Content="Fechar"
                     Style="{StaticResource RedButton}"
                     Margin="0,10,0,0"
                     Click="CancelButton_Click"/>

@@ -5,8 +5,8 @@
                 <UseWPF>true</UseWPF>
                 <ApplicationIcon>ChatGPT-Image-3-de-jul.-de-2025_-09_07_24.ico</ApplicationIcon>
                 <Version>1.0.0.1</Version>
-                <AssemblyVersion>1.0.0.0</AssemblyVersion>
-                <FileVersion>1.0.0.0</FileVersion>
+                <AssemblyVersion>1.0.0.1</AssemblyVersion>
+                <FileVersion>1.0.0.1</FileVersion>
         </PropertyGroup>
 
         <ItemGroup>

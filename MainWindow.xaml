@@ -273,6 +273,50 @@
                                 </Setter.Value>
                             </Setter>
                         </Style>
+
+                        <Style x:Key="ActionButtonStyleClean" TargetType="Button">
+                            <Setter Property="Background" Value="#ff0000" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="FontSize" Value="14" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="Padding" Value="15,12" />
+                            <Setter Property="MinHeight" Value="42" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border"
+                                                Background="{TemplateBinding Background}"
+                                                CornerRadius="8"
+                                                Padding="{TemplateBinding Padding}">
+                                            <Border.Effect>
+                                                <DropShadowEffect ShadowDepth="2" BlurRadius="5" Opacity="0.3" Color="Black"/>
+                                            </Border.Effect>
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#ec5353" />
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#ff2401" />
+                                                <Setter TargetName="border" Property="Effect">
+                                                    <Setter.Value>
+                                                        <DropShadowEffect ShadowDepth="1" BlurRadius="3" Opacity="0.2" Color="Black"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter TargetName="border" Property="Background" Value="#BDBDBD" />
+                                                <Setter TargetName="border" Property="Effect" Value="{x:Null}" />
+                                                <Setter Property="Foreground" Value="#757575"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
                     </Grid.Resources>
 
                     <Grid.ColumnDefinitions>
@@ -301,7 +345,7 @@
                         </StackPanel>
                     </Button>
 
-                    <Button Grid.Row="1" Grid.Column="0" x:Name="ClearFiltersButton" Style="{StaticResource ActionButtonStyle}" Margin="5" Click="ClearFiltersButton_Click">
+                    <Button Grid.Row="1" Grid.Column="0" x:Name="ClearFiltersButton" Style="{StaticResource ActionButtonStyleClean}" Margin="5" Click="ClearFiltersButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" VerticalAlignment="Center" Margin="0,0,8,0"/>
                             <TextBlock Text="Limpar Filtros" VerticalAlignment="Center"/>
@@ -315,24 +359,17 @@
                         </StackPanel>
                     </Button>
 
-                    <Button Grid.Row="2" Grid.ColumnSpan="2" x:Name="SearchEmployeeButton" Style="{StaticResource ActionButtonStyle}" Margin="5" Click="SearchEmployeeButton_Click">
+                    <Button Grid.Row="2" Grid.Column="1" x:Name="SearchEmployeeButton" Style="{StaticResource ActionButtonStyle}" Margin="5" Click="SearchEmployeeButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE721;" VerticalAlignment="Center" Margin="0,0,8,0"/>
                             <TextBlock Text="Buscar Funcionário" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Grid.Row="3" Grid.ColumnSpan="2" x:Name="PrazoButton" Style="{StaticResource ActionButtonStyle}" Margin="5" Click="PrazoButton_Click">
+                    <Button Grid.Row="2" Grid.Column="0" x:Name="PrazoButton" Style="{StaticResource ActionButtonStyle}" Margin="5" Click="PrazoButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE823;" VerticalAlignment="Center" Margin="0,0,8,0"/>
                             <TextBlock Text="Painel de Prazos" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button Grid.Row="4" Grid.ColumnSpan="2" x:Name="CheckUpdateButton" Style="{StaticResource ActionButtonStyle}" Margin="5" Click="CheckUpdateButton_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE895;" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock Text="Procurar Atualização" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </Grid>
@@ -625,22 +662,6 @@
                     <StackPanel Margin="15" x:Name="StatsPanel">
                         <TextBlock x:Name="DatalogSummaryText" FontWeight="Bold" FontSize="14" Margin="0,0,0,15"/>
 
-                        <Border Style="{StaticResource StatsCard}">
-                            <StackPanel>
-                                <TextBlock Text="Coletas de Datalog por Rota" FontWeight="Bold" FontSize="16" Margin="0,0,0,4"/>
-                                <TextBlock Text="Mostra a quantidade de coletas em cada rota." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
-                                <controls:LineChartControl x:Name="RouteChart" Height="200" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource StatsCard}">
-                            <StackPanel>
-                                <TextBlock Text="Datalog por Tipo de Serviço" FontWeight="Bold" FontSize="16" Margin="0,0,0,4"/>
-                                <TextBlock Text="Compara ordens preventivas e corretivas com coletas de datalog." TextWrapping="Wrap" Foreground="{StaticResource Text.Secondary}" FontSize="12" Margin="0,0,0,10"/>
-                                <controls:HorizontalBarChartControl x:Name="TipoServicoChart" />
-                            </StackPanel>
-                        </Border>
-                        
                         <Border Style="{StaticResource StatsCard}">
                     <StackPanel>
                         <TextBlock FontWeight="Bold" FontSize="16" Margin="0,0,0,4"
