@@ -11,7 +11,7 @@ namespace ManutMap
     /// </summary>
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
             var culture = new CultureInfo("pt-BR");
@@ -19,20 +19,34 @@ namespace ManutMap
             Thread.CurrentThread.CurrentUICulture = culture;
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-            var updateWindow = new UpdateWindow();
-            updateWindow.ShowDialog();
+            bool showUpdate = false;
+            try
+            {
+                var svc = new Services.AtualizadorService();
+                var (localVer, remoteVer) = await svc.GetVersionsAsync();
+                showUpdate = remoteVer > localVer;
+            }
+            catch
+            {
+                // Falha ao verificar; assume sem atualização
+            }
 
-            if (!updateWindow.UpdateInitiated)
+            if (showUpdate)
             {
-                var mainWindow = new MainWindow();
-                MainWindow = mainWindow;
-                mainWindow.Show();
-                ShutdownMode = ShutdownMode.OnMainWindowClose;
+                var updateWindow = new UpdateWindow();
+                updateWindow.ShowDialog();
+
+                if (updateWindow.UpdateInitiated)
+                {
+                    Shutdown();
+                    return;
+                }
             }
-            else
-            {
-                Shutdown();
-            }
+
+            var mainWindow = new MainWindow();
+            MainWindow = mainWindow;
+            mainWindow.Show();
+            ShutdownMode = ShutdownMode.OnMainWindowClose;
         }
     }
 
