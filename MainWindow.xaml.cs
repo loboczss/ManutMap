@@ -144,6 +144,8 @@ namespace ManutMap
             TipoPrazoCombo.SelectionChanged += FiltersChanged;
             PrevCountRotaCombo.SelectionChanged += FiltersChanged;
             PrevClosedCountCombo.SelectionChanged += FiltersChanged;
+            FuncFieldCombo.SelectionChanged += FiltersChanged;
+            FuncSearchBox.TextChanged += FiltersChanged;
         }
 
         private void LoadLocalAndPopulate()
@@ -343,7 +345,10 @@ namespace ManutMap
                 UseClusters = ChbCluster.IsChecked != false,
                 SingleClientMarker = ChbSingleClient.IsChecked == true,
                 PrazoDias = int.TryParse(PrazoDiasTextBox.Text, out var pd) ? pd : 0,
-                TipoPrazo = (TipoPrazoCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos"
+                TipoPrazo = (TipoPrazoCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
+                FuncionarioTermo = FuncSearchBox.Text.Trim(),
+                FuncionarioCampo = FuncFieldCombo.SelectedIndex,
+                FuncionarioMap = _funcMap
             };
         }
 
@@ -738,6 +743,9 @@ namespace ManutMap
             TipoPrazoCombo.SelectedIndex = 0;
             PrevCountRotaCombo.SelectedIndex = 0;
             PrevClosedCountCombo.SelectedIndex = 0;
+
+            FuncSearchBox.Text = string.Empty;
+            FuncFieldCombo.SelectedIndex = 0;
 
             ApplyFilters();
         }
