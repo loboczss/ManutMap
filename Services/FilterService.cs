@@ -69,6 +69,47 @@ namespace ManutMap.Services
                             return false;
                     }
 
+                    if (!string.IsNullOrEmpty(c.FuncionarioTermo))
+                    {
+                        var desc = item["DESCADICIONALEXEC"]?.ToString() ?? string.Empty;
+                        if (c.FuncionarioCampo == 0)
+                        {
+                            bool ok = false;
+                            foreach (Match m in Regex.Matches(desc, "#(\\d+)"))
+                            {
+                                var mat = m.Groups[1].Value.TrimStart('0');
+                                if (mat.IndexOf(c.FuncionarioTermo.TrimStart('0'), StringComparison.OrdinalIgnoreCase) >= 0)
+                                {
+                                    ok = true;
+                                    break;
+                                }
+                            }
+                            if (!ok) return false;
+                        }
+                        else
+                        {
+                            bool ok = false;
+                            foreach (Match m in Regex.Matches(desc, "#(\\d+)"))
+                            {
+                                var mat = m.Groups[1].Value.TrimStart('0');
+                                if (c.FuncionarioMap != null && c.FuncionarioMap.TryGetValue(mat, out var nome))
+                                {
+                                    if (nome.IndexOf(c.FuncionarioTermo, StringComparison.OrdinalIgnoreCase) >= 0)
+                                    {
+                                        ok = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!ok)
+                            {
+                                var nomes = item["FUNCIONARIOS"]?.ToString() ?? string.Empty;
+                                if (nomes.IndexOf(c.FuncionarioTermo, StringComparison.OrdinalIgnoreCase) < 0)
+                                    return false;
+                            }
+                        }
+                    }
+
                     if (c.OnlyDatalog)
                     {
                         var tem = item["TEMDATALOG"]?.ToObject<bool>() ?? false;

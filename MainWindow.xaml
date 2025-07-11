@@ -388,6 +388,7 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
                                     <StackPanel Grid.Row="1" Margin="0,0,0,10">
@@ -442,6 +443,17 @@
                                             <ComboBoxItem Content="4"/>
                                             <ComboBoxItem Content="5"/>
                                         </ComboBox>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="8" Margin="0,0,0,10">
+                                        <TextBlock Text="Funcionário" Style="{StaticResource LabelStyle}"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <ComboBox x:Name="FuncFieldCombo" Width="100" SelectionChanged="FiltersChanged" SelectedIndex="0" Margin="0,0,5,0">
+                                                <ComboBoxItem>Matricula</ComboBoxItem>
+                                                <ComboBoxItem>Nome</ComboBoxItem>
+                                            </ComboBox>
+                                            <TextBox x:Name="FuncSearchBox" Width="120" TextChanged="FiltersChanged"/>
+                                        </StackPanel>
                                     </StackPanel>
 
                                 </Grid>

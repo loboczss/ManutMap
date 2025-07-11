@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 
 namespace ManutMap.Models
 {
@@ -53,6 +54,13 @@ namespace ManutMap.Models
         // Filtro de prazos
         public int PrazoDias { get; set; }
         public string TipoPrazo { get; set; } = "Todos";
+
+        // Busca por funcionário
+        public string FuncionarioTermo { get; set; } = string.Empty;
+        // 0 = Matrícula, 1 = Nome
+        public int FuncionarioCampo { get; set; }
+
+        // Mapeamento matrícula -> nome
+        public Dictionary<string, string>? FuncionarioMap { get; set; }
     }
 }
-
