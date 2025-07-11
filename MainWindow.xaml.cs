@@ -560,19 +560,27 @@ namespace ManutMap
                 {
                     var proxima = dtCon.AddMonths(6);
                     int dias = (int)Math.Ceiling((proxima.Date - DateTime.Today).TotalDays);
-                    obj["PREV_ULTIMA"] = dtCon.ToString("yyyy-MM-dd");
-                    obj["PREV_PROXIMA"] = proxima.ToString("yyyy-MM-dd");
-                    obj["PREV_DIAS"] = dias;
-                    obj["ROTA_LAST"] = obj["ROTA"]?.ToString() ?? string.Empty;
+
+                    if (dias >= -60)
+                    {
+                        obj["PREV_ULTIMA"] = dtCon.ToString("yyyy-MM-dd");
+                        obj["PREV_PROXIMA"] = proxima.ToString("yyyy-MM-dd");
+                        obj["PREV_DIAS"] = dias;
+                        obj["ROTA_LAST"] = obj["ROTA"]?.ToString() ?? string.Empty;
+                    }
                 }
                 else if (prevDict.TryGetValue(id, out var info))
                 {
                     var proxima = info.dt.AddMonths(6);
                     int dias = (int)Math.Ceiling((proxima.Date - DateTime.Today).TotalDays);
-                    obj["PREV_ULTIMA"] = info.dt.ToString("yyyy-MM-dd");
-                    obj["PREV_PROXIMA"] = proxima.ToString("yyyy-MM-dd");
-                    obj["PREV_DIAS"] = dias;
-                    obj["ROTA_LAST"] = info.rota;
+
+                    if (dias >= -60)
+                    {
+                        obj["PREV_ULTIMA"] = info.dt.ToString("yyyy-MM-dd");
+                        obj["PREV_PROXIMA"] = proxima.ToString("yyyy-MM-dd");
+                        obj["PREV_DIAS"] = dias;
+                        obj["ROTA_LAST"] = info.rota;
+                    }
                 }
 
                 if (corrDict.TryGetValue(id, out var cdias))

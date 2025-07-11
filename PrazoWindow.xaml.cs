@@ -114,6 +114,10 @@ namespace ManutMap
             {
                 var proxima = kv.Value.dt.AddMonths(6);
                 int dias = (int)Math.Ceiling((proxima.Date - DateTime.Today).TotalDays);
+
+                // Ignore clients more than 60 days overdue
+                if (dias < -60) continue;
+
                 list.Add(new PreventivaInfo
                 {
                     NumOS = kv.Value.numOs,
