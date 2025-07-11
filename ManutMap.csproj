@@ -3,6 +3,7 @@
                 <OutputType>WinExe</OutputType>
                 <TargetFramework>net8.0-windows</TargetFramework>
                 <UseWPF>true</UseWPF>
+                <PublishTrimmed>false</PublishTrimmed>
                 <ApplicationIcon>ChatGPT-Image-3-de-jul.-de-2025_-09_07_24.ico</ApplicationIcon>
                 <Version>1.0.0.1</Version>
                 <AssemblyVersion>1.0.0.1</AssemblyVersion>
