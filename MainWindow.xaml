@@ -470,7 +470,7 @@
                         </Border>
 
                         <Border Style="{StaticResource Card}">
-                            <Expander Header="Prazos" IsExpanded="True">
+                            <Expander Header="Prazos" IsExpanded="False">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>

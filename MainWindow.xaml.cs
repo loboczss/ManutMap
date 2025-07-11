@@ -514,6 +514,7 @@ namespace ManutMap
 
             foreach (var obj in _manutList.OfType<JObject>())
             {
+                string tipo = obj["TIPO"]?.ToString()?.Trim() ?? string.Empty;
                 string id = obj["IDSIGFI"]?.ToString()?.Trim();
                 if (string.IsNullOrEmpty(id))
                     id = obj["NOMECLIENTE"]?.ToString()?.Trim() ?? string.Empty;

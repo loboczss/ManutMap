@@ -2,6 +2,22 @@
         <PropertyGroup>
                 <OutputType>WinExe</OutputType>
                 <TargetFramework>net8.0-windows</TargetFramework>
+				<!-- Indica o runtime que queremos embutir -->
+				<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+
+				<!-- Publica tudo num único arquivo -->
+				<PublishSingleFile>true</PublishSingleFile>
+
+				<!-- Self-contained = inclui o runtime .NET -->
+				<SelfContained>true</SelfContained>
+
+				<!-- Opcional: trim para reduzir o tamanho -->
+				<PublishTrimmed>true</PublishTrimmed>
+
+				<!-- Opcional: pré-compilar for R2R para desempenho melhor -->
+				<PublishReadyToRun>true</PublishReadyToRun>
+
+				<UseAppHost>true</UseAppHost>
                 <UseWPF>true</UseWPF>
                 <ApplicationIcon>ChatGPT-Image-3-de-jul.-de-2025_-09_07_24.ico</ApplicationIcon>
                 <Version>1.0.0.1</Version>
