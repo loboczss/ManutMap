@@ -40,6 +40,7 @@ namespace ManutMap.Services
             DriveDatalog
         };
         private const string DriveJson = "ArquivosJSON";
+        private const string InstalacaoJsonName = "Instalacao_AC.json";
         private const string ListIdDatalog = "5b66bbc3-23d2-42d9-827a-e6b77765e8e0";
         private const string ListIdDatalogAC = "f5904f07-a47e-4955-8a9d-5807ef6e2179";
 
@@ -240,15 +241,24 @@ namespace ManutMap.Services
                         dict[item.Name] = (item.Url, item.Date);
                 }
 
+                string jsonDriveIdInst = await GetDriveId(site.Id, DriveJson);
+                var rotaMap = await GetInstalacaoRotaMapAsync(jsonDriveIdInst);
+
                 return dict.OrderBy(k => k.Key)
-                           .Select(kvp => new OsInfo
+                           .Select(kvp =>
                            {
-                               NumOS = kvp.Key,
-                               IdSigfi = kvp.Key,
-                               Rota = "-",
-                               Data = kvp.Value.Date,
-                               TemDatalog = true,
-                               FolderUrl = kvp.Value.Url
+                               string id = kvp.Key.Split('_')[0];
+                               rotaMap.TryGetValue(id, out var rota);
+                               if (string.IsNullOrWhiteSpace(rota)) rota = "-";
+                               return new OsInfo
+                               {
+                                   NumOS = kvp.Key,
+                                   IdSigfi = kvp.Key,
+                                   Rota = rota,
+                                   Data = kvp.Value.Date,
+                                   TemDatalog = true,
+                                   FolderUrl = kvp.Value.Url
+                               };
                            })
                            .ToList();
             }
@@ -526,6 +536,31 @@ namespace ManutMap.Services
                         (i.LastModifiedDateTime ?? i.CreatedDateTime ?? DateTimeOffset.MinValue)
                             .UtcDateTime))
                     .ToList();
+        }
+
+        private async Task<Dictionary<string, string>> GetInstalacaoRotaMapAsync(string driveId)
+        {
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                using var st = await _graph.Drives[driveId].Root.ItemWithPath(InstalacaoJsonName).Content.GetAsync();
+                using var sr = new StreamReader(st, Encoding.UTF8);
+                var root = JToken.Parse(await sr.ReadToEndAsync());
+
+                foreach (var obj in root.DescendantsAndSelf().OfType<JObject>())
+                {
+                    string id = obj.Value<string>("IDSERVICOSCONJ")?.Trim() ?? string.Empty;
+                    string rota = obj.Value<string>("ROTA")?.Trim() ?? string.Empty;
+                    if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(rota) && !dict.ContainsKey(id))
+                        dict[id] = rota;
+                }
+            }
+            catch
+            {
+                // Ignored - return empty map on failure
+            }
+
+            return dict;
         }
 
         public async Task<Dictionary<string, string>> GetAllDatalogFoldersAsync(IProgress<(int Percent, string Message)>? progress = null,
