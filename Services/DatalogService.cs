@@ -140,12 +140,7 @@ namespace ManutMap.Services
         {
             bool isInst = IsInstalacaoFolder(name);
 
-            // Always register the full folder name
             dict[name] = url;
-
-            // Only map OS identifiers when the folder represents an installation
-            if (!isInst)
-                return;
 
             string? osKey = null;
             var m = OsFullPrefixRegex.Match(name);
@@ -158,25 +153,44 @@ namespace ManutMap.Services
                     osKey = m.Groups[2].Value + m.Groups[1].Value;
             }
             if (!string.IsNullOrEmpty(osKey))
-                dict[osKey] = url;
+            {
+                if (isInst)
+                    dict[osKey] = url;
+                else
+                    dict.TryAdd(osKey, url);
+            }
 
             int idx = name.IndexOf('_');
             if (idx > 0)
             {
                 string prefix = name[..idx];
-                dict[prefix] = url;
+                if (isInst)
+                    dict[prefix] = url;
+                else
+                    dict.TryAdd(prefix, url);
 
                 if (idx == name.Length - 1)
                 {
                     string trimmed = prefix.TrimEnd('_');
-                    dict[trimmed] = url;
+                    if (isInst)
+                        dict[trimmed] = url;
+                    else
+                        dict.TryAdd(trimmed, url);
                 }
             }
 
             foreach (Match m2 in OsDigitsRegex.Matches(name))
             {
-                dict[m2.Value] = url;
-                dict[m2.Groups[1].Value] = url;
+                if (isInst)
+                {
+                    dict[m2.Value] = url;
+                    dict[m2.Groups[1].Value] = url;
+                }
+                else
+                {
+                    dict.TryAdd(m2.Value, url);
+                    dict.TryAdd(m2.Groups[1].Value, url);
+                }
             }
         }
 
