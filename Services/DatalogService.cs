@@ -39,6 +39,13 @@ namespace ManutMap.Services
         {
             DriveDatalog
         };
+
+        private static readonly string[] DatalogFileSuffixes =
+        {
+            "_CON.csv",
+            "_CON.xls",
+            "_CON.xlsx"
+        };
         private const string DriveJson = "ArquivosJSON";
         private const string InstalacaoJsonName = "Instalacao_AC.json";
         private const string ListIdDatalog = "5b66bbc3-23d2-42d9-827a-e6b77765e8e0";
@@ -310,15 +317,17 @@ namespace ManutMap.Services
                 progress?.Report((CalcPercent(completed, total), $"{driveName}: buscando"));
                 string driveId = await GetDriveId(site.Id, driveName);
                 var novos = await GetNewRootFoldersAsync(driveId, driveName, folderProgress);
-                return (driveName, novos);
+                return (driveName, driveId, novos);
             }).ToArray();
 
             foreach (var task in tasks)
             {
-                var (driveName, novos) = await task;
+                var (driveName, driveId, novos) = await task;
                 completed++;
                 foreach (var item in novos)
                 {
+                    if (!await FolderHasDatalogAsync(driveId, item.Id!))
+                        continue;
                     string name = item.Name!.Trim();
                     string url = item.WebUrl ??
                                   $"https://{Domain}/sites/{SitePath}/{driveName}/{name}";
@@ -508,6 +517,47 @@ namespace ManutMap.Services
             return result;
         }
 
+        private async Task<bool> FolderHasDatalogAsync(string driveId, string folderId)
+        {
+            var page = await _graph.Drives[driveId].Items[folderId].Children.GetAsync();
+
+            while (true)
+            {
+                foreach (var c in page.Value)
+                {
+                    if (c.File != null)
+                    {
+                        string name = c.Name?.Trim() ?? string.Empty;
+                        if (name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+                            return true;
+                        foreach (var suf in DatalogFileSuffixes)
+                        {
+                            if (name.EndsWith(suf, StringComparison.OrdinalIgnoreCase))
+                                return true;
+                        }
+                    }
+                }
+
+                if (page.OdataNextLink is string next)
+                {
+                    var req = new RequestInformation
+                    {
+                        HttpMethod = Method.GET,
+                        UrlTemplate = next,
+                        PathParameters = new Dictionary<string, object>()
+                    };
+                    page = await _graph.RequestAdapter.SendAsync(
+                        req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return false;
+        }
+
         private async Task<List<DriveItem>> GetLatestJsonsAsync(string driveId)
         {
             var pg = await _graph.Drives[driveId].Items["root"].Children.GetAsync();
@@ -635,6 +685,8 @@ namespace ManutMap.Services
 
             foreach (var it in q)
             {
+                if (!await FolderHasDatalogAsync(driveId, it.Id!))
+                    continue;
                 string name = it.Name!.Trim();
                 string url = it.WebUrl ??
                               $"https://{Domain}/sites/{SitePath}/{driveName}/{name}";
@@ -659,13 +711,19 @@ namespace ManutMap.Services
             if (!string.IsNullOrWhiteSpace(regional))
                 q = q.Where(i => i.Name!.StartsWith(regional, StringComparison.OrdinalIgnoreCase));
 
-            return q.Select(i => (
-                        i.Name!.Trim(),
-                        i.WebUrl ??
-                        $"https://{Domain}/sites/{SitePath}/{driveName}/{i.Name!.Trim()}",
-                        (i.LastModifiedDateTime ?? i.CreatedDateTime ?? DateTimeOffset.MinValue)
-                            .UtcDateTime))
-                    .ToList();
+            var list = new List<(string Name, string Url, DateTime Date)>();
+            foreach (var i in q)
+            {
+                if (!await FolderHasDatalogAsync(driveId, i.Id!))
+                    continue;
+                list.Add((
+                    i.Name!.Trim(),
+                    i.WebUrl ??
+                    $"https://{Domain}/sites/{SitePath}/{driveName}/{i.Name!.Trim()}",
+                    (i.LastModifiedDateTime ?? i.CreatedDateTime ?? DateTimeOffset.MinValue)
+                        .UtcDateTime));
+            }
+            return list;
         }
 
         private async Task<Dictionary<string, string>> GetInstalacaoRotaMapAsync(string driveId)
