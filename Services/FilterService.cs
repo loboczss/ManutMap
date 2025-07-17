@@ -122,10 +122,24 @@ namespace ManutMap.Services
                         if (string.IsNullOrWhiteSpace(coord)) return false;
                     }
 
-                    var dtRec = item["DTAHORARECLAMACAO"]?.ToString();
-                    var dtCon = item["DTCONCLUSAO"]?.ToString();
-                    bool isOpen = !string.IsNullOrWhiteSpace(dtRec) && string.IsNullOrWhiteSpace(dtCon);
-                    bool isClosed = !string.IsNullOrWhiteSpace(dtCon);
+                    string dtRec = null;
+                    string dtCon;
+                    bool isOpen;
+                    bool isClosed;
+
+                    if (c.OnlyInstalacao)
+                    {
+                        dtCon = item["CONCLUSAO"]?.ToString();
+                        isOpen = false;
+                        isClosed = !string.IsNullOrWhiteSpace(dtCon);
+                    }
+                    else
+                    {
+                        dtRec = item["DTAHORARECLAMACAO"]?.ToString();
+                        dtCon = item["DTCONCLUSAO"]?.ToString();
+                        isOpen = !string.IsNullOrWhiteSpace(dtRec) && string.IsNullOrWhiteSpace(dtCon);
+                        isClosed = !string.IsNullOrWhiteSpace(dtCon);
+                    }
 
                     if (isOpen && !c.ShowOpen) return false;
                     if (isClosed && !c.ShowClosed) return false;
@@ -134,8 +148,13 @@ namespace ManutMap.Services
                     {
                         DateTime dt;
                         var pt = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
-                        if ((isOpen && DateTime.TryParse(dtRec, pt, System.Globalization.DateTimeStyles.None, out dt)) ||
-                            (isClosed && DateTime.TryParse(dtCon, pt, System.Globalization.DateTimeStyles.None, out dt)))
+                        bool parsed = false;
+                        if (isOpen && dtRec != null)
+                            parsed = DateTime.TryParse(dtRec, pt, System.Globalization.DateTimeStyles.None, out dt);
+                        else if (isClosed)
+                            parsed = DateTime.TryParse(dtCon, pt, System.Globalization.DateTimeStyles.None, out dt);
+
+                        if (parsed)
                         {
                             if (c.StartDate.HasValue && dt < c.StartDate.Value) return false;
                             if (c.EndDate.HasValue && dt > c.EndDate.Value) return false;
