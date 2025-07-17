@@ -639,7 +639,7 @@ namespace ManutMap.Services
         public Task<int> CountAllDatalogFoldersAsync()
         {
             LoadCache();
-            return Task.FromResult(_folderCache?.Count ?? 0);
+            return Task.FromResult(_cacheInst.Count + _cacheManut.Count);
         }
 
 
