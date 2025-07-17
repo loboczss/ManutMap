@@ -146,7 +146,7 @@ namespace ManutMap.Services
 
                     if (c.StartDate.HasValue || c.EndDate.HasValue)
                     {
-                        DateTime dt;
+                        DateTime dt = DateTime.MinValue;
                         var pt = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
                         bool parsed = false;
                         if (isOpen && dtRec != null)
