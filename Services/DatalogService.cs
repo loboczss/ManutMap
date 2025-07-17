@@ -54,37 +54,50 @@ namespace ManutMap.Services
             AppDomain.CurrentDomain.BaseDirectory,
             "datalog_folders_cache.json");
 
-        private Dictionary<string, string>? _folderCache;
-        private DateTime _cacheDate;
+        private readonly Dictionary<string, string> _cacheInst = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> _cacheManut = new(StringComparer.OrdinalIgnoreCase);
+        private DateTime _cacheDateInst;
+        private DateTime _cacheDateManut;
+        private bool _cacheLoaded;
 
         private void LoadCache()
         {
-            if (_folderCache != null) return;
+            if (_cacheLoaded) return;
             if (!File.Exists(CachePath))
             {
-                _folderCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                _cacheDate = DateTime.MinValue;
+                _cacheDateInst = DateTime.MinValue;
+                _cacheDateManut = DateTime.MinValue;
+                _cacheLoaded = true;
                 return;
             }
 
             var obj = JObject.Parse(File.ReadAllText(CachePath));
-            _cacheDate = obj.Value<DateTime?>("lastUpdate") ?? DateTime.MinValue;
-            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            if (obj["folders"] is JObject folders)
+            _cacheDateInst = obj.Value<DateTime?>("lastUpdateInst") ?? DateTime.MinValue;
+            _cacheDateManut = obj.Value<DateTime?>("lastUpdateManut") ?? DateTime.MinValue;
+
+            if (obj["foldersInst"] is JObject inst)
             {
-                foreach (var p in folders.Properties())
-                    dict[p.Name] = p.Value?.ToString() ?? string.Empty;
+                foreach (var p in inst.Properties())
+                    _cacheInst[p.Name] = p.Value?.ToString() ?? string.Empty;
             }
-            _folderCache = dict;
+
+            if (obj["foldersManut"] is JObject man)
+            {
+                foreach (var p in man.Properties())
+                    _cacheManut[p.Name] = p.Value?.ToString() ?? string.Empty;
+            }
+
+            _cacheLoaded = true;
         }
 
         private void SaveCache()
         {
-            if (_folderCache == null) return;
             var obj = new JObject
             {
-                ["lastUpdate"] = _cacheDate,
-                ["folders"] = JObject.FromObject(_folderCache)
+                ["lastUpdateInst"] = _cacheDateInst,
+                ["lastUpdateManut"] = _cacheDateManut,
+                ["foldersInst"] = JObject.FromObject(_cacheInst),
+                ["foldersManut"] = JObject.FromObject(_cacheManut)
             };
             File.WriteAllText(CachePath, obj.ToString());
         }
@@ -92,7 +105,10 @@ namespace ManutMap.Services
         public Dictionary<string, string> GetCachedDatalogFolders()
         {
             LoadCache();
-            return _folderCache ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var dict = new Dictionary<string, string>(_cacheInst, StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in _cacheManut)
+                dict[kv.Key] = kv.Value;
+            return dict;
         }
 
 
@@ -109,13 +125,15 @@ namespace ManutMap.Services
                                                                    string driveName,
                                                                    IProgress<int>? folderProgress = null)
         {
-            if (_cacheDate == DateTime.MinValue)
+            LoadCache();
+            DateTime since = _cacheDateInst <= _cacheDateManut ? _cacheDateInst : _cacheDateManut;
+            if (since == DateTime.MinValue)
                 return await GetAllRootFoldersAsync(driveId, driveName, folderProgress);
 
             var todas = await GetAllFoldersRecursiveAsync(driveId, "root", 2, folderProgress);
             return todas.Where(i =>
                                    i.CreatedDateTime.HasValue &&
-                                   i.CreatedDateTime.Value.UtcDateTime >= _cacheDate)
+                                   i.CreatedDateTime.Value.UtcDateTime >= since)
                          .ToList();
         }
 
@@ -123,12 +141,10 @@ namespace ManutMap.Services
         private static readonly Regex OsFullPrefixRegex = new("(?i)^([A-Z]{2}\\d{5,})");
         private static readonly Regex OsFullSuffixRegex = new("(?i)^(\\d{5,})_([A-Z]{2})(?:_|$)");
 
-        // Nome de pasta de instala\u00e7\u00e3o no formato "AC55984_instalacao"
+        // Nome de pasta de instalação no formato "AC55984_instalacao"
         private static bool IsInstalacaoFolder(string name)
         {
-            var parts = name.Split('_');
-            return parts.Length == 2 &&
-                   parts[1].Equals("instalacao", StringComparison.OrdinalIgnoreCase);
+            return name.EndsWith("_instalacao", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsOsFolderName(string name)
@@ -194,17 +210,11 @@ namespace ManutMap.Services
             }
         }
 
-        private void MergeFolders(IEnumerable<DriveItem> items, string driveName)
+        private void MergeFolders(string name, string url, bool isInst)
         {
             LoadCache();
-            foreach (var it in items)
-            {
-                string name = it.Name!.Trim();
-                string url = it.WebUrl ??
-                              $"https://{Domain}/sites/{SitePath}/{driveName}/{name}";
-
-                AddFolderKeys(_folderCache!, name, url);
-            }
+            var dict = isInst ? _cacheInst : _cacheManut;
+            AddFolderKeys(dict, name, url);
         }
 
         private static int CalcPercent(int completed, int total)
@@ -216,8 +226,10 @@ namespace ManutMap.Services
         private async Task EnsureCacheUpdatedAsync(IProgress<(int Percent, string Message)>? progress = null,
                                                   IProgress<int>? folderProgress = null)
         {
+            LoadCache();
             var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
-            bool updated = false;
+            bool updatedInst = false;
+            bool updatedManut = false;
             int total = DriveDatalogAll.Length;
             int completed = 0;
 
@@ -233,24 +245,25 @@ namespace ManutMap.Services
             {
                 var (driveName, novos) = await task;
                 completed++;
-                if (novos.Count > 0)
+                foreach (var item in novos)
                 {
-                    MergeFolders(novos, driveName);
-                    updated = true;
+                    string name = item.Name!.Trim();
+                    string url = item.WebUrl ??
+                                  $"https://{Domain}/sites/{SitePath}/{driveName}/{name}";
+                    bool isInst = IsInstalacaoFolder(name);
+                    MergeFolders(name, url, isInst);
+                    if (isInst) updatedInst = true; else updatedManut = true;
                 }
                 progress?.Report((CalcPercent(completed, total), $"{driveName}: processado"));
             }
 
-            if (updated)
-            {
-                _cacheDate = DateTime.UtcNow;
+            if (updatedInst)
+                _cacheDateInst = DateTime.UtcNow;
+            if (updatedManut)
+                _cacheDateManut = DateTime.UtcNow;
+
+            if (updatedInst || updatedManut)
                 SaveCache();
-            }
-            else if (_folderCache == null)
-            {
-                // no cache existed and no folders found
-                _folderCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            }
         }
 
         public async Task<List<OsInfo>> BuscarAsync(DateTime ini,
@@ -319,9 +332,10 @@ namespace ManutMap.Services
 
             await EnsureCacheUpdatedAsync();
             LoadCache();
+            var cache = tipoFiltro == 0 ? _cacheInst : _cacheManut;
 
             foreach (var inf in mapa.Values)
-                if (_folderCache!.TryGetValue(inf.NumOS, out var url))
+                if (cache.TryGetValue(inf.NumOS, out var url))
                 {
                     inf.TemDatalog = true;
                     inf.FolderUrl = url;
@@ -612,7 +626,14 @@ namespace ManutMap.Services
             await EnsureCacheUpdatedAsync(progress, folderProgress);
             LoadCache();
             progress?.Report((100, "concluído"));
-            return _folderCache!;
+            return GetCachedDatalogFolders();
+        }
+
+        public async Task<Dictionary<string, string>> GetAllDatalogFoldersAsync(DatalogTipo tipo)
+        {
+            await EnsureCacheUpdatedAsync();
+            LoadCache();
+            return tipo == DatalogTipo.Instalacao ? _cacheInst : _cacheManut;
         }
 
         public async Task<int> CountAllDatalogFoldersAsync()
