@@ -163,7 +163,7 @@ namespace ManutMap
 
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
             PopulateComboBox(TipoFilterCombo, "TIPO");
-            PopulateComboBox(RotaFilterCombo, "ROTA");
+            UpdateRotaCombo();
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
             AnnotatePrazoInfo();
@@ -185,7 +185,7 @@ namespace ManutMap
 
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
             PopulateComboBox(TipoFilterCombo, "TIPO");
-            PopulateComboBox(RotaFilterCombo, "ROTA");
+            UpdateRotaCombo();
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
             AnnotatePrazoInfo();
@@ -223,6 +223,38 @@ namespace ManutMap
                 comboBox.Items.Add(new ComboBoxItem { Content = item });
             }
             comboBox.SelectedIndex = 0;
+        }
+
+        private void UpdateRotaCombo()
+        {
+            var regionalSel = (RegionalFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
+            if (ChbOnlyInst.IsChecked == true)
+            {
+                var rotas = _instalList
+                    .OfType<JObject>()
+                    .Select(o => o["ROTA"]?.ToString()?.Trim())
+                    .Where(s => !string.IsNullOrEmpty(s));
+
+                if (regionalSel != "Todos" && _regionalRotas.TryGetValue(regionalSel, out var regionalRotas))
+                    rotas = rotas.Where(r => regionalRotas.Contains(r));
+
+                PopulateComboBox(RotaFilterCombo, rotas.Distinct());
+            }
+            else
+            {
+                if (regionalSel == "Todos")
+                {
+                    PopulateComboBox(RotaFilterCombo, "ROTA");
+                }
+                else if (_regionalRotas.TryGetValue(regionalSel, out var rotas))
+                {
+                    PopulateComboBox(RotaFilterCombo, rotas);
+                }
+                else
+                {
+                    PopulateComboBox(RotaFilterCombo, "ROTA");
+                }
+            }
         }
 
         private async void SyncButton_Click(object sender, RoutedEventArgs e)
@@ -302,7 +334,7 @@ namespace ManutMap
             progress?.Report((70, "Atualizando filtros..."));
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
             PopulateComboBox(TipoFilterCombo, "TIPO");
-            PopulateComboBox(RotaFilterCombo, "ROTA");
+            UpdateRotaCombo();
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
             progress?.Report((85, "Aplicando filtros..."));
@@ -314,17 +346,21 @@ namespace ManutMap
         private void FiltersChanged(object sender, RoutedEventArgs e)
         {
             if (_debounceTimer == null) return;
-            if (sender == ChbOnlyInst && ChbOnlyInst.IsChecked == true)
+            if (sender == ChbOnlyInst)
             {
-                foreach (ComboBoxItem item in LatLonFieldCombo.Items)
+                if (ChbOnlyInst.IsChecked == true)
                 {
-                    if ((item.Content?.ToString() ?? "") == "LATLONCONF")
+                    foreach (ComboBoxItem item in LatLonFieldCombo.Items)
                     {
-                        if (LatLonFieldCombo.SelectedItem != item)
-                            LatLonFieldCombo.SelectedItem = item;
-                        break;
+                        if ((item.Content?.ToString() ?? "") == "LATLONCONF")
+                        {
+                            if (LatLonFieldCombo.SelectedItem != item)
+                                LatLonFieldCombo.SelectedItem = item;
+                            break;
+                        }
                     }
                 }
+                UpdateRotaCombo();
             }
             _debounceTimer.Stop();
             _debounceTimer.Start();
@@ -380,14 +416,7 @@ namespace ManutMap
         private void RegionalChanged(object sender, SelectionChangedEventArgs e)
         {
             var selected = (RegionalFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
-            if (selected == "Todos")
-            {
-                PopulateComboBox(RotaFilterCombo, "ROTA");
-            }
-            else if (_regionalRotas.TryGetValue(selected, out var rotas))
-            {
-                PopulateComboBox(RotaFilterCombo, rotas);
-            }
+            UpdateRotaCombo();
             FiltersChanged(sender, e);
         }
 
@@ -740,7 +769,7 @@ namespace ManutMap
             IdSigfiFilterBox.Text = string.Empty;
 
             RegionalFilterCombo.SelectedIndex = 0;
-            PopulateComboBox(RotaFilterCombo, "ROTA");
+            UpdateRotaCombo();
             RotaFilterCombo.SelectedIndex = 0;
 
             StartDatePicker.SelectedDate = null;
@@ -1060,6 +1089,7 @@ namespace ManutMap
                     ["NOMECLIENTE"] = obj["NOMEDOCLIENTE"] ?? obj["NOMECLIENTE"],
                     ["LATLONCONF"] = obj["LATLONCONF"],
                     ["ROTA"] = obj["ROTA"],
+                    ["CONCLUSAO"] = obj["CONCLUSAO"],
                     ["TIPO"] = "INSTALACAO",
                     ["TIPODESIGFI"] = "INSTALACAO"
                 };
