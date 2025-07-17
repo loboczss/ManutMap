@@ -123,6 +123,14 @@ namespace ManutMap.Services
         private static readonly Regex OsFullPrefixRegex = new("(?i)^([A-Z]{2}\\d{5,})");
         private static readonly Regex OsFullSuffixRegex = new("(?i)^(\\d{5,})_([A-Z]{2})(?:_|$)");
 
+        // Nome de pasta de instala\u00e7\u00e3o no formato "AC55984_instalacao"
+        private static bool IsInstalacaoFolder(string name)
+        {
+            var parts = name.Split('_');
+            return parts.Length == 2 &&
+                   parts[1].Equals("instalacao", StringComparison.OrdinalIgnoreCase);
+        }
+
         private static bool IsOsFolderName(string name)
         {
             return name.Contains('_') || OsDigitsRegex.IsMatch(name);
@@ -520,8 +528,7 @@ namespace ManutMap.Services
         {
             var all = await GetAllRootFoldersAsync(driveId, driveName);
 
-            var q = all.Where(i => i.Name!.EndsWith("_instalacao",
-                                       StringComparison.OrdinalIgnoreCase));
+            var q = all.Where(i => IsInstalacaoFolder(i.Name!));
 
             if (!string.IsNullOrWhiteSpace(idSigfi))
                 q = q.Where(i => i.Name!.StartsWith(idSigfi, StringComparison.OrdinalIgnoreCase));
