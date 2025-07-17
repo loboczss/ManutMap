@@ -11,6 +11,7 @@ namespace ManutMap.Models
         public string Regional { get; set; } = "Todos";
         public string Rota { get; set; } = "Todos";
         public string TipoServico { get; set; } = "Todos";
+        public string Empresa { get; set; } = "Todos";
 
         // Quantidade de preventivas por rota (0 = todas)
         public int PreventivasPorRota { get; set; }

@@ -69,6 +69,13 @@ namespace ManutMap.Services
                             return false;
                     }
 
+                    if (c.Empresa != "Todos")
+                    {
+                        var emp = (item["EMPRESA"]?.ToString() ?? string.Empty).Trim();
+                        if (!emp.Equals(c.Empresa, StringComparison.OrdinalIgnoreCase))
+                            return false;
+                    }
+
                     if (!string.IsNullOrEmpty(c.FuncionarioTermo))
                     {
                         var desc = item["DESCADICIONALEXEC"]?.ToString() ?? string.Empty;
