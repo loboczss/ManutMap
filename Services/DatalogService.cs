@@ -615,6 +615,19 @@ namespace ManutMap.Services
             return _folderCache!;
         }
 
+        public async Task<int> CountAllDatalogFoldersAsync()
+        {
+            var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
+            int total = 0;
+            foreach (var driveName in DriveDatalogAll)
+            {
+                string driveId = await GetDriveId(site.Id, driveName);
+                var folders = await GetAllRootFoldersAsync(driveId, driveName);
+                total += folders.Count;
+            }
+            return total;
+        }
+
 
         public async Task<Dictionary<string, string>> GetDatalogFoldersPeriodAsync(DateTime ini, DateTime fim)
         {

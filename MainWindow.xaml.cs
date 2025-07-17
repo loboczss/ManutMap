@@ -62,6 +62,7 @@ namespace ManutMap
         private readonly DispatcherTimer _updateTimer;
         private bool _sidebarVisible = true;
         private int _foldersVisited = 0;
+        private int _totalFolders = 0;
 
         public MainWindow()
         {
@@ -344,33 +345,35 @@ namespace ManutMap
             _instalList = await _spService.DownloadInstalacaoJsonAsync();
             AppendInstalacaoData(_instalList);
 
+            progress?.Report((15, "Calculando pastas..."));
+
+            _totalFolders = await _datalogService.CountAllDatalogFoldersAsync();
             _foldersVisited = 0;
+
             var folderProgress = new Progress<int>(n =>
             {
                 _foldersVisited += n;
                 UpdateFolderProgress(_foldersVisited);
+                if (_totalFolders > 0)
+                {
+                    int percent = 15 + _foldersVisited * 75 / _totalFolders;
+                    progress?.Report((percent, "Sincronizando datalog..."));
+                }
             });
 
-            var subProgress = new Progress<(int Percent, string Message)>(p =>
-            {
-                int percent = 40 + p.Percent * 30 / 100;
-                progress?.Report((percent, $"Sincronizando datalog... {p.Message}"));
-                UpdateFolderProgress(_foldersVisited);
-            });
-
-            _datalogMap = await _datalogService.GetAllDatalogFoldersAsync(subProgress, folderProgress);
+            _datalogMap = await _datalogService.GetAllDatalogFoldersAsync(null, folderProgress);
             AnnotateDatalogInfo();
             AnnotatePrazoInfo();
             AnnotatePrevOpenCount();
             await AnnotateFuncionariosInfoAsync();
 
-            progress?.Report((70, "Atualizando filtros..."));
+            progress?.Report((90, "Atualizando filtros..."));
             PopulateComboBox(SigfiFilterCombo, "TIPODESIGFI");
             PopulateComboBox(TipoFilterCombo, "TIPO");
             UpdateRotaCombo();
             PopulateComboBox(RegionalFilterCombo, _regionalRotas.Keys);
 
-            progress?.Report((85, "Aplicando filtros..."));
+            progress?.Report((95, "Aplicando filtros..."));
             ApplyFilters();
             LastUpdatedText.Text = _spService.LastUpdate.ToString("dd/MM/yyyy HH:mm");
             progress?.Report((100, "Concluído"));
