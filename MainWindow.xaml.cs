@@ -123,8 +123,6 @@ namespace ManutMap
             ChbClosed.Unchecked += FiltersChanged;
             ChbOnlyDatalog.Checked += FiltersChanged;
             ChbOnlyDatalog.Unchecked += FiltersChanged;
-            ChbOnlyInst.Checked += FiltersChanged;
-            ChbOnlyInst.Unchecked += FiltersChanged;
             ColorOpenCombo.SelectionChanged += FiltersChanged;
             ColorClosedCombo.SelectionChanged += FiltersChanged;
             ChbColorPrev.Checked += FiltersChanged;
@@ -228,9 +226,9 @@ namespace ManutMap
 
         private void UpdateRotaCombo(bool updateEmpresa = true)
         {
-            var regionalSel = (RegionalFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
-            var empresaSel = (EmpresaFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
-            if (ChbOnlyInst.IsChecked == true)
+            var regionalSel = (EmpresaFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
+            if (IsInstalacaoSelected())
+
             {
                 var rotas = _instalList
                     .OfType<JObject>()
@@ -265,7 +263,7 @@ namespace ManutMap
 
         private void UpdateEmpresaCombo()
         {
-            if (ChbOnlyInst.IsChecked == true)
+            if (IsInstalacaoSelected())
             {
                 var empresas = _instalList
                     .OfType<JObject>()
@@ -282,6 +280,12 @@ namespace ManutMap
                 EmpresaFilterCombo.Items.Add(new ComboBoxItem { Content = "Todos" });
                 EmpresaFilterCombo.SelectedIndex = 0;
             }
+        }
+
+        private bool IsInstalacaoSelected()
+        {
+            var selected = (TipoFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
+            return string.Equals(selected, "INSTALACAO", StringComparison.OrdinalIgnoreCase);
         }
 
         private async void SyncButton_Click(object sender, RoutedEventArgs e)
@@ -373,9 +377,9 @@ namespace ManutMap
         private void FiltersChanged(object sender, RoutedEventArgs e)
         {
             if (_debounceTimer == null) return;
-            if (sender == ChbOnlyInst)
+            if (sender == TipoFilterCombo)
             {
-                if (ChbOnlyInst.IsChecked == true)
+                if (IsInstalacaoSelected())
                 {
                     foreach (ComboBoxItem item in LatLonFieldCombo.Items)
                     {
@@ -429,12 +433,12 @@ namespace ManutMap
                 ColorServicoCorretiva = (ColorTipoCorrCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FFA500",
                 ColorServicoOutros = (ColorTipoServCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#008080",
                 LatLonField =
-                    ChbOnlyInst.IsChecked == true
+                    IsInstalacaoSelected()
                         ? "LATLONCONF"
                         : (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON",
                 MarkerStyle = (MarkerStyleCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "circle",
                 OnlyDatalog = ChbOnlyDatalog.IsChecked == true,
-                OnlyInstalacao = ChbOnlyInst.IsChecked == true,
+                OnlyInstalacao = IsInstalacaoSelected(),
                 UseClusters = ChbCluster.IsChecked != false,
                 SingleClientMarker = ChbSingleClient.IsChecked == true,
                 PrazoDias = int.TryParse(PrazoDiasTextBox.Text, out var pd) ? pd : 0,
@@ -811,7 +815,6 @@ namespace ManutMap
             ChbOpen.IsChecked = true;
             ChbClosed.IsChecked = true;
             ChbOnlyDatalog.IsChecked = false;
-            ChbOnlyInst.IsChecked = false;
 
             ColorOpenCombo.SelectedIndex = 0;
             ColorClosedCombo.SelectedIndex = 0;
