@@ -348,6 +348,8 @@ namespace ManutMap
             progress?.Report((15, "Calculando pastas..."));
 
             _totalFolders = await _datalogService.CountAllDatalogFoldersAsync();
+            if (_totalFolders == 0)
+                _totalFolders = 1; // evita divisão por zero e permite avanço da barra
             _foldersVisited = 0;
 
             var folderProgress = new Progress<int>(n =>
