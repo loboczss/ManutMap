@@ -28,6 +28,23 @@ namespace ManutMap
         private JArray _instalList;
         private Dictionary<string, string> _datalogMap;
         private Dictionary<string, string>? _funcMap;
+
+        private Dictionary<string, string> FiltrarDatalogPorTipo(
+            Dictionary<string, string> mapaOriginal, bool instalacao)
+        {
+            if (mapaOriginal == null)
+                return new Dictionary<string, string>();
+
+            return mapaOriginal
+                .Where(kv => instalacao
+                                 ? kv.Value.EndsWith("_instalacao",
+                                    StringComparison.OrdinalIgnoreCase)
+                                 : !kv.Value.EndsWith("_instalacao",
+                                    StringComparison.OrdinalIgnoreCase))
+                .ToDictionary(kv => kv.Key,
+                              kv => kv.Value,
+                              StringComparer.OrdinalIgnoreCase);
+        }
         private List<RouteCount> _routeStats = new();
         private List<RouteCount> _recentRouteStats = new();
         private List<RouteCount> _clientRouteStats = new();
@@ -88,7 +105,8 @@ namespace ManutMap
                     await _mapService.InitializeAsync();
 
                     await LoadLocalAndPopulateAsync();
-                    _datalogMap = _datalogService.GetCachedDatalogFolders();
+                    var mapaBruto = _datalogService.GetCachedDatalogFolders();
+                    _datalogMap = FiltrarDatalogPorTipo(mapaBruto, IsInstalacaoSelected());
                     AnnotateDatalogInfo();
                     AnnotatePrazoInfo();
                     AnnotatePrevOpenCount();
@@ -363,7 +381,8 @@ namespace ManutMap
                 }
             });
 
-            _datalogMap = await _datalogService.GetAllDatalogFoldersAsync(null, folderProgress);
+            var mapaBruto = await _datalogService.GetAllDatalogFoldersAsync(null, folderProgress);
+            _datalogMap = FiltrarDatalogPorTipo(mapaBruto, IsInstalacaoSelected());
             AnnotateDatalogInfo();
             AnnotatePrazoInfo();
             AnnotatePrevOpenCount();
@@ -406,6 +425,14 @@ namespace ManutMap
             }
             _debounceTimer.Stop();
             _debounceTimer.Start();
+
+            if (sender == TipoFilterCombo)
+            {
+                _datalogMap = FiltrarDatalogPorTipo(
+                    _datalogService.GetCachedDatalogFolders(),
+                    IsInstalacaoSelected());
+                AnnotateDatalogInfo();
+            }
         }
 
         private void DebouncedApplyFilters(object sender, EventArgs e)
@@ -588,12 +615,27 @@ namespace ManutMap
             foreach (var obj in _manutList.OfType<JObject>())
             {
                 string num = (obj["NUMOS"]?.ToString() ?? string.Empty).Trim();
-                if (string.IsNullOrEmpty(num)) continue;
+                if (string.IsNullOrEmpty(num))
+                    continue;
+
+                bool instalacao = string.Equals(
+                    obj["TIPO"]?.ToString(),
+                    "INSTALACAO",
+                    StringComparison.OrdinalIgnoreCase);
 
                 if (_datalogMap.TryGetValue(num, out var url))
                 {
-                    obj["TEMDATALOG"] = true;
-                    obj["FOLDERURL"] = url;
+                    bool urlInst = url.EndsWith("_instalacao", StringComparison.OrdinalIgnoreCase);
+                    if ((instalacao && urlInst) || (!instalacao && !urlInst))
+                    {
+                        obj["TEMDATALOG"] = true;
+                        obj["FOLDERURL"] = url;
+                    }
+                    else
+                    {
+                        obj["TEMDATALOG"] = false;
+                        obj["FOLDERURL"] = null;
+                    }
                 }
                 else
                 {
