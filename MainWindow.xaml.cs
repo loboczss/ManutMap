@@ -314,6 +314,18 @@ namespace ManutMap
         private void FiltersChanged(object sender, RoutedEventArgs e)
         {
             if (_debounceTimer == null) return;
+            if (sender == ChbOnlyInst && ChbOnlyInst.IsChecked == true)
+            {
+                foreach (ComboBoxItem item in LatLonFieldCombo.Items)
+                {
+                    if ((item.Content?.ToString() ?? "") == "LATLONCONF")
+                    {
+                        if (LatLonFieldCombo.SelectedItem != item)
+                            LatLonFieldCombo.SelectedItem = item;
+                        break;
+                    }
+                }
+            }
             _debounceTimer.Stop();
             _debounceTimer.Start();
         }
@@ -348,7 +360,10 @@ namespace ManutMap
                 ColorServicoPreventiva = (ColorTipoPrevCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#0000FF",
                 ColorServicoCorretiva = (ColorTipoCorrCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FFA500",
                 ColorServicoOutros = (ColorTipoServCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#008080",
-                LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON",
+                LatLonField =
+                    ChbOnlyInst.IsChecked == true
+                        ? "LATLONCONF"
+                        : (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON",
                 MarkerStyle = (MarkerStyleCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "circle",
                 OnlyDatalog = ChbOnlyDatalog.IsChecked == true,
                 OnlyInstalacao = ChbOnlyInst.IsChecked == true,
