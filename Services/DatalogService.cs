@@ -56,9 +56,20 @@ namespace ManutMap.Services
 
         private readonly Dictionary<string, string> _cacheInst = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, string> _cacheManut = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, (string Url, bool IsInst)> _folderCache
+            = new(StringComparer.OrdinalIgnoreCase);
         private DateTime _cacheDateInst;
         private DateTime _cacheDateManut;
         private bool _cacheLoaded;
+
+        private void RebuildFolderCache()
+        {
+            _folderCache.Clear();
+            foreach (var kv in _cacheManut)
+                AddFolderKeys(_folderCache, kv.Key, kv.Value, false);
+            foreach (var kv in _cacheInst)
+                AddFolderKeys(_folderCache, kv.Key, kv.Value, true);
+        }
 
         private void LoadCache()
         {
@@ -87,6 +98,7 @@ namespace ManutMap.Services
                     _cacheManut[p.Name] = p.Value?.ToString() ?? string.Empty;
             }
 
+            RebuildFolderCache();
             _cacheLoaded = true;
         }
 
@@ -105,9 +117,9 @@ namespace ManutMap.Services
         public Dictionary<string, string> GetCachedDatalogFolders()
         {
             LoadCache();
-            var dict = new Dictionary<string, string>(_cacheInst, StringComparer.OrdinalIgnoreCase);
-            foreach (var kv in _cacheManut)
-                dict[kv.Key] = kv.Value;
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in _folderCache)
+                dict[kv.Key] = kv.Value.Url;
             return dict;
         }
 
@@ -210,11 +222,71 @@ namespace ManutMap.Services
             }
         }
 
+        private static void AddFolderKeys(IDictionary<string, (string Url, bool IsInst)> dict,
+                                          string name,
+                                          string url,
+                                          bool isInst)
+        {
+            dict[name] = (url, isInst);
+
+            string? osKey = null;
+            var m = OsFullPrefixRegex.Match(name);
+            if (m.Success)
+                osKey = m.Groups[1].Value;
+            else
+            {
+                m = OsFullSuffixRegex.Match(name);
+                if (m.Success)
+                    osKey = m.Groups[2].Value + m.Groups[1].Value;
+            }
+            if (!string.IsNullOrEmpty(osKey))
+            {
+                if (isInst)
+                    dict[osKey] = (url, true);
+                else
+                    dict.TryAdd(osKey, (url, false));
+            }
+
+            int idx = name.IndexOf('_');
+            if (idx > 0)
+            {
+                string prefix = name[..idx];
+                if (isInst)
+                    dict[prefix] = (url, true);
+                else
+                    dict.TryAdd(prefix, (url, false));
+
+                if (idx == name.Length - 1)
+                {
+                    string trimmed = prefix.TrimEnd('_');
+                    if (isInst)
+                        dict[trimmed] = (url, true);
+                    else
+                        dict.TryAdd(trimmed, (url, false));
+                }
+            }
+
+            foreach (Match m2 in OsDigitsRegex.Matches(name))
+            {
+                if (isInst)
+                {
+                    dict[m2.Value] = (url, true);
+                    dict[m2.Groups[1].Value] = (url, true);
+                }
+                else
+                {
+                    dict.TryAdd(m2.Value, (url, false));
+                    dict.TryAdd(m2.Groups[1].Value, (url, false));
+                }
+            }
+        }
+
         private void MergeFolders(string name, string url, bool isInst)
         {
             LoadCache();
             var dict = isInst ? _cacheInst : _cacheManut;
             AddFolderKeys(dict, name, url);
+            AddFolderKeys(_folderCache, name, url, isInst);
         }
 
         private static int CalcPercent(int completed, int total)
@@ -332,13 +404,26 @@ namespace ManutMap.Services
 
             await EnsureCacheUpdatedAsync();
             LoadCache();
-            var cache = tipoFiltro == 0 ? _cacheInst : _cacheManut;
 
             foreach (var inf in mapa.Values)
-                if (cache.TryGetValue(inf.NumOS, out var url))
+                if (_folderCache.TryGetValue(inf.NumOS, out var val))
                 {
-                    inf.TemDatalog = true;
-                    inf.FolderUrl = url;
+                    if (tipoFiltro == 0)
+                    {
+                        if (val.IsInst)
+                        {
+                            inf.TemDatalog = true;
+                            inf.FolderUrl = val.Url;
+                        }
+                    }
+                    else
+                    {
+                        if (!val.IsInst)
+                        {
+                            inf.TemDatalog = true;
+                            inf.FolderUrl = val.Url;
+                        }
+                    }
                 }
 
             return mapa.Values.OrderBy(i => i.NumOS).ToList();
@@ -633,7 +718,21 @@ namespace ManutMap.Services
         {
             await EnsureCacheUpdatedAsync();
             LoadCache();
-            return tipo == DatalogTipo.Instalacao ? _cacheInst : _cacheManut;
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var (key, val) in _folderCache)
+            {
+                if (tipo == DatalogTipo.Instalacao)
+                {
+                    if (val.IsInst)
+                        dict[key] = val.Url;
+                }
+                else
+                {
+                    if (!val.IsInst)
+                        dict[key] = val.Url;
+                }
+            }
+            return dict;
         }
 
         public Task<int> CountAllDatalogFoldersAsync()
