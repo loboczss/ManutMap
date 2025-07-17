@@ -1,4 +1,5 @@
 using Azure.Identity;
+using ManutMap.Models;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Kiota.Abstractions;
@@ -8,10 +9,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using ManutMap.Models;
 
 namespace ManutMap.Services
 {
@@ -138,20 +139,26 @@ namespace ManutMap.Services
         private static async Task<T> ExecuteWithRetryAsync<T>(Func<Task<T>> action)
         {
             const int maxAttempts = 5;
-            int delayMs = 1000;
+            int delayMs = 1_000;
+
             for (int attempt = 1; attempt <= maxAttempts; attempt++)
             {
                 try
                 {
                     return await action();
                 }
-                catch (ServiceException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests && attempt < maxAttempts)
+                catch (ServiceException ex) when
+                    // cast do enum para int, ou use '429' diretamente
+                    (ex.ResponseStatusCode == (int)HttpStatusCode.TooManyRequests
+                     && attempt < maxAttempts)
                 {
+                    // deu 429, espera um pouco e tenta de novo
                     await Task.Delay(delayMs);
                     delayMs *= 2;
                 }
             }
-            // última tentativa sem captura específica
+
+            // última tentativa: deixa a exceção subir se falhar de novo
             return await action();
         }
 
