@@ -135,6 +135,26 @@ namespace ManutMap.Services
             await File.WriteAllTextAsync(CachePath, obj.ToString());
         }
 
+        private static async Task<T> ExecuteWithRetryAsync<T>(Func<Task<T>> action)
+        {
+            const int maxAttempts = 5;
+            int delayMs = 1000;
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                try
+                {
+                    return await action();
+                }
+                catch (ServiceException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests && attempt < maxAttempts)
+                {
+                    await Task.Delay(delayMs);
+                    delayMs *= 2;
+                }
+            }
+            // última tentativa sem captura específica
+            return await action();
+        }
+
         public Dictionary<string, string> GetCachedDatalogFolders()
         {
             LoadCache();
@@ -320,51 +340,73 @@ namespace ManutMap.Services
                                                   IProgress<int>? folderProgress = null)
         {
             LoadCache();
-            var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
             bool updatedInst = false;
             bool updatedManut = false;
             int total = DriveDatalogAll.Length;
             int completed = 0;
+            var site = await ExecuteWithRetryAsync(() =>
+                _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync());
 
             var tasks = DriveDatalogAll.Select(async driveName =>
             {
-                progress?.Report((CalcPercent(completed, total), $"{driveName}: buscando"));
-                string driveId = await GetDriveId(site.Id, driveName);
-                var novos = await GetNewRootFoldersAsync(driveId, driveName, folderProgress);
-                return (driveName, driveId, novos);
+                try
+                {
+                    progress?.Report((CalcPercent(completed, total), $"{driveName}: buscando"));
+                    string driveId = await GetDriveId(site.Id, driveName);
+                    var novos = await GetNewRootFoldersAsync(driveId, driveName, folderProgress);
+                    return (driveName, driveId, novos);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Falha em drive {driveName}: {ex.Message}");
+                    return (driveName, string.Empty, new List<DriveItem>());
+                }
             }).ToArray();
 
-            foreach (var task in tasks)
+            try
             {
-                var (driveName, driveId, novos) = await task;
-                completed++;
-                foreach (var item in novos)
+                foreach (var task in tasks)
                 {
-                    if (!await FolderHasDatalogAsync(driveId, item.Id!))
-                        continue;
-                    string name = item.Name!.Trim();
-                    string url = item.WebUrl ??
-                                  $"https://{Domain}/sites/{SitePath}/{driveName}/{name}";
-                    bool isInst = IsInstalacaoFolder(name);
-                    MergeFolders(name, url, isInst);
-                    if (isInst) updatedInst = true; else updatedManut = true;
+                    bool driveUpdated = false;
+                    var (driveName, driveId, novos) = await task;
+                    completed++;
+                    foreach (var item in novos)
+                    {
+                        if (string.IsNullOrEmpty(driveId))
+                            break;
+                        if (!await FolderHasDatalogAsync(driveId, item.Id!))
+                            continue;
+                        string name = item.Name!.Trim();
+                        string url = item.WebUrl ??
+                                      $"https://{Domain}/sites/{SitePath}/{driveName}/{name}";
+                        bool isInst = IsInstalacaoFolder(name);
+                        MergeFolders(name, url, isInst);
+                        driveUpdated = true;
+                        if (isInst) updatedInst = true; else updatedManut = true;
+                    }
+                    if (driveUpdated)
+                        await SaveCacheAsync();
+                    progress?.Report((CalcPercent(completed, total), $"{driveName}: processado"));
                 }
-                progress?.Report((CalcPercent(completed, total), $"{driveName}: processado"));
-            }
 
-            if (updatedInst)
-                _cacheDateInst = DateTime.UtcNow;
-            if (updatedManut)
-                _cacheDateManut = DateTime.UtcNow;
+                if (updatedInst)
+                    _cacheDateInst = DateTime.UtcNow;
+                if (updatedManut)
+                    _cacheDateManut = DateTime.UtcNow;
 
-            if (updatedInst || updatedManut)
-            {
-                await SaveCacheAsync();
+                if (updatedInst || updatedManut)
+                {
+                    await SaveCacheAsync();
+                }
+                else if (!File.Exists(CachePath))
+                {
+                    // Garante a criação do arquivo de cache mesmo quando nenhum
+                    // datalog novo é encontrado.
+                    await SaveCacheAsync();
+                }
             }
-            else if (!File.Exists(CachePath))
+            finally
             {
-                // Garante a criação do arquivo de cache mesmo quando nenhum
-                // datalog novo é encontrado.
                 await SaveCacheAsync();
             }
         }
@@ -375,7 +417,8 @@ namespace ManutMap.Services
                                                     int tipoFiltro,
                                                     string? regional)
         {
-            var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
+            var site = await ExecuteWithRetryAsync(() =>
+                _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync());
 
             // When searching for installation folders (combo index 0)
             if (tipoFiltro == 0)
@@ -464,12 +507,14 @@ namespace ManutMap.Services
         {
             if (DriveListMap.TryGetValue(driveName, out var listId))
             {
-                var drv = await _graph.Sites[siteId].Lists[listId].Drive.GetAsync();
+                var drv = await ExecuteWithRetryAsync(() =>
+                    _graph.Sites[siteId].Lists[listId].Drive.GetAsync());
                 if (drv != null)
                     return drv.Id!;
             }
 
-            var drives = await _graph.Sites[siteId].Drives.GetAsync();
+            var drives = await ExecuteWithRetryAsync(() =>
+                _graph.Sites[siteId].Drives.GetAsync());
             var drive = drives.Value.FirstOrDefault(d => d.Name.Equals(driveName,
                 StringComparison.OrdinalIgnoreCase));
             if (drive == null)
@@ -496,37 +541,61 @@ namespace ManutMap.Services
                                                                        IProgress<int>? folderProgress = null)
         {
             var result = new List<DriveItem>();
-            var page = await _graph.Drives[driveId].Items[itemId].Children.GetAsync();
+            int progressBuffer = 0;
+
+            var page = await ExecuteWithRetryAsync(() =>
+                _graph.Drives[driveId].Items[itemId].Children.GetAsync());
             var folders = new List<DriveItem>();
+
+            if (page?.Value == null)
+                return result;
+
             foreach (var i in page.Value.Where(i => i.Folder != null))
             {
-                folderProgress?.Report(1);
+                progressBuffer++; if (progressBuffer >= 100) { folderProgress?.Report(progressBuffer); progressBuffer = 0; }
                 if (IsOsFolderName(i.Name!))
                     result.Add(i);
                 else
                     folders.Add(i);
             }
 
-            while (page.OdataNextLink is string next)
+            while (page?.OdataNextLink is string next)
             {
-                var req = new RequestInformation
+                try
                 {
-                    HttpMethod = Method.GET,
-                    UrlTemplate = next,
-                    PathParameters = new Dictionary<string, object>()
-                };
-                page = await _graph.RequestAdapter.SendAsync(
-                           req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
+                    var req = new RequestInformation
+                    {
+                        HttpMethod = Method.GET,
+                        UrlTemplate = next,
+                        PathParameters = new Dictionary<string, object>()
+                    };
+                    page = await ExecuteWithRetryAsync(() =>
+                        _graph.RequestAdapter.SendAsync(
+                            req, DriveItemCollectionResponse.CreateFromDiscriminatorValue));
+                    if (page?.Value == null)
+                    {
+                        Console.WriteLine("Página nula recebida, encerrando loop.");
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Falha ao obter página: {ex.Message}");
+                    break;
+                }
 
-                foreach (var i in page!.Value.Where(i => i.Folder != null))
+                foreach (var i in page.Value.Where(i => i.Folder != null))
                 {
-                    folderProgress?.Report(1);
+                    progressBuffer++; if (progressBuffer >= 100) { folderProgress?.Report(progressBuffer); progressBuffer = 0; }
                     if (IsOsFolderName(i.Name!))
                         result.Add(i);
                     else
                         folders.Add(i);
                 }
             }
+
+            if (progressBuffer > 0)
+                folderProgress?.Report(progressBuffer);
 
             if (depth > 0)
             {
@@ -543,7 +612,11 @@ namespace ManutMap.Services
                                                                 string folderId,
                                                                 int depth)
         {
-            var page = await _graph.Drives[driveId].Items[folderId].Children.GetAsync();
+            var page = await ExecuteWithRetryAsync(() =>
+                _graph.Drives[driveId].Items[folderId].Children.GetAsync());
+
+            if (page?.Value == null)
+                return false;
 
             while (true)
             {
@@ -567,16 +640,30 @@ namespace ManutMap.Services
                     }
                 }
 
-                if (page.OdataNextLink is string next)
+                if (page?.OdataNextLink is string next)
                 {
-                    var req = new RequestInformation
+                    try
                     {
-                        HttpMethod = Method.GET,
-                        UrlTemplate = next,
-                        PathParameters = new Dictionary<string, object>()
-                    };
-                    page = await _graph.RequestAdapter.SendAsync(
-                        req, DriveItemCollectionResponse.CreateFromDiscriminatorValue);
+                        var req = new RequestInformation
+                        {
+                            HttpMethod = Method.GET,
+                            UrlTemplate = next,
+                            PathParameters = new Dictionary<string, object>()
+                        };
+                        page = await ExecuteWithRetryAsync(() =>
+                            _graph.RequestAdapter.SendAsync(
+                                req, DriveItemCollectionResponse.CreateFromDiscriminatorValue));
+                        if (page?.Value == null)
+                        {
+                            Console.WriteLine("Página nula recebida, encerrando loop.");
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Falha ao obter página: {ex.Message}");
+                        break;
+                    }
                 }
                 else
                 {
@@ -596,7 +683,8 @@ namespace ManutMap.Services
 
         private async Task<List<DriveItem>> GetLatestJsonsAsync(string driveId)
         {
-            var pg = await _graph.Drives[driveId].Items["root"].Children.GetAsync();
+            var pg = await ExecuteWithRetryAsync(() =>
+                _graph.Drives[driveId].Items["root"].Children.GetAsync());
             var list = new List<DriveItem>();
 
             foreach (var suf in JsonFileConstants.JsonSuffixes)
@@ -626,7 +714,8 @@ namespace ManutMap.Services
                                                          bool buscaUnica,
                                                          string? regionalSel)
         {
-            using var st = await _graph.Drives[driveId].Items[itemId].Content.GetAsync();
+            using var st = await ExecuteWithRetryAsync(() =>
+                _graph.Drives[driveId].Items[itemId].Content.GetAsync());
             using var sr = new StreamReader(st, Encoding.UTF8);
             var root = JObject.Parse(await sr.ReadToEndAsync());
 
@@ -768,7 +857,8 @@ namespace ManutMap.Services
 
             try
             {
-                using var st = await _graph.Drives[driveId].Root.ItemWithPath(InstalacaoJsonName).Content.GetAsync();
+                using var st = await ExecuteWithRetryAsync(() =>
+                    _graph.Drives[driveId].Root.ItemWithPath(InstalacaoJsonName).Content.GetAsync());
                 using var sr = new StreamReader(st, Encoding.UTF8);
                 var root = JToken.Parse(await sr.ReadToEndAsync());
 
@@ -838,7 +928,8 @@ namespace ManutMap.Services
 
         public async Task<Dictionary<string, string>> GetDatalogFoldersPeriodAsync(DateTime ini, DateTime fim)
         {
-            var site = await _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync();
+            var site = await ExecuteWithRetryAsync(() =>
+                _graph.Sites[$"{Domain}:/sites/{SitePath}"].GetAsync());
             var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var driveName in DriveDatalogAll)
