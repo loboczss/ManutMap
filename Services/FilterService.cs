@@ -116,6 +116,12 @@ namespace ManutMap.Services
                         if (!tem) return false;
                     }
 
+                    if (c.OnlyInstalacao)
+                    {
+                        var coord = item["LATLONCONF"]?.ToString();
+                        if (string.IsNullOrWhiteSpace(coord)) return false;
+                    }
+
                     var dtRec = item["DTAHORARECLAMACAO"]?.ToString();
                     var dtCon = item["DTCONCLUSAO"]?.ToString();
                     bool isOpen = !string.IsNullOrWhiteSpace(dtRec) && string.IsNullOrWhiteSpace(dtCon);
