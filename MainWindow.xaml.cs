@@ -25,6 +25,7 @@ namespace ManutMap
         private readonly DatalogService _datalogService = new DatalogService();
         private MapService _mapService;
         private JArray _manutList;
+        private JArray _instalList;
         private Dictionary<string, string> _datalogMap;
         private Dictionary<string, string>? _funcMap;
         private List<RouteCount> _routeStats = new();
@@ -154,6 +155,8 @@ namespace ManutMap
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manutencoes_latest.json");
             _manutList = _fileService.LoadLocalJson(path) ?? new JArray();
+            _instalList = _spService.DownloadInstalacaoJsonAsync().GetAwaiter().GetResult();
+            AppendInstalacaoData(_instalList);
 
             if (File.Exists(path))
                 LastUpdatedText.Text = File.GetLastWriteTime(path).ToString("dd/MM/yyyy HH:mm");
@@ -174,6 +177,8 @@ namespace ManutMap
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manutencoes_latest.json");
             _manutList = await _fileService.LoadLocalJsonAsync(path) ?? new JArray();
+            _instalList = await _spService.DownloadInstalacaoJsonAsync();
+            AppendInstalacaoData(_instalList);
 
             if (File.Exists(path))
                 LastUpdatedText.Text = File.GetLastWriteTime(path).ToString("dd/MM/yyyy HH:mm");
@@ -271,6 +276,8 @@ namespace ManutMap
 
             progress?.Report((10, "Baixando dados..."));
             _manutList = await _spService.DownloadLatestJsonAsync();
+            _instalList = await _spService.DownloadInstalacaoJsonAsync();
+            AppendInstalacaoData(_instalList);
 
             _foldersVisited = 0;
             var folderProgress = new Progress<int>(n =>
@@ -1019,6 +1026,30 @@ namespace ManutMap
                         nomes.Add(nome);
                 }
                 obj["FUNCIONARIOS"] = nomes.Count > 0 ? string.Join(", ", nomes) : null;
+            }
+        }
+
+        private void AppendInstalacaoData(JArray data)
+        {
+            if (data == null || _manutList == null) return;
+
+            foreach (var obj in data.OfType<JObject>())
+            {
+                var id = (obj["IDSERVICOSCONJ"]?.ToString() ?? string.Empty).Trim();
+                if (string.IsNullOrEmpty(id)) continue;
+
+                var novo = new JObject
+                {
+                    ["NUMOS"] = id,
+                    ["IDSIGFI"] = id,
+                    ["NOMECLIENTE"] = obj["NOMEDOCLIENTE"] ?? obj["NOMECLIENTE"],
+                    ["LATLONCONF"] = obj["LATLONCONF"],
+                    ["ROTA"] = obj["ROTA"],
+                    ["TIPO"] = "INSTALACAO",
+                    ["TIPODESIGFI"] = "INSTALACAO"
+                };
+
+                _manutList.Add(novo);
             }
         }
 
