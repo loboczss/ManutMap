@@ -198,7 +198,19 @@ namespace ManutMap.Services
             filtered = filtered
                 .GroupBy(o => (o["NUMOS"]?.ToString() ?? string.Empty).Trim(),
                          StringComparer.OrdinalIgnoreCase)
-                .Select(g => g.First())
+                .Select(g =>
+                {
+                    if (c.OnlyInstalacao)
+                    {
+                        var inst = g.FirstOrDefault(o =>
+                            string.Equals(o["TIPO"]?.ToString()?.Trim(),
+                                          "INSTALACAO",
+                                          StringComparison.OrdinalIgnoreCase));
+                        if (inst != null)
+                            return inst;
+                    }
+                    return g.First();
+                })
                 .ToList();
 
             if (c.PreventivasPorRota > 0)
