@@ -149,6 +149,7 @@ namespace ManutMap
             PrevClosedCountCombo.SelectionChanged += FiltersChanged;
             FuncFieldCombo.SelectionChanged += FiltersChanged;
             FuncSearchBox.TextChanged += FiltersChanged;
+            EmpresaFilterCombo.SelectionChanged += FiltersChanged;
         }
 
         private void LoadLocalAndPopulate()
@@ -254,6 +255,28 @@ namespace ManutMap
                 {
                     PopulateComboBox(RotaFilterCombo, "ROTA");
                 }
+            }
+            UpdateEmpresaCombo();
+        }
+
+        private void UpdateEmpresaCombo()
+        {
+            if (ChbOnlyInst.IsChecked == true)
+            {
+                var empresas = _instalList
+                    .OfType<JObject>()
+                    .Select(o => o["EMPRESA"]?.ToString()?.Trim())
+                    .Where(s => !string.IsNullOrEmpty(s))
+                    .Distinct();
+                PopulateComboBox(EmpresaFilterCombo, empresas);
+                EmpresaPanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                EmpresaPanel.Visibility = Visibility.Collapsed;
+                EmpresaFilterCombo.Items.Clear();
+                EmpresaFilterCombo.Items.Add(new ComboBoxItem { Content = "Todos" });
+                EmpresaFilterCombo.SelectedIndex = 0;
             }
         }
 
@@ -382,6 +405,7 @@ namespace ManutMap
                 IdSigfi = IdSigfiFilterBox.Text.Trim(),
                 Regional = (RegionalFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
                 Rota = (RotaFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
+                Empresa = (EmpresaFilterCombo.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Todos",
                 PreventivasPorRota = int.TryParse((PrevCountRotaCombo.SelectedItem as ComboBoxItem)?.Content.ToString(), out var pc) ? pc : 0,
                 PreventivasConcluidasPorRota = int.TryParse((PrevClosedCountCombo.SelectedItem as ComboBoxItem)?.Content.ToString(), out var pcc) ? pcc : 0,
                 StartDate = StartDatePicker.SelectedDate,
@@ -771,6 +795,7 @@ namespace ManutMap
             RegionalFilterCombo.SelectedIndex = 0;
             UpdateRotaCombo();
             RotaFilterCombo.SelectedIndex = 0;
+            EmpresaFilterCombo.SelectedIndex = 0;
 
             StartDatePicker.SelectedDate = null;
             EndDatePicker.SelectedDate = null;
@@ -1090,6 +1115,7 @@ namespace ManutMap
                     ["LATLONCONF"] = obj["LATLONCONF"],
                     ["ROTA"] = obj["ROTA"],
                     ["CONCLUSAO"] = obj["CONCLUSAO"],
+                    ["EMPRESA"] = obj["EMPRESA"],
                     ["TIPO"] = "INSTALACAO",
                     ["TIPODESIGFI"] = "INSTALACAO"
                 };

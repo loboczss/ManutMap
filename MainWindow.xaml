@@ -400,6 +400,7 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
                                     <StackPanel Grid.Row="1" Margin="0,0,0,10">
@@ -465,6 +466,11 @@
                                             </ComboBox>
                                             <TextBox x:Name="FuncSearchBox" Width="120" TextChanged="FiltersChanged"/>
                                         </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel x:Name="EmpresaPanel" Grid.Row="9" Margin="0,0,0,10" Visibility="Collapsed">
+                                        <TextBlock Text="Empresa" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="EmpresaFilterCombo" SelectionChanged="FiltersChanged"/>
                                     </StackPanel>
 
                                 </Grid>
