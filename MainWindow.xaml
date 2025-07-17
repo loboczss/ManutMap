@@ -527,7 +527,6 @@
                                     <CheckBox x:Name="ChbOpen" Content="Exibir OS Abertas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                     <CheckBox x:Name="ChbClosed" Content="Exibir OS Concluídas" IsChecked="True" Checked="FiltersChanged" Unchecked="FiltersChanged" Margin="0,10,0,0"/>
                                     <CheckBox x:Name="ChbOnlyDatalog" Content="Apenas OS com Datalog" Checked="FiltersChanged" Unchecked="FiltersChanged" Margin="0,10,0,0"/>
-                                    <CheckBox x:Name="ChbOnlyInst" Content="Apenas Instalação" Style="{StaticResource HighlightCheckBox}" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                     <CheckBox x:Name="ChbSingleClient" Content="Marcador único por cliente" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                     <CheckBox x:Name="ChbCluster" Content="Agrupar Marcadores" IsChecked="True" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                     <CheckBox x:Name="ChbColorPrev" Content="Colorir por Preventiva" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
