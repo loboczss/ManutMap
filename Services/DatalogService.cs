@@ -66,6 +66,7 @@ namespace ManutMap.Services
         private readonly Dictionary<string, string> _cacheManut = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, (string Url, bool IsInst)> _folderCache
             = new(StringComparer.OrdinalIgnoreCase);
+        private int _cacheFolderCount;
         private DateTime _cacheDateInst;
         private DateTime _cacheDateManut;
         private bool _cacheLoaded;
@@ -77,6 +78,7 @@ namespace ManutMap.Services
                 AddFolderKeys(_folderCache, kv.Key, kv.Value, false);
             foreach (var kv in _cacheInst)
                 AddFolderKeys(_folderCache, kv.Key, kv.Value, true);
+            _cacheFolderCount = _cacheInst.Count + _cacheManut.Count;
         }
 
         private void LoadCache()
@@ -93,6 +95,7 @@ namespace ManutMap.Services
             var obj = JObject.Parse(File.ReadAllText(CachePath));
             _cacheDateInst = obj.Value<DateTime?>("lastUpdateInst") ?? DateTime.MinValue;
             _cacheDateManut = obj.Value<DateTime?>("lastUpdateManut") ?? DateTime.MinValue;
+            _cacheFolderCount = obj.Value<int?>("foldersCount") ?? 0;
 
             if (obj["foldersInst"] is JObject inst)
             {
@@ -112,12 +115,14 @@ namespace ManutMap.Services
 
         private async Task SaveCacheAsync()
         {
+            _cacheFolderCount = _cacheInst.Count + _cacheManut.Count;
             var obj = new JObject
             {
                 ["lastUpdateInst"] = _cacheDateInst,
                 ["lastUpdateManut"] = _cacheDateManut,
                 ["foldersInst"] = JObject.FromObject(_cacheInst),
-                ["foldersManut"] = JObject.FromObject(_cacheManut)
+                ["foldersManut"] = JObject.FromObject(_cacheManut),
+                ["foldersCount"] = _cacheFolderCount
             };
 
             if (File.Exists(CachePath))
@@ -170,6 +175,12 @@ namespace ManutMap.Services
             foreach (var kv in _folderCache)
                 dict[kv.Key] = kv.Value.Url;
             return dict;
+        }
+
+        public int GetCachedFolderCount()
+        {
+            LoadCache();
+            return _cacheFolderCount;
         }
 
 
@@ -930,7 +941,8 @@ namespace ManutMap.Services
         public Task<int> CountAllDatalogFoldersAsync()
         {
             LoadCache();
-            return Task.FromResult(_cacheInst.Count + _cacheManut.Count);
+            _cacheFolderCount = _cacheInst.Count + _cacheManut.Count;
+            return Task.FromResult(_cacheFolderCount);
         }
 
 
