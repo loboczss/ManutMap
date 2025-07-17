@@ -224,13 +224,16 @@ namespace ManutMap
             comboBox.SelectedIndex = 0;
         }
 
-        private void UpdateRotaCombo()
+        private void UpdateRotaCombo(bool updateEmpresa = true)
         {
-            var regionalSel = (RegionalFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
+            var regionalSel = (EmpresaFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
             if (IsInstalacaoSelected())
+
             {
                 var rotas = _instalList
                     .OfType<JObject>()
+                    .Where(o => empresaSel == "Todos" ||
+                                string.Equals(o["EMPRESA"]?.ToString()?.Trim(), empresaSel, StringComparison.OrdinalIgnoreCase))
                     .Select(o => o["ROTA"]?.ToString()?.Trim())
                     .Where(s => !string.IsNullOrEmpty(s));
 
@@ -254,7 +257,8 @@ namespace ManutMap
                     PopulateComboBox(RotaFilterCombo, "ROTA");
                 }
             }
-            UpdateEmpresaCombo();
+            if (updateEmpresa)
+                UpdateEmpresaCombo();
         }
 
         private void UpdateEmpresaCombo()
@@ -388,6 +392,10 @@ namespace ManutMap
                     }
                 }
                 UpdateRotaCombo();
+            }
+            else if (sender == EmpresaFilterCombo)
+            {
+                UpdateRotaCombo(false);
             }
             _debounceTimer.Stop();
             _debounceTimer.Start();
