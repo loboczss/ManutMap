@@ -27,6 +27,8 @@ namespace ManutMap.Services
 
         private static readonly string OfflinePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                                                                   "manutencoes_latest.json");
+        private static readonly string InstalacaoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                                                                    "instalacao.json");
         private static readonly string FuncCsvPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                                                                   "funcionarios.csv");
 
@@ -83,6 +85,44 @@ namespace ManutMap.Services
                     var cached = JObject.Parse(File.ReadAllText(OfflinePath, Encoding.UTF8));
                     dados = cached["manutencoes"] as JArray ?? new JArray();
                 }
+            }
+
+            return dados;
+        }
+
+        public async Task<JArray> DownloadInstalacaoJsonAsync()
+        {
+            bool fromInternet = false;
+            JArray dados = new JArray();
+
+            if (HasInternet())
+            {
+                try
+                {
+                    string driveId = await GetDriveIdAsync();
+                    using var st = await _client.Drives[driveId].Root.ItemWithPath("Instalacao_AC.json").Content.GetAsync();
+                    using var sr = new StreamReader(st, Encoding.UTF8);
+                    var text = await sr.ReadToEndAsync();
+                    var token = JToken.Parse(text);
+                    if (token is JArray arr)
+                        dados = arr;
+                    else if (token is JObject obj)
+                        dados = obj["instalacoes"] as JArray ?? obj.Properties().FirstOrDefault()?.Value as JArray ?? new JArray();
+
+                    var root = new JObject { ["instalacoes"] = dados };
+                    File.WriteAllText(InstalacaoPath, root.ToString());
+                    fromInternet = true;
+                }
+                catch
+                {
+                    // fallback to cache
+                }
+            }
+
+            if (!fromInternet && File.Exists(InstalacaoPath))
+            {
+                var cached = JObject.Parse(File.ReadAllText(InstalacaoPath, Encoding.UTF8));
+                dados = cached["instalacoes"] as JArray ?? new JArray();
             }
 
             return dados;
