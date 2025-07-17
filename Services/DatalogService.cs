@@ -134,6 +134,7 @@ namespace ManutMap.Services
             }
 
             await File.WriteAllTextAsync(CachePath, obj.ToString());
+            _cacheLoaded = false;
         }
 
         private static async Task<T> ExecuteWithRetryAsync<T>(Func<Task<T>> action)
