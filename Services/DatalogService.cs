@@ -344,7 +344,15 @@ namespace ManutMap.Services
                 _cacheDateManut = DateTime.UtcNow;
 
             if (updatedInst || updatedManut)
+            {
                 await SaveCacheAsync();
+            }
+            else if (!File.Exists(CachePath))
+            {
+                // Garante a criação do arquivo de cache mesmo quando nenhum
+                // datalog novo é encontrado.
+                await SaveCacheAsync();
+            }
         }
 
         public async Task<List<OsInfo>> BuscarAsync(DateTime ini,
@@ -517,7 +525,9 @@ namespace ManutMap.Services
             return result;
         }
 
-        private async Task<bool> FolderHasDatalogAsync(string driveId, string folderId)
+        private async Task<bool> FolderHasDatalogRecursiveAsync(string driveId,
+                                                                string folderId,
+                                                                int depth)
         {
             var page = await _graph.Drives[driveId].Items[folderId].Children.GetAsync();
 
@@ -535,6 +545,11 @@ namespace ManutMap.Services
                             if (name.EndsWith(suf, StringComparison.OrdinalIgnoreCase))
                                 return true;
                         }
+                    }
+                    else if (depth > 0 && c.Folder != null)
+                    {
+                        if (await FolderHasDatalogRecursiveAsync(driveId, c.Id!, depth - 1))
+                            return true;
                     }
                 }
 
@@ -556,6 +571,13 @@ namespace ManutMap.Services
             }
 
             return false;
+        }
+
+        private Task<bool> FolderHasDatalogAsync(string driveId, string folderId)
+        {
+            // Busca datalog em até duas camadas de subpastas para garantir que
+            // arquivos armazenados em estruturas diferenciadas sejam encontrados.
+            return FolderHasDatalogRecursiveAsync(driveId, folderId, 2);
         }
 
         private async Task<List<DriveItem>> GetLatestJsonsAsync(string driveId)
