@@ -109,7 +109,7 @@ namespace ManutMap.Services
             _cacheLoaded = true;
         }
 
-        private void SaveCache()
+        private async Task SaveCacheAsync()
         {
             var obj = new JObject
             {
@@ -118,7 +118,7 @@ namespace ManutMap.Services
                 ["foldersInst"] = JObject.FromObject(_cacheInst),
                 ["foldersManut"] = JObject.FromObject(_cacheManut)
             };
-            File.WriteAllText(CachePath, obj.ToString());
+            await File.WriteAllTextAsync(CachePath, obj.ToString());
         }
 
         public Dictionary<string, string> GetCachedDatalogFolders()
@@ -344,7 +344,7 @@ namespace ManutMap.Services
                 _cacheDateManut = DateTime.UtcNow;
 
             if (updatedInst || updatedManut)
-                SaveCache();
+                await SaveCacheAsync();
         }
 
         public async Task<List<OsInfo>> BuscarAsync(DateTime ini,
