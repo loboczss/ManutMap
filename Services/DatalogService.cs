@@ -118,6 +118,20 @@ namespace ManutMap.Services
                 ["foldersInst"] = JObject.FromObject(_cacheInst),
                 ["foldersManut"] = JObject.FromObject(_cacheManut)
             };
+
+            if (File.Exists(CachePath))
+            {
+                try
+                {
+                    File.Delete(CachePath);
+                }
+                catch
+                {
+                    // Se a exclusão falhar continuamos a criar o novo arquivo,
+                    // pois File.WriteAllTextAsync irá sobrescrever o conteúdo.
+                }
+            }
+
             await File.WriteAllTextAsync(CachePath, obj.ToString());
         }
 
