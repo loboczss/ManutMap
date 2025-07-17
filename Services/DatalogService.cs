@@ -117,7 +117,8 @@ namespace ManutMap.Services
                 ["lastUpdateInst"] = _cacheDateInst,
                 ["lastUpdateManut"] = _cacheDateManut,
                 ["foldersInst"] = JObject.FromObject(_cacheInst),
-                ["foldersManut"] = JObject.FromObject(_cacheManut)
+                ["foldersManut"] = JObject.FromObject(_cacheManut),
+                ["folderCount"] = _cacheInst.Count + _cacheManut.Count
             };
 
             if (File.Exists(CachePath))
@@ -390,6 +391,7 @@ namespace ManutMap.Services
                         MergeFolders(name, url, isInst);
                         driveUpdated = true;
                         if (isInst) updatedInst = true; else updatedManut = true;
+                        await SaveCacheAsync();
                     }
                     if (driveUpdated)
                         await SaveCacheAsync();
