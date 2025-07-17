@@ -541,27 +541,38 @@ namespace ManutMap.Services
         private async Task<Dictionary<string, string>> GetInstalacaoRotaMapAsync(string driveId)
         {
             var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
             try
             {
                 using var st = await _graph.Drives[driveId].Root.ItemWithPath(InstalacaoJsonName).Content.GetAsync();
                 using var sr = new StreamReader(st, Encoding.UTF8);
                 var root = JToken.Parse(await sr.ReadToEndAsync());
 
-                foreach (var obj in root.DescendantsAndSelf().OfType<JObject>())
+                // Só usamos DescendantsAndSelf() se for um JContainer
+                if (root is JContainer container)
                 {
-                    string id = obj.Value<string>("IDSERVICOSCONJ")?.Trim() ?? string.Empty;
-                    string rota = obj.Value<string>("ROTA")?.Trim() ?? string.Empty;
-                    if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(rota) && !dict.ContainsKey(id))
-                        dict[id] = rota;
+                    foreach (var obj in container.DescendantsAndSelf().OfType<JObject>())
+                    {
+                        string id = obj.Value<string>("IDSERVICOSCONJ")?.Trim() ?? string.Empty;
+                        string rota = obj.Value<string>("ROTA")?.Trim() ?? string.Empty;
+
+                        if (!string.IsNullOrEmpty(id) &&
+                            !string.IsNullOrEmpty(rota) &&
+                            !dict.ContainsKey(id))
+                        {
+                            dict[id] = rota;
+                        }
+                    }
                 }
             }
             catch
             {
-                // Ignored - return empty map on failure
+                // Ignorado — retorna dicionário vazio em caso de erro
             }
 
             return dict;
         }
+
 
         public async Task<Dictionary<string, string>> GetAllDatalogFoldersAsync(IProgress<(int Percent, string Message)>? progress = null,
                                                                                IProgress<int>? folderProgress = null)
