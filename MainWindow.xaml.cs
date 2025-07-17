@@ -317,9 +317,23 @@ namespace ManutMap
                 UpdateProgress(p.Percent, p.Message);
             });
             ShowProgress();
-            await SyncAndRefresh(progress);
-            HideProgress();
-            SyncButton.IsEnabled = true;
+            try
+            {
+                await SyncAndRefresh(progress);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Erro ao sincronizar:\n" + ex.Message,
+                    "Erro",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                HideProgress();
+                SyncButton.IsEnabled = true;
+            }
         }
 
         private void ShowProgress()
