@@ -138,6 +138,8 @@ namespace ManutMap.Services
 
         private static void AddFolderKeys(IDictionary<string, string> dict, string name, string url)
         {
+            bool isInst = IsInstalacaoFolder(name);
+
             dict[name] = url;
 
             string? osKey = null;
@@ -151,22 +153,44 @@ namespace ManutMap.Services
                     osKey = m.Groups[2].Value + m.Groups[1].Value;
             }
             if (!string.IsNullOrEmpty(osKey))
-                dict.TryAdd(osKey, url);
+            {
+                if (isInst)
+                    dict[osKey] = url;
+                else
+                    dict.TryAdd(osKey, url);
+            }
 
             int idx = name.IndexOf('_');
             if (idx > 0)
             {
                 string prefix = name[..idx];
-                dict.TryAdd(prefix, url);
+                if (isInst)
+                    dict[prefix] = url;
+                else
+                    dict.TryAdd(prefix, url);
 
                 if (idx == name.Length - 1)
-                    dict.TryAdd(prefix.TrimEnd('_'), url);
+                {
+                    string trimmed = prefix.TrimEnd('_');
+                    if (isInst)
+                        dict[trimmed] = url;
+                    else
+                        dict.TryAdd(trimmed, url);
+                }
             }
 
             foreach (Match m2 in OsDigitsRegex.Matches(name))
             {
-                dict.TryAdd(m2.Value, url);
-                dict.TryAdd(m2.Groups[1].Value, url);
+                if (isInst)
+                {
+                    dict[m2.Value] = url;
+                    dict[m2.Groups[1].Value] = url;
+                }
+                else
+                {
+                    dict.TryAdd(m2.Value, url);
+                    dict.TryAdd(m2.Groups[1].Value, url);
+                }
             }
         }
 
