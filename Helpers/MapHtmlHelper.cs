@@ -79,6 +79,8 @@ namespace ManutMap.Helpers
           coord = item.LATLON;
         else if(latLonField === 'LATLONCON')
           coord = item.LATLONCON;
+        else if(latLonField === 'LATLONCONF')
+          coord = item.LATLONCONF;
 
         if (!coord || coord.trim() === '') return;
 
@@ -166,6 +168,8 @@ namespace ManutMap.Helpers
           coord = item.LATLON;
         else if(latLonField === 'LATLONCON')
           coord = item.LATLONCON;
+        else if(latLonField === 'LATLONCONF')
+          coord = item.LATLONCONF;
         if(!coord || coord.trim() === '') return;
 
         var coordStr = coord.trim();
@@ -239,6 +243,8 @@ namespace ManutMap.Helpers
           coord = item.LATLON;
         else if(latLonField === 'LATLONCON')
           coord = item.LATLONCON;
+        else if(latLonField === 'LATLONCONF')
+          coord = item.LATLONCONF;
         if(!coord || coord.trim() === '') return;
 
         var coordStr = coord.trim();
@@ -310,6 +316,8 @@ namespace ManutMap.Helpers
           coord = item.LATLON;
         else if(latLonField === 'LATLONCON')
           coord = item.LATLONCON;
+        else if(latLonField === 'LATLONCONF')
+          coord = item.LATLONCONF;
         if(!coord || coord.trim() === '') return;
 
         var coordStr = coord.trim();
@@ -406,6 +414,8 @@ namespace ManutMap.Helpers
           coord = item.LATLON;
         else if(latLonField === 'LATLONCON')
           coord = item.LATLONCON;
+        else if(latLonField === 'LATLONCONF')
+          coord = item.LATLONCONF;
         if(!coord || coord.trim() === '') return;
 
         var coordStr = coord.trim();
@@ -483,6 +493,8 @@ namespace ManutMap.Helpers
           coord = item.LATLON;
         else if(latLonField === 'LATLONCON')
           coord = item.LATLONCON;
+        else if(latLonField === 'LATLONCONF')
+          coord = item.LATLONCONF;
         if(!coord || coord.trim() === '') return;
 
         var coordStr = coord.trim();

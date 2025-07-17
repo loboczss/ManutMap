@@ -122,6 +122,8 @@ namespace ManutMap
             ChbClosed.Unchecked += FiltersChanged;
             ChbOnlyDatalog.Checked += FiltersChanged;
             ChbOnlyDatalog.Unchecked += FiltersChanged;
+            ChbOnlyInst.Checked += FiltersChanged;
+            ChbOnlyInst.Unchecked += FiltersChanged;
             ColorOpenCombo.SelectionChanged += FiltersChanged;
             ColorClosedCombo.SelectionChanged += FiltersChanged;
             ChbColorPrev.Checked += FiltersChanged;
@@ -342,6 +344,7 @@ namespace ManutMap
                 LatLonField = (LatLonFieldCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "LATLON",
                 MarkerStyle = (MarkerStyleCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "circle",
                 OnlyDatalog = ChbOnlyDatalog.IsChecked == true,
+                OnlyInstalacao = ChbOnlyInst.IsChecked == true,
                 UseClusters = ChbCluster.IsChecked != false,
                 SingleClientMarker = ChbSingleClient.IsChecked == true,
                 PrazoDias = int.TryParse(PrazoDiasTextBox.Text, out var pd) ? pd : 0,
@@ -724,6 +727,7 @@ namespace ManutMap
             ChbOpen.IsChecked = true;
             ChbClosed.IsChecked = true;
             ChbOnlyDatalog.IsChecked = false;
+            ChbOnlyInst.IsChecked = false;
 
             ColorOpenCombo.SelectedIndex = 0;
             ColorClosedCombo.SelectedIndex = 0;
