@@ -228,8 +228,9 @@ namespace ManutMap
         {
             var regionalSel = (EmpresaFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
             if (IsInstalacaoSelected())
-
             {
+                var empresaSel = (EmpresaFilterCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Todos";
+
                 var rotas = _instalList
                     .OfType<JObject>()
                     .Where(o => empresaSel == "Todos" ||
@@ -242,6 +243,7 @@ namespace ManutMap
 
                 PopulateComboBox(RotaFilterCombo, rotas.Distinct());
             }
+
             else
             {
                 if (regionalSel == "Todos")
