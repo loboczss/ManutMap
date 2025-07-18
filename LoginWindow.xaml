@@ -66,7 +66,6 @@
                        Foreground="Red" 
                        Margin="0,5,0,10"
                        MinHeight="20"/>
-
             <Button x:Name="LoginButton" 
                     Content="Entrar" 
                     Style="{StaticResource ModernButton}" 
