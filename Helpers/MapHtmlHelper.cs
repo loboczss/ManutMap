@@ -153,7 +153,7 @@ namespace ManutMap.Helpers
       }
     }
 
-    function addMarkersSelective(data, showOpen, showClosed, colorOpen, colorClosed, colorPrev, colorCorr, colorServ, doPrev, doCorr, doServ, latLonField){
+    function addMarkersSelective(data, showOpen, showClosed, colorOpen, colorClosed, colorPrev, colorCorr, colorServ, doPrev, doCorr, doServ, doDat, colorDat, latLonField){
       clearMarkers();
 
       data.forEach(function(item){
@@ -180,17 +180,18 @@ namespace ManutMap.Helpers
         if(isNaN(lat) || isNaN(lng)) return;
 
         var tipo = (item.TIPO || '').toString().trim().toLowerCase();
+        var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var color = isOpen ? colorOpen : colorClosed;
         if(tipo === 'preventiva' && doPrev) color = colorPrev;
         else if(tipo === 'corretiva' && doCorr) color = colorCorr;
         else if(tipo !== 'preventiva' && tipo !== 'corretiva' && doServ) color = colorServ;
+        if(temDat && doDat) color = colorDat;
 
         var m = L.circleMarker([lat,lng],{
           radius:6, fillColor:color, color:'#fff', weight:1.2, fillOpacity:0.9
         });
         markerGroup.addLayer(m);
 
-        var temDat = item.TemDatalog || item.TEMDATALOG || false;
         var datUrl = item.FolderUrl || item.FOLDERURL || '';
         var descExec = item.DESCADICIONALEXEC || '';
         var prevUlt = item.PREV_ULTIMA ? fmtDate(item.PREV_ULTIMA) : "";
@@ -559,6 +560,8 @@ namespace ManutMap.Helpers
                                              bool colorPrevOn,
                                              bool colorCorrOn,
                                              bool colorServOn,
+                                             bool colorDatalogOn,
+                                             string colorDatalog,
                                              string latLonField,
                                              bool iconByTipo = false,
                                              string? customIcon = null,
@@ -572,7 +575,7 @@ namespace ManutMap.Helpers
             else if(iconByTipo)
                 call = $"addMarkersByTipoServicoIcon(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{latLonField}');";
             else
-                call = $"addMarkersSelective(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorOpen}','{colorClosed}','{colorPrev}','{colorCorr}','{colorServ}',{colorPrevOn.ToString().ToLower()},{colorCorrOn.ToString().ToLower()},{colorServOn.ToString().ToLower()},'{latLonField}');";
+                call = $"addMarkersSelective(data,{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()},'{colorOpen}','{colorClosed}','{colorPrev}','{colorCorr}','{colorServ}',{colorPrevOn.ToString().ToLower()},{colorCorrOn.ToString().ToLower()},{colorServOn.ToString().ToLower()},{colorDatalogOn.ToString().ToLower()},'{colorDatalog}','{latLonField}');";
             var script = $"<script>var data = {json};window.onload=function(){{setClustering({useClusters.ToString().ToLower()});{call}}}</script>";
             return baseHtml.Replace("</body></html>", script + "</body></html>");
         }

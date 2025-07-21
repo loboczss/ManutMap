@@ -150,9 +150,12 @@ namespace ManutMap
             ChbColorCorr.Unchecked += FiltersChanged;
             ChbColorServ.Checked += FiltersChanged;
             ChbColorServ.Unchecked += FiltersChanged;
+            ChbColorDatalog.Checked += FiltersChanged;
+            ChbColorDatalog.Unchecked += FiltersChanged;
             ColorTipoPrevCombo.SelectionChanged += FiltersChanged;
             ColorTipoCorrCombo.SelectionChanged += FiltersChanged;
             ColorTipoServCombo.SelectionChanged += FiltersChanged;
+            ColorDatalogCombo.SelectionChanged += FiltersChanged;
             MarkerStyleCombo.SelectionChanged += FiltersChanged;
             ChbSingleClient.Checked += FiltersChanged;
             ChbSingleClient.Unchecked += FiltersChanged;
@@ -480,6 +483,8 @@ namespace ManutMap
                 ColorServicoPreventiva = (ColorTipoPrevCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#0000FF",
                 ColorServicoCorretiva = (ColorTipoCorrCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#FFA500",
                 ColorServicoOutros = (ColorTipoServCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#008080",
+                ColorDatalogOn = ChbColorDatalog.IsChecked == true,
+                ColorDatalog = (ColorDatalogCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "#800080",
                 LatLonField =
                     IsInstalacaoSelected()
                         ? "LATLONCONF"
@@ -527,6 +532,8 @@ namespace ManutMap
                                                 criteria.ColorPrevOn,
                                                 criteria.ColorCorrOn,
                                                 criteria.ColorServOn,
+                                                criteria.ColorDatalogOn,
+                                                criteria.ColorDatalog,
                                                 criteria.LatLonField);
             }
             else if (_iconUrls.TryGetValue(criteria.MarkerStyle, out var iconUrl))
@@ -550,6 +557,8 @@ namespace ManutMap
                                                 criteria.ColorPrevOn,
                                                 criteria.ColorCorrOn,
                                                 criteria.ColorServOn,
+                                                criteria.ColorDatalogOn,
+                                                criteria.ColorDatalog,
                                                 criteria.LatLonField);
             }
 
@@ -885,10 +894,12 @@ namespace ManutMap
             ChbColorPrev.IsChecked = false;
             ChbColorCorr.IsChecked = false;
             ChbColorServ.IsChecked = false;
+            ChbColorDatalog.IsChecked = false;
 
             ColorTipoPrevCombo.SelectedIndex = 0;
             ColorTipoCorrCombo.SelectedIndex = 0;
             ColorTipoServCombo.SelectedIndex = 0;
+            ColorDatalogCombo.SelectedIndex = 0;
 
             MarkerStyleCombo.SelectedIndex = 0;
             LatLonFieldCombo.SelectedIndex = 0;

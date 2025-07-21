@@ -72,13 +72,16 @@ namespace ManutMap.Services
                                          bool colorPrevOn,
                                          bool colorCorrOn,
                                          bool colorServOn,
+                                         bool colorDatalogOn,
+                                         string colorDatalog,
                                          string latLonField = "LATLON")
         {
             var json = JsonConvert.SerializeObject(data);
             var script =
                 $"addMarkersSelective({json},{showOpen.ToString().ToLower()},{showClosed.ToString().ToLower()}," +
                 $"'{colorOpen}','{colorClosed}','{colorPrev}','{colorCorr}','{colorServ}'," +
-                $"{colorPrevOn.ToString().ToLower()},{colorCorrOn.ToString().ToLower()},{colorServOn.ToString().ToLower()},'{latLonField}');";
+                $"{colorPrevOn.ToString().ToLower()},{colorCorrOn.ToString().ToLower()},{colorServOn.ToString().ToLower()}," +
+                $"{colorDatalogOn.ToString().ToLower()},'{colorDatalog}','{latLonField}');";
 
             if (!_ready)
                 _pendingScripts.Add(script);
