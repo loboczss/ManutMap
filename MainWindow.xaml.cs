@@ -850,6 +850,8 @@ namespace ManutMap
                                                                 criteria.ColorPrevOn,
                                                                 criteria.ColorCorrOn,
                                                                 criteria.ColorServOn,
+                                                                criteria.ColorDatalogOn,
+                                                                criteria.ColorDatalog,
                                                                 criteria.LatLonField,
                                                                 false,
                                                                 icon,
