@@ -532,6 +532,7 @@
                                     <CheckBox x:Name="ChbColorPrev" Content="Colorir por Preventiva" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                     <CheckBox x:Name="ChbColorCorr" Content="Colorir por Corretiva" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
                                     <CheckBox x:Name="ChbColorServ" Content="Colorir por Serviços" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
+                                    <CheckBox x:Name="ChbColorDatalog" Content="Colorir Datalog" Margin="0,10,0,0" Checked="FiltersChanged" Unchecked="FiltersChanged"/>
 
                                     <Separator Margin="0,10,0,15"/>
 
@@ -593,6 +594,15 @@
                                         <TextBlock Text="Cor Serviços:" Style="{StaticResource LabelStyle}"/>
                                         <ComboBox x:Name="ColorTipoServCombo" SelectionChanged="FiltersChanged" Width="120">
                                             <ComboBoxItem Content="Teal" Tag="#008080" IsSelected="True"/>
+                                            <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
+                                            <ComboBoxItem Content="Verde" Tag="#008000"/>
+                                            <ComboBoxItem Content="Azul" Tag="#0000FF"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Margin="0,0,0,15">
+                                        <TextBlock Text="Cor Datalog:" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="ColorDatalogCombo" SelectionChanged="FiltersChanged" Width="120">
+                                            <ComboBoxItem Content="Roxo" Tag="#800080" IsSelected="True"/>
                                             <ComboBoxItem Content="Vermelho" Tag="#FF0000"/>
                                             <ComboBoxItem Content="Verde" Tag="#008000"/>
                                             <ComboBoxItem Content="Azul" Tag="#0000FF"/>
