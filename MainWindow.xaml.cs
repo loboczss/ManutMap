@@ -1191,7 +1191,7 @@ namespace ManutMap
                     ["CONCLUSAO"] = obj["CONCLUSAO"],
                     ["EMPRESA"] = obj["EMPRESA"],
                     ["TIPO"] = "INSTALACAO",
-                    ["TIPODESIGFI"] = "INSTALACAO"
+                    ["TIPODESIGFI"] = obj["TIPODESIGFI"] ?? "INSTALACAO"
                 };
 
                 _manutList.Add(novo);
